@@ -1,0 +1,11 @@
+[Protocol]
+exec=gobyte-qt '%u'
+protocol=gobyte
+input=none
+output=none
+helper=true
+listing=
+reading=false
+writing=false
+makedir=false
+deleting=false

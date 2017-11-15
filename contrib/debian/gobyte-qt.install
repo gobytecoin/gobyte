@@ -1,0 +1,6 @@
+usr/local/bin/gobyte-qt usr/bin
+share/pixmaps/gobyte32.xpm usr/share/pixmaps
+share/pixmaps/gobyte16.xpm usr/share/pixmaps
+share/pixmaps/gobyte128.png usr/share/pixmaps
+debian/gobyte-qt.desktop usr/share/applications
+debian/gobyte-qt.protocol usr/share/kde4/services/

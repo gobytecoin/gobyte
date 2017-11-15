@@ -1,0 +1,22 @@
+[Unit]
+Description=GoByte's distributed currency daemon
+After=network.target
+
+[Service]
+User=gobytecore
+Group=gobytecore
+
+Type=forking
+PIDFile=/var/lib/gobyted/gobyted.pid
+ExecStart=/usr/bin/gobyted -daemon -pid=/var/lib/gobyted/gobyted.pid \
+-conf=/etc/gobytecore/gobyte.conf -datadir=/var/lib/gobyted -disablewallet
+
+Restart=always
+PrivateTmp=true
+TimeoutStopSec=60s
+TimeoutStartSec=2s
+StartLimitInterval=120s
+StartLimitBurst=5
+
+[Install]
+WantedBy=multi-user.target

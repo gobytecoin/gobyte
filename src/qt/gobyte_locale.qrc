@@ -1,0 +1,20 @@
+<!DOCTYPE RCC><RCC version="1.0">
+    <qresource prefix="/translations">
+        <file alias="bg">locale/gobyte_bg.qm</file>
+        <file alias="de">locale/gobyte_de.qm</file>
+        <file alias="en">locale/gobyte_en.qm</file>
+        <file alias="es">locale/gobyte_es.qm</file>
+        <file alias="fi">locale/gobyte_fi.qm</file>
+        <file alias="fr">locale/gobyte_fr.qm</file>
+        <file alias="it">locale/gobyte_it.qm</file>
+        <file alias="ja">locale/gobyte_ja.qm</file>
+        <file alias="pl">locale/gobyte_pl.qm</file>
+        <file alias="pt">locale/gobyte_pt.qm</file>
+        <file alias="ru">locale/gobyte_ru.qm</file>
+        <file alias="sk">locale/gobyte_sk.qm</file>
+        <file alias="sv">locale/gobyte_sv.qm</file>
+        <file alias="vi">locale/gobyte_vi.qm</file>
+        <file alias="zh_CN">locale/gobyte_zh_CN.qm</file>
+        <file alias="zh_TW">locale/gobyte_zh_TW.qm</file>
+    </qresource>
+</RCC>
