@@ -785,7 +785,7 @@ QWidget .QFrame#frame .QLabel#label_5 { /* Wallet Label */
 qproperty-alignment: 'AlignVCenter | AlignRight';
 min-width:160px;
 background-color:transparent;
-color:#f4f4f5;
+color:#999;
 margin-right:5px;
 padding-right:5px;
 }
