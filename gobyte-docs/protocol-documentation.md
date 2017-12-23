@@ -27,7 +27,7 @@ Bitcoin Input https://bitcoin.org/en/glossary/input
 
 | Field Size | Field Name | Data type | Description |
 | ---------- | ----------- | --------- | -------- |
-| 36 | prevout | COutPoint | The previous output from an existing transaction, in the form of an unspent output
+| 36 | prevout | [COutPoint](#coutpoint) | The previous output from an existing transaction, in the form of an unspent output
 | 1+ | script length | var_int | The length of the signature script
 | ? | script | CScript | The script which is validated for this input to be spent
 | 4 | nSequence | uint_32t | Transaction version as defined by the sender. Intended for "replacement" of transactions when information is updated before inclusion into a block.
@@ -41,6 +41,17 @@ Bitcoin Output https://bitcoin.org/en/glossary/output
 | 8 | nValue | int64_t | Transfered value
 | ? | scriptPubKey | CScript | The script for indicating what conditions must be fulfilled for this output to be further spent
 
+### CTransaction
+
+| Field Size | Field Name | Data type | Description |
+| ---------- | ----------- | --------- | -------- |
+| 4 | nVersion | int32_t | Transaction data format version
+| 1+ | tx_in count | var_int | Number of Transaction inputs
+| 41+ | vin | [CTxIn](#ctxin) | A list of 1 or more transaction inputs
+| 1+ | tx_out count | var_int | Number of Transaction outputs
+| 9+ | vout | [CTxOut](#ctxout) | A list of 1 or more transaction outputs
+| 4 | nLockTime | uint32_t | The block number or timestamp at which this transaction is unlocked
+
 ### CPubKey
 
 Bitcoin Public Key https://bitcoin.org/en/glossary/public-key
@@ -48,6 +59,13 @@ Bitcoin Public Key https://bitcoin.org/en/glossary/public-key
 | Field Size | Field Name | Data type | Description |
 | ---------- | ----------- | --------- | -------- |
 | 33-65 | vch | char[] | The public portion of a keypair which can be used to verify signatures made with the private portion of the keypair.
+
+### CService
+
+| Field Size | Field Name | Data type | Description |
+| ---------- | ----------- | --------- | -------- |
+| 16 | IP | CNetAddr | IP Address
+| 2 | Port | uint16 | IP Port
 
 ## Message Types
 
@@ -59,11 +77,11 @@ Whenever a masternode comes online or a client is syncing, they will send this m
 
 | Field Size | Field Name | Data type | Description |
 | ---------- | ----------- | --------- | -------- |
-| 41 | vin | CTxIn | The unspent output which is holding 1000 GBX
-| # | addr | CService | Address of the main 1000 GBX unspent output
-| 33-65 | pubKeyCollateralAddress | CPubKey | CPubKey of the main 1000 GBX unspent output
-| 33-65 | pubKeyMasternode | CPubKey | CPubKey of the secondary signing key (For all other messaging other than announce message)
-| 71-73 | sig | char[] | Signature of this message
+| 41 | vin | [CTxIn](#ctxin) | The unspent output which is holding 1000 GBX
+| # | addr | [CService](#cservice) | IPv4 address of the masternode
+| 33-65 | pubKeyCollateralAddress | [CPubKey](#cpubkey) | CPubKey of the main 1000 GBX unspent output
+| 33-65 | pubKeyMasternode | [CPubKey](#cpubkey) | CPubKey of the secondary signing key (For all other messaging other than announce message)
+| 71-73 | sig | char[] | Signature of this message (verifiable via pubKeyCollateralAddress)
 | 8 | sigTime | int64_t | Time which the signature was created
 | 4 | nProtocolVersion | int | The protocol version of the masternode
 | # | lastPing | CMasternodePing | The last known ping of the masternode
@@ -77,7 +95,7 @@ Every few minutes, masternodes ping the network with a message that propagates t
 
 | Field Size | Field Name | Data type | Description |
 | ---------- | ----------- | --------- | -------- |
-| 41 | vin | CTxIn | The unspent output of the masternode which is signing the message
+| 41 | vin | [CTxIn](#ctxin) | The unspent output of the masternode which is signing the message
 | 32 | blockHash | uint256 | Current chaintip blockhash minus 12
 | 8 | sigTime | int64_t | Signature time for this ping
 | 71-73 | vchSig | char[] | Signature of this message by masternode (verifiable via pubKeyMasternode)
@@ -90,7 +108,7 @@ When a new block is found on the network, a masternode quorum will be determined
 
 | Field Size | Field Name | Data type | Description |
 | ---------- | ----------- | --------- | -------- |
-| 41 | vinMasternode | CTxIn | The unspent output of the masternode which is signing the message
+| 41 | vinMasternode | [CTxIn](#ctxin) | The unspent output of the masternode which is signing the message
 | 4 | nBlockHeight | int | The blockheight which the payee should be paid
 | ? | payeeAddress | CScript | The address to pay to
 | 71-73 | sig | char[] | Signature of the masternode which is signing the message
@@ -103,8 +121,8 @@ Masternodes can broadcast subsidised transactions without fees for the sake of s
 
 | Field Size | Field Name | Data type | Description |
 | ---------- | ----------- | --------- | -------- |
-| # | tx | CTransaction | The transaction
-| 41 | vin | CTxIn | Masternode unspent output
+| # | tx | [CTransaction](#ctransaction) | The transaction
+| 41 | vin | [CTxIn](#ctxin) | Masternode unspent output
 | 71-73 | vchSig | char[] | Signature of this message by masternode (verifiable via pubKeyMasternode)
 | 8 | sigTime | int64_t | Time this message was signed
 
@@ -129,7 +147,7 @@ Asks users to sign final mixing tx message.
 | Field Size | Field Name | Data type | Description |
 | ---------- | ----------- | --------- | -------- |
 | 4 | nDenom | int | Which denomination is allowed in this mixing session
-| 41 | vin | CTxIn | unspend output from masternode which is hosting this session
+| 41 | vin | [CTxIn](#ctxin) | unspend output from masternode which is hosting this session
 | 4 | nTime | int | the time this DSQ was created
 | 4 | fReady | int | if the mixing pool is ready to be executed
 | 71-73 | vchSig | char[] | Signature of this message by masternode (verifiable via pubKeyMasternode)
@@ -151,10 +169,10 @@ When queue is ready user is expected to send his entry to start actual mixing
 
 | Field Size | Field Name | Data type | Description |
 | ---------- | ----------- | --------- | -------- |
-| ? | vecTxDSIn | CTxDSIn[] | vector of users inputs (CTxDSIn serialization is equal to CTxIn serialization)
+| ? | vecTxDSIn | CTxDSIn[] | vector of users inputs (CTxDSIn serialization is equal to [CTxIn](#ctxin) serialization)
 | 8 | nAmount | int64_t | depreciated since 12.1, it's used for backwards compatibility only and can be removed with future protocol bump
-| ? | txCollateral | CTransaction | Collateral transaction which is used to prevent misbehavior and also to charge fees randomly
-| ? | vecTxDSOut | CTxDSOut[] | vector of user outputs (CTxDSOut serialization is equal to CTxOut serialization)
+| ? | txCollateral | [CTransaction](#ctransaction) | Collateral transaction which is used to prevent misbehavior and also to charge fees randomly
+| ? | vecTxDSOut | CTxDSOut[] | vector of user outputs (CTxDSOut serialization is equal to [CTxOut](#ctxout) serialization)
 
 ### DSSIGNFINALTX - "dss"
 
@@ -162,14 +180,14 @@ User's signed inputs for a group transaction in a mixing session
 
 | Field Size | Field Name | Data type | Description |
 | ---------- | ----------- | --------- | -------- |
-| # | inputs | CTxIn[] | signed inputs for mixing session
+| # | inputs | [CTxIn](#ctxin)[] | signed inputs for mixing session
 
 
 ### TXLOCKREQUEST - "ix"
 
 CTxLockRequest
 
-Transaction Lock Request, serialization is the same as for CTransaction.
+Transaction Lock Request, serialization is the same as for [CTransaction](#ctransaction).
 
 ### TXLOCKVOTE - "txlvote"
 
@@ -180,8 +198,8 @@ Transaction Lock Vote
 | Field Size | Field Name | Data type | Description |
 | ---------- | ----------- | --------- | -------- |
 | 32 | txHash | uint256 | txid of the transaction to lock
-| 36 | outpoint | COutPoint | The utxo to lock in this transaction
-| 36 | outpointMasternode | COutPoint | The utxo of the masternode which is signing the vote
+| 36 | outpoint | [COutPoint](#coutpoint) | The utxo to lock in this transaction
+| 36 | outpointMasternode | [COutPoint](#coutpoint) | The utxo of the masternode which is signing the vote
 | 71-73 | vchMasternodeSignature | char[] | Signature of this message by masternode (verifiable via pubKeyMasternode)
 
 ### MNGOVERNANCEOBJECT - "govobj"
@@ -198,8 +216,8 @@ A proposal, contract or setting.
 | 32 | nCollateralHash | uint256 | Hash of the collateral fee transaction
 | 0-16384 | strData | string | Data field - can be used for anything
 | 4 | nObjectType | int | ????
-| 41 | vinMasternode | CTxIn | Unspent output for the masternode which is signing this object
-| 71-73 | vchSig | char[] | Signature of the masternode
+| 41 | vinMasternode | [CTxIn](#ctxin) | Unspent output for the masternode which is signing this object
+| 66* | vchSig | char[] | Signature of the masternode (unclear if 66 is the correct size, but this is what it appears to be in most cases)
 
 ### MNGOVERNANCEOBJECTVOTE - "govobjvote"
 
@@ -209,9 +227,122 @@ Masternodes use governance voting in response to new proposals, contracts, setti
 
 | Field Size | Field Name | Data type | Description |
 | ---------- | ----------- | --------- | -------- |
-| 41+ | vinMasternode | CTxIn | Unspent output for the masternode which is voting
+| 41+ | vinMasternode | [CTxIn](#ctxin) | Unspent output for the masternode which is voting
 | 32 | nParentHash | uint256 | Object which we're voting on (proposal, contract, setting or final budget)
 | 4 | nVoteOutcome | int | ???
 | 4 | nVoteSignal | int | ???
 | 8 | nTime | int64_t | Time which the vote was created
-| 71-73 | vchSig | char[] | Signature of the masternode
+| 66* | vchSig | char[] | Signature of the masternode (unclear if 66 is the correct size, but this is what it appears to be in most cases)
+
+### SPORK - "spork"
+
+Spork
+
+Spork
+
+| Field Size | Field Name | Data type | Description |
+| ---------- | ----------- | --------- | -------- |
+| 4 | nSporkID | int |
+| 8 | nValue | int64_t |
+| 8 | nTimeSigned | int64_t |
+| 66* | vchSig | char[] | Unclear if 66 is the correct size, but this is what it appears to be in most cases
+
+#### Defined Sporks (per src/sporks.h)
+
+| Spork ID | Number | Name | Description |
+| ---------- | ---------- | ----------- | ----------- |
+| 10001 | 2 | INSTANTSEND_ENABLED | Turns on and off InstantSend network wide
+| 10002 | 3 | INSTANTSEND_BLOCK_FILTERING | Turns on and off InstantSend block filtering
+| 10004 | 5 | INSTANTSEND_MAX_VALUE | Controls the max value for an InstantSend transaction (currently 2000 gobyte)
+| 10007 | 8 | MASTERNODE_PAYMENT_ENFORCEMENT | Requires masternodes to be paid by miners when blocks are processed
+| 10008 | 9 | SUPERBLOCKS_ENABLED | Superblocks are enabled (the 10% comes to fund the gobyte treasury)
+| 10009 | 10 | MASTERNODE_PAY_UPDATED_NODES | Only current protocol version masternode's will be paid (not older nodes)
+| 10011 | 12 | RECONSIDER_BLOCKS |
+| 10012 | 13 | OLD_SUPERBLOCK_FLAG |
+| 10013 | 14 | REQUIRE_SENTINEL_FLAG | Only masternode's running sentinel will be paid
+
+## Undocumented messages
+
+### MASTERNODEPAYMENTBLOCK - "mnwb"
+
+Masternode Payment Block
+
+*NOTE: Per src/protocol.cpp, there is no message for this (only inventory)*
+
+### MNVERIFY - "mnv"
+
+Masternode Verify
+
+| Field Size | Field Name | Data type | Description |
+| ---------- | ----------- | --------- | -------- |
+| 41 | vin1 | [CTxIn](#ctxin) | The unspent output which is holding 1000 GBX for masternode 1
+| 41 | vin2 | [CTxIn](#ctxin) | The unspent output which is holding 1000 GBX for masternode 2
+| # | addr | [CService](#cservice) | IPv4 address / port of the masternode
+| 4 | nonce | int | Nonce
+| 4 | nBlockHeight | int | The blockheight
+| 66* | vchSig1 | char[] | Signature of by masternode 1 (unclear if 66 is the correct size, but this is what it appears to be in most cases)
+| 66* | vchSig2 | char[] | Signature of by masternode 2 (unclear if 66 is the correct size, but this is what it appears to be in most cases)
+
+### DSFINALTX - "dsf"
+
+Darksend Final Transaction
+
+| Field Size | Field Name | Data type | Description |
+| ---------- | ----------- | --------- | -------- |
+| 4 | nSessionID | int |
+| # | txFinal | [CTransaction](#ctransaction) | Final mixing transaction
+
+### DSCOMPLETE - "dsc"
+
+Darksend Complete
+
+| Field Size | Field Name | Data type | Description |
+| ---------- | ----------- | --------- | -------- |
+| 4 | nSessionID | int |
+| 4 | nMessageID | int |
+
+### MNGOVERNANCESYNC - "govsync"
+
+Governance Sync
+
+| Field Size | Field Name | Data type | Description |
+| ---------- | ----------- | --------- | -------- |
+| 32 | nHash | uint256 |
+| # | filter | CBloomFilter |
+
+### DSEG - "dseg"
+
+Masternode List/Entry Sync
+
+Get Masternode list or specific entry
+
+| Field Size | Field Name | Data type | Description |
+| ---------- | ----------- | --------- | -------- |
+| 41 | vin | [CTxIn](#ctxin) | The unspent output which is holding 1000 GBX
+
+### SYNCSTATUSCOUNT - "ssc"
+
+Sync Status Count
+
+| Field Size | Field Name | Data type | Description |
+| ---------- | ----------- | --------- | -------- |
+| 4 | nItemID | int | Masternode Sync Item ID
+| 4 | nCount | int | Masternode Sync Count
+
+#### Defined Sync Item IDs (per src/masternode-sync.h)
+
+| Item ID | Name | Description |
+| ---------- | ---------- | ----------- |
+| 2 | MASTERNODE_SYNC_LIST |
+| 3 | MASTERNODE_SYNC_MNW |
+| 4 | MASTERNODE_SYNC_GOVERNANCE |
+| 10 | MASTERNODE_SYNC_GOVOBJ |
+| 11 | MASTERNODE_SYNC_GOVOBJ_VOTE |
+
+### MASTERNODEPAYMENTSYNC - "mnget"
+
+Masternode Payment Sync
+
+| Field Size | Field Name | Data type | Description |
+| ---------- | ----------- | --------- | -------- |
+| 4 | nMnCount | int |

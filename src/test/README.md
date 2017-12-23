@@ -27,9 +27,8 @@ example, to run just the getarg_tests verbosely:
 
     test_gobyte --log_level=all --run_test=getarg_tests
 
-... or to run just the doublegobyte test:
+... or to run just the doubledash test:
 
-    test_gobyte --run_test=getarg_tests/doublegobyte
+    test_gobyte --run_test=getarg_tests/doubledash
 
 Run  test_gobyte --help   for the full list.
-

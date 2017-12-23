@@ -30,7 +30,7 @@
 
   <key>CFBundleExecutable</key>
   <string>GoByte-Qt</string>
-  
+
   <key>CFBundleName</key>
   <string>GoByte-Qt</string>
 
@@ -71,7 +71,7 @@
         <string>application/x-gobyte-payment-request</string>
         <key>public.filename-extension</key>
         <array>
-          <string>gobytecoinmentrequest</string>
+          <string>gobytepaymentrequest</string>
         </array>
       </dict>
     </dict>
@@ -99,7 +99,7 @@
 
   <key>LSAppNapIsDisabled</key>
     <string>True</string>
-  
+
   <key>LSApplicationCategoryType</key>
     <string>public.app-category.finance</string>
 </dict>

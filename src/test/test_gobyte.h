@@ -1,5 +1,5 @@
-#ifndef BITCOIN_TEST_TEST_GBX_H
-#define BITCOIN_TEST_TEST_GBX_H
+#ifndef BITCOIN_TEST_TEST_GOBYTE_H
+#define BITCOIN_TEST_TEST_GOBYTE_H
 
 #include "chainparamsbase.h"
 #include "key.h"
@@ -24,10 +24,12 @@ struct BasicTestingSetup {
  * Included are data directory, coins database, script check threads
  * and wallet (if enabled) setup.
  */
+class CConnman;
 struct TestingSetup: public BasicTestingSetup {
     CCoinsViewDB *pcoinsdbview;
     boost::filesystem::path pathTemp;
     boost::thread_group threadGroup;
+    CConnman* connman;
 
     TestingSetup(const std::string& chainName = CBaseChainParams::MAIN);
     ~TestingSetup();
@@ -73,7 +75,7 @@ struct TestMemPoolEntryHelper
     TestMemPoolEntryHelper() :
         nFee(0), nTime(0), dPriority(0.0), nHeight(1),
         hadNoDependencies(false), spendsCoinbase(false), sigOpCount(1) { }
-    
+
     CTxMemPoolEntry FromTx(CMutableTransaction &tx, CTxMemPool *pool = NULL);
 
     // Change the default value

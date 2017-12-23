@@ -3,8 +3,10 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include "darksend.h"
-#include "main.h"
+#include "chainparams.h"
+#include "validation.h"
+#include "messagesigner.h"
+#include "net_processing.h"
 #include "spork.h"
 
 #include <boost/lexical_cast.hpp>
@@ -16,13 +18,12 @@ CSporkManager sporkManager;
 
 std::map<uint256, CSporkMessage> mapSporks;
 
-void CSporkManager::ProcessSpork(CNode* pfrom, std::string& strCommand, CDataStream& vRecv)
+void CSporkManager::ProcessSpork(CNode* pfrom, std::string& strCommand, CDataStream& vRecv, CConnman& connman)
 {
     if(fLiteMode) return; // disable all GoByte specific functionality
 
     if (strCommand == NetMsgType::SPORK) {
 
-        CDataStream vMsg(vRecv);
         CSporkMessage spork;
         vRecv >> spork;
 
@@ -55,7 +56,7 @@ void CSporkManager::ProcessSpork(CNode* pfrom, std::string& strCommand, CDataStr
 
         mapSporks[hash] = spork;
         mapSporksActive[spork.nSporkID] = spork;
-        spork.Relay();
+        spork.Relay(connman);
 
         //does a task if needed
         ExecuteSpork(spork.nSporkID, spork.nValue);
@@ -65,7 +66,7 @@ void CSporkManager::ProcessSpork(CNode* pfrom, std::string& strCommand, CDataStr
         std::map<int, CSporkMessage>::iterator it = mapSporksActive.begin();
 
         while(it != mapSporksActive.end()) {
-            pfrom->PushMessage(NetMsgType::SPORK, it->second);
+            connman.PushMessage(pfrom, NetMsgType::SPORK, it->second);
             it++;
         }
     }
@@ -101,13 +102,13 @@ void CSporkManager::ExecuteSpork(int nSporkID, int nValue)
     }
 }
 
-bool CSporkManager::UpdateSpork(int nSporkID, int64_t nValue)
+bool CSporkManager::UpdateSpork(int nSporkID, int64_t nValue, CConnman& connman)
 {
 
-    CSporkMessage spork = CSporkMessage(nSporkID, nValue, GetTime());
+    CSporkMessage spork = CSporkMessage(nSporkID, nValue, GetAdjustedTime());
 
     if(spork.Sign(strMasterPrivKey)) {
-        spork.Relay();
+        spork.Relay(connman);
         mapSporks[spork.GetHash()] = spork;
         mapSporksActive[nSporkID] = spork;
         return true;
@@ -141,7 +142,7 @@ bool CSporkManager::IsSporkActive(int nSporkID)
         }
     }
 
-    return r < GetTime();
+    return r < GetAdjustedTime();
 }
 
 // grab the value of the spork on the network, or the default
@@ -224,17 +225,17 @@ bool CSporkMessage::Sign(std::string strSignKey)
     std::string strError = "";
     std::string strMessage = boost::lexical_cast<std::string>(nSporkID) + boost::lexical_cast<std::string>(nValue) + boost::lexical_cast<std::string>(nTimeSigned);
 
-    if(!darkSendSigner.GetKeysFromSecret(strSignKey, key, pubkey)) {
+    if(!CMessageSigner::GetKeysFromSecret(strSignKey, key, pubkey)) {
         LogPrintf("CSporkMessage::Sign -- GetKeysFromSecret() failed, invalid spork key %s\n", strSignKey);
         return false;
     }
 
-    if(!darkSendSigner.SignMessage(strMessage, vchSig, key)) {
+    if(!CMessageSigner::SignMessage(strMessage, vchSig, key)) {
         LogPrintf("CSporkMessage::Sign -- SignMessage() failed\n");
         return false;
     }
 
-    if(!darkSendSigner.VerifyMessage(pubkey, vchSig, strMessage, strError)) {
+    if(!CMessageSigner::VerifyMessage(pubkey, vchSig, strMessage, strError)) {
         LogPrintf("CSporkMessage::Sign -- VerifyMessage() failed, error: %s\n", strError);
         return false;
     }
@@ -249,7 +250,7 @@ bool CSporkMessage::CheckSignature()
     std::string strMessage = boost::lexical_cast<std::string>(nSporkID) + boost::lexical_cast<std::string>(nValue) + boost::lexical_cast<std::string>(nTimeSigned);
     CPubKey pubkey(ParseHex(Params().SporkPubKey()));
 
-    if(!darkSendSigner.VerifyMessage(pubkey, vchSig, strMessage, strError)) {
+    if(!CMessageSigner::VerifyMessage(pubkey, vchSig, strMessage, strError)) {
         LogPrintf("CSporkMessage::CheckSignature -- VerifyMessage() failed, error: %s\n", strError);
         return false;
     }
@@ -257,8 +258,8 @@ bool CSporkMessage::CheckSignature()
     return true;
 }
 
-void CSporkMessage::Relay()
+void CSporkMessage::Relay(CConnman& connman)
 {
     CInv inv(MSG_SPORK, GetHash());
-    RelayInv(inv);
+    connman.RelayInv(inv);
 }

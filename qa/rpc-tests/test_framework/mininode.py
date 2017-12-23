@@ -44,7 +44,7 @@ MAX_BLOCK_SIZE = 1000000
 COIN = 100000000L # 1 btc in satoshis
 
 # Keep our own socket map for asyncore, so that we can track disconnects
-# ourselves (to workaround an issue with closing an asyncore socket when 
+# ourselves (to workaround an issue with closing an asyncore socket when
 # using select)
 mininode_socket_map = dict()
 
