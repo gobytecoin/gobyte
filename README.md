@@ -1,7 +1,7 @@
 GoByte Core staging tree 0.12.1
 ===============================
 
-`master:` [![Build Status](https://travis-ci.org/gobytecoin/gobyte.svg?branch=master)](https://travis-ci.org/gobytecoin/gobyte) `v0.12.0.x:` [![Build Status](https://travis-ci.org/gobytecoin/gobyte.svg?branch=v0.12.0.x)](https://travis-ci.org/gobytecoin/gobyte/branches) `v0.12.1.x:` [![Build Status](https://travis-ci.org/gobytecoin/gobyte.svg?branch=v0.12.1.x)](https://travis-ci.org/gobytecoin/gobyte/branches)
+`master:` [![Build Status](https://travis-ci.org/gobytecoin/gobyte.svg?branch=master)](https://travis-ci.org/gobytecoin/gobyte) `develop:` [![Build Status](https://travis-ci.org/gobytecoin/gobyte.svg?branch=develop)](https://travis-ci.org/gobytecoin/gobyte/branches)
 
 https://www.gobyte.network
 
