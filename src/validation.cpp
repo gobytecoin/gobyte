@@ -1236,7 +1236,7 @@ CAmount GetBlockSubsidy(int nPrevBits, int nPrevHeight, const Consensus::Params&
 
     CAmount nSubsidy = 15 * COIN;
 
-    // yearly decline of production by 12% per year, projected 136m coins max by year 2050+.
+    // yearly decline of production by ~8.333% per year until reached max coin ~31M.
     for (int i = consensusParams.nSubsidyHalvingInterval; i <= nPrevHeight; i += consensusParams.nSubsidyHalvingInterval) {
         nSubsidy -= nSubsidy/12;
     }
