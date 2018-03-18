@@ -3,8 +3,8 @@
 	CATEGORY MAPPING
 
 	* means the category has an associated class
-	
-	CGoByteNetwork: GOBYTE NETWORK (ROOT)
+
+  CGoByteNetwork: GOBYTE NETWORK (ROOT)
 	has:
 		vector<CNetworkVariable> vecNetworkVariables;
 		vector<CGoByteProject> vecProjects;
@@ -26,7 +26,7 @@
 	// 		-> LEVEL
 	// 			-> I, II, III, IV, V, VI, VII, VIII, IX, X, XI
 	// 		-> VALUEOVERRIDE
-	// 			-> NETWORK, OWNER 
+	// 			-> NETWORK, OWNER
 	// 		-> PROJECT*
 	// 			-> TYPES
 	// 				-> SOFTWARE
@@ -55,4 +55,3 @@
 	// 	-> COMPANIES
 	// 		-> COMPANY1
 	// 		-> DAO1
-

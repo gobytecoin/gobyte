@@ -1,4 +1,3 @@
-// Copyright (c) 2014-2017 The Dash Core developers
 // Copyright (c) 2014-2017 The GoByte Core developers
 
 #include "governance-validators.h"
@@ -43,7 +42,7 @@ std::string CreateEncodedProposalObject(const UniValue& objJSON)
 
     UniValue outerArray(UniValue::VARR);
     outerArray.push_back(innerArray);
-
+    
     std::string strData = outerArray.write();
     std::string strHex = HexStr(strData);
     return strHex;

@@ -1,5 +1,5 @@
 // Copyright (c) 2014-2017 The Dash Core developers
-// Copyright (c) 2014-2017 The GoByte Core developers
+// Copyright (c) 2017-2018 The GoByte Core developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 #include "privatesend-server.h"
@@ -10,6 +10,7 @@
 #include "init.h"
 #include "masternode-sync.h"
 #include "masternodeman.h"
+#include "script/interpreter.h"
 #include "txmempool.h"
 #include "util.h"
 #include "utilmoneystr.h"
@@ -153,14 +154,14 @@ void CPrivateSendServer::ProcessMessage(CNode* pfrom, std::string& strCommand, C
             return;
         }
 
-        if(entry.vecTxDSOut.size() > PRIVATESEND_ENTRY_MAX_SIZE) {
-            LogPrintf("DSVIN -- ERROR: too many outputs! %d/%d\n", entry.vecTxDSOut.size(), PRIVATESEND_ENTRY_MAX_SIZE);
+        if(entry.vecTxOut.size() > PRIVATESEND_ENTRY_MAX_SIZE) {
+            LogPrintf("DSVIN -- ERROR: too many outputs! %d/%d\n", entry.vecTxOut.size(), PRIVATESEND_ENTRY_MAX_SIZE);
             PushStatus(pfrom, STATUS_REJECTED, ERR_MAXIMUM, connman);
             return;
         }
 
         //do we have the same denominations as the current session?
-        if(!IsOutputsCompatibleWithSessionDenom(entry.vecTxDSOut)) {
+        if(!IsOutputsCompatibleWithSessionDenom(entry.vecTxOut)) {
             LogPrintf("DSVIN -- not compatible with existing transactions!\n");
             PushStatus(pfrom, STATUS_REJECTED, ERR_EXISTING_TX, connman);
             return;
@@ -173,7 +174,7 @@ void CPrivateSendServer::ProcessMessage(CNode* pfrom, std::string& strCommand, C
 
             CMutableTransaction tx;
 
-            BOOST_FOREACH(const CTxOut txout, entry.vecTxDSOut) {
+            for (const auto& txout : entry.vecTxOut) {
                 nValueOut += txout.nValue;
                 tx.vout.push_back(txout);
 
@@ -182,7 +183,7 @@ void CPrivateSendServer::ProcessMessage(CNode* pfrom, std::string& strCommand, C
                     PushStatus(pfrom, STATUS_REJECTED, ERR_NON_STANDARD_PUBKEY, connman);
                     return;
                 }
-                if(!txout.scriptPubKey.IsNormalPaymentScript()) {
+                if(!txout.scriptPubKey.IsPayToPublicKeyHash()) {
                     LogPrintf("DSVIN -- invalid script! scriptPubKey=%s\n", ScriptToAsmStr(txout.scriptPubKey));
                     PushStatus(pfrom, STATUS_REJECTED, ERR_INVALID_SCRIPT, connman);
                     return;
@@ -194,9 +195,9 @@ void CPrivateSendServer::ProcessMessage(CNode* pfrom, std::string& strCommand, C
 
                 LogPrint("privatesend", "DSVIN -- txin=%s\n", txin.ToString());
 
-                CCoins coins;
-                if(GetUTXOCoins(txin.prevout, coins)) {
-                    nValueIn += coins.vout[txin.prevout.n].nValue;
+                Coin coin;
+                if(GetUTXOCoin(txin.prevout, coin)) {
+                    nValueIn += coin.out.nValue;
                 } else {
                     LogPrintf("DSVIN -- missing input! tx=%s", tx.ToString());
                     PushStatus(pfrom, STATUS_REJECTED, ERR_MISSING_TX, connman);
@@ -311,8 +312,8 @@ void CPrivateSendServer::CreateFinalTransaction(CConnman& connman)
 
     // make our new transaction
     for(int i = 0; i < GetEntriesCount(); i++) {
-        BOOST_FOREACH(const CTxDSOut& txdsout, vecEntries[i].vecTxDSOut)
-            txNew.vout.push_back(txdsout);
+        for (const auto& txout : vecEntries[i].vecTxOut)
+            txNew.vout.push_back(txout);
 
         BOOST_FOREACH(const CTxDSIn& txdsin, vecEntries[i].vecTxDSIn)
             txNew.vin.push_back(txdsin);
@@ -495,19 +496,7 @@ void CPrivateSendServer::ChargeRandomFees(CConnman& connman)
 //
 void CPrivateSendServer::CheckTimeout(CConnman& connman)
 {
-    {
-        TRY_LOCK(cs_darksend, lockDS);
-        if(!lockDS) return; // it's ok to fail here, we run this quite frequently
-
-        // check mixing queue objects for timeouts
-        std::vector<CDarksendQueue>::iterator it = vecDarksendQueue.begin();
-        while(it != vecDarksendQueue.end()) {
-            if((*it).IsExpired()) {
-                LogPrint("privatesend", "CPrivateSendServer::CheckTimeout -- Removing expired queue (%s)\n", (*it).ToString());
-                it = vecDarksendQueue.erase(it);
-            } else ++it;
-        }
-    }
+    CheckQueue();
 
     if(!fMasterNode) return;
 
@@ -556,8 +545,8 @@ bool CPrivateSendServer::IsInputScriptSigValid(const CTxIn& txin)
 
     BOOST_FOREACH(CDarkSendEntry& entry, vecEntries) {
 
-        BOOST_FOREACH(const CTxDSOut& txdsout, entry.vecTxDSOut)
-            txNew.vout.push_back(txdsout);
+        for (const auto& txout : entry.vecTxOut)
+            txNew.vout.push_back(txout);
 
         BOOST_FOREACH(const CTxDSIn& txdsin, entry.vecTxDSIn) {
             txNew.vin.push_back(txdsin);
@@ -658,7 +647,6 @@ bool CPrivateSendServer::AddScriptSig(const CTxIn& txinNew)
     BOOST_FOREACH(CTxIn& txin, finalMutableTransaction.vin) {
         if(txinNew.prevout == txin.prevout && txin.nSequence == txinNew.nSequence) {
             txin.scriptSig = txinNew.scriptSig;
-            txin.prevPubKey = txinNew.prevPubKey;
             LogPrint("privatesend", "CPrivateSendServer::AddScriptSig -- adding to finalMutableTransaction, scriptSig=%s\n", ScriptToAsmStr(txinNew.scriptSig).substr(0,24));
         }
     }
@@ -683,14 +671,14 @@ bool CPrivateSendServer::IsSignaturesComplete()
     return true;
 }
 
-bool CPrivateSendServer::IsOutputsCompatibleWithSessionDenom(const std::vector<CTxDSOut>& vecTxDSOut)
+bool CPrivateSendServer::IsOutputsCompatibleWithSessionDenom(const std::vector<CTxOut>& vecTxOut)
 {
-    if(CPrivateSend::GetDenominations(vecTxDSOut) == 0) return false;
+    if(CPrivateSend::GetDenominations(vecTxOut) == 0) return false;
 
     BOOST_FOREACH(const CDarkSendEntry entry, vecEntries) {
-        LogPrintf("CPrivateSendServer::IsOutputsCompatibleWithSessionDenom -- vecTxDSOut denom %d, entry.vecTxDSOut denom %d\n",
-                CPrivateSend::GetDenominations(vecTxDSOut), CPrivateSend::GetDenominations(entry.vecTxDSOut));
-        if(CPrivateSend::GetDenominations(vecTxDSOut) != CPrivateSend::GetDenominations(entry.vecTxDSOut)) return false;
+        LogPrintf("CPrivateSendServer::IsOutputsCompatibleWithSessionDenom -- vecTxOut denom %d, entry.vecTxOut denom %d\n",
+                CPrivateSend::GetDenominations(vecTxOut), CPrivateSend::GetDenominations(entry.vecTxOut));
+        if(CPrivateSend::GetDenominations(vecTxOut) != CPrivateSend::GetDenominations(entry.vecTxOut)) return false;
     }
 
     return true;

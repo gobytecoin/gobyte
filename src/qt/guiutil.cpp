@@ -735,8 +735,8 @@ boost::filesystem::path static GetAutostartFilePath()
 {
     std::string chain = ChainNameFromCommandLine();
     if (chain == CBaseChainParams::MAIN)
-        return GetAutostartDir() / "gobyte.desktop";
-    return GetAutostartDir() / strprintf("gobyte-%s.lnk", chain);
+        return GetAutostartDir() / "gobytecore.desktop";
+    return GetAutostartDir() / strprintf("gobytecore-%s.lnk", chain);
 }
 
 bool GetStartOnSystemStartup()
@@ -779,7 +779,7 @@ bool SetStartOnSystemStartup(bool fAutoStart)
         optionFile << "[Desktop Entry]\n";
         optionFile << "Type=Application\n";
         if (chain == CBaseChainParams::MAIN)
-            optionFile << "Name=GoByte\n";
+            optionFile << "Name=GoByte Core\n";
         else
             optionFile << strprintf("Name=GoByte Core (%s)\n", chain);
         optionFile << "Exec=" << pszExePath << strprintf(" -min -testnet=%d -regtest=%d\n", GetBoolArg("-testnet", false), GetBoolArg("-regtest", false));

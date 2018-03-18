@@ -19,9 +19,9 @@
 
 #ifdef ENABLE_WALLET
 #include "wallet/wallet.h" // for CWallet::GetRequiredFee()
-#endif
 
 #include "privatesend-client.h"
+#endif // ENABLE_WALLET
 
 #include <boost/thread.hpp>
 
@@ -32,7 +32,9 @@
 #include <QMessageBox>
 #include <QTimer>
 
+#ifdef ENABLE_WALLET
 extern CWallet* pwalletMain;
+#endif // ENABLE_WALLET
 
 OptionsDialog::OptionsDialog(QWidget *parent, bool enableWallet) :
     QDialog(parent),
@@ -81,21 +83,21 @@ OptionsDialog::OptionsDialog(QWidget *parent, bool enableWallet) :
     }
 
     /* Display elements init */
-
+    
     /* Number of displayed decimal digits selector */
     QString digits;
     for(int index = 2; index <=8; index++){
         digits.setNum(index);
         ui->digits->addItem(digits, digits);
     }
-
+    
     /* Theme selector */
     ui->theme->addItem(QString("GBX-light"), QVariant("light"));
     ui->theme->addItem(QString("GBX-light-hires"), QVariant("light-hires"));
     ui->theme->addItem(QString("GBX-blue"), QVariant("drkblue"));
     ui->theme->addItem(QString("GBX-Crownium"), QVariant("crownium"));
     ui->theme->addItem(QString("GBX-traditional"), QVariant("trad"));
-
+    
     /* Language selector */
     QDir translations(":translations");
     ui->lang->addItem(QString("(") + tr("default") + QString(")"), QVariant(""));
@@ -262,8 +264,11 @@ void OptionsDialog::on_resetButton_clicked()
 void OptionsDialog::on_okButton_clicked()
 {
     mapper->submit();
+#ifdef ENABLE_WALLET
     privateSendClient.nCachedNumBlocks = std::numeric_limits<int>::max();
-    pwalletMain->MarkDirty();
+    if(pwalletMain)
+        pwalletMain->MarkDirty();
+#endif // ENABLE_WALLET
     accept();
     updateDefaultProxyNets();
 }

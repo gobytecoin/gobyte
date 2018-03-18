@@ -2,7 +2,6 @@
 // Copyright (c) 2017-2018 The GoByte Core developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
-
 #ifndef INSTANTX_H
 #define INSTANTX_H
 
@@ -88,6 +87,7 @@ public:
     void ProcessMessage(CNode* pfrom, std::string& strCommand, CDataStream& vRecv, CConnman& connman);
 
     bool ProcessTxLockRequest(const CTxLockRequest& txLockRequest, CConnman& connman);
+    void Vote(const uint256& txHash, CConnman& connman);
 
     bool AlreadyHave(const uint256& hash);
 
@@ -123,7 +123,7 @@ public:
 class CTxLockRequest : public CTransaction
 {
 private:
-    static const CAmount MIN_FEE            = 0.001 * COIN;
+    static const CAmount MIN_FEE            = 0.0001 * COIN;
 
 public:
     static const int WARN_MANY_INPUTS       = 100;

@@ -1241,14 +1241,6 @@
         <translation>&amp;Spusť GoByte po prihlásení do systému</translation>
     </message>
     <message>
-        <source>Automatically start GoByte Core after logging in to the system.</source>
-        <translation>Automaticky spustiť GoByte Core po prihlásení do systému.</translation>
-    </message>
-    <message>
-        <source>&amp;Start GoByte Core on system login</source>
-        <translation>&amp;Spusť GoByte po prihlásení do systému</translation>
-    </message>
-    <message>
         <source>Show Masternodes Tab</source>
         <translation>Ukázať záložku Masternodes</translation>
     </message>
@@ -4210,8 +4202,8 @@ https://www.transifex.com/projects/p/gobyte/</translation>
         <translation>Pokiaľ &lt;category&gt; nie je nastavená, alebo &lt;category&gt; = 1, vypíš všetky informácie pre ladenie.</translation>
     </message>
     <message>
-        <source>InstantSend doesn't support sending values that high yet. Transactions are currently limited to %1 GoByte.</source>
-        <translation>InstantSend zatiaľ nepodporuje posielanie takto vysokých čiastok. Transakcie sú limitované na %1 GoByte.</translation>
+        <source>InstantSend doesn't support sending values that high yet. Transactions are currently limited to %1 GBX.</source>
+        <translation>InstantSend zatiaľ nepodporuje posielanie takto vysokých čiastok. Transakcie sú limitované na %1 GBX.</translation>
     </message>
     <message>
         <source>InstantSend requires inputs with at least %d confirmations, you might need to wait a few minutes and try again.</source>

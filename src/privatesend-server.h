@@ -1,5 +1,5 @@
 // Copyright (c) 2014-2017 The Dash Core developers
-// Copyright (c) 2014-2017 The GoByte Core developers
+// Copyright (c) 2017-2018 The GoByte Core developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -19,8 +19,6 @@ extern CPrivateSendServer privateSendServer;
 class CPrivateSendServer : public CPrivateSendBase
 {
 private:
-    mutable CCriticalSection cs_darksend;
-
     // Mixing uses collateral transactions to trust parties entering the pool
     // to behave honestly. If they don't it takes their money.
     std::vector<CTransaction> vecSessionCollaterals;
@@ -55,7 +53,7 @@ private:
     /// Check to make sure a given input matches an input in the pool and its scriptSig is valid
     bool IsInputScriptSigValid(const CTxIn& txin);
     /// Are these outputs compatible with other client in the pool?
-    bool IsOutputsCompatibleWithSessionDenom(const std::vector<CTxDSOut>& vecTxDSOut);
+    bool IsOutputsCompatibleWithSessionDenom(const std::vector<CTxOut>& vecTxOut);
 
     // Set the 'state' value, with some logging and capturing when the state changed
     void SetState(PoolState nStateNew);

@@ -6,6 +6,7 @@
 #ifndef PRIVATESEND_H
 #define PRIVATESEND_H
 
+#include "chain.h"
 #include "chainparams.h"
 #include "primitives/transaction.h"
 #include "pubkey.h"
@@ -78,36 +79,22 @@ enum PoolStatusUpdate {
 class CTxDSIn : public CTxIn
 {
 public:
+    // memory only
+    CScript prevPubKey;
     bool fHasSig; // flag to indicate if signed
     int nSentTimes; //times we've sent this anonymously
 
-    CTxDSIn(const CTxIn& txin) :
+    CTxDSIn(const CTxIn& txin, const CScript& script) :
         CTxIn(txin),
+        prevPubKey(script),
         fHasSig(false),
         nSentTimes(0)
         {}
 
     CTxDSIn() :
         CTxIn(),
+        prevPubKey(),
         fHasSig(false),
-        nSentTimes(0)
-        {}
-};
-
-/** Holds an mixing output
- */
-class CTxDSOut : public CTxOut
-{
-public:
-    int nSentTimes; //times we've sent this anonymously
-
-    CTxDSOut(const CTxOut& out) :
-        CTxOut(out),
-        nSentTimes(0)
-        {}
-
-    CTxDSOut() :
-        CTxOut(),
         nSentTimes(0)
         {}
 };
@@ -117,19 +104,24 @@ class CDarkSendEntry
 {
 public:
     std::vector<CTxDSIn> vecTxDSIn;
-    std::vector<CTxDSOut> vecTxDSOut;
+    std::vector<CTxOut> vecTxOut;
     CTransaction txCollateral;
     // memory only
     CService addr;
 
     CDarkSendEntry() :
         vecTxDSIn(std::vector<CTxDSIn>()),
-        vecTxDSOut(std::vector<CTxDSOut>()),
+        vecTxOut(std::vector<CTxOut>()),
         txCollateral(CTransaction()),
         addr(CService())
         {}
 
-    CDarkSendEntry(const std::vector<CTxIn>& vecTxIn, const std::vector<CTxOut>& vecTxOut, const CTransaction& txCollateral);
+    CDarkSendEntry(const std::vector<CTxDSIn>& vecTxDSIn, const std::vector<CTxOut>& vecTxOut, const CTransaction& txCollateral) :
+        vecTxDSIn(vecTxDSIn),
+        vecTxOut(vecTxOut),
+        txCollateral(txCollateral),
+        addr(CService())
+        {}
 
     ADD_SERIALIZE_METHODS;
 
@@ -137,7 +129,7 @@ public:
     inline void SerializationOp(Stream& s, Operation ser_action, int nType, int nVersion) {
         READWRITE(vecTxDSIn);
         READWRITE(txCollateral);
-        READWRITE(vecTxDSOut);
+        READWRITE(vecTxOut);
     }
 
     bool AddScriptSig(const CTxIn& txin);
@@ -280,6 +272,8 @@ public:
 class CPrivateSendBase
 {
 protected:
+    mutable CCriticalSection cs_darksend;
+
     // The current mixing sessions in progress on the network
     std::vector<CDarksendQueue> vecDarksendQueue;
 
@@ -293,6 +287,7 @@ protected:
     CMutableTransaction finalMutableTransaction; // the finalized transaction ready for signing
 
     void SetNull();
+    void CheckQueue();
 
 public:
     int nSessionDenom; //Users must submit an denom matching this
@@ -324,6 +319,8 @@ private:
 
     static CCriticalSection cs_mapdstx;
 
+    static void CheckDSTXes(int nHeight);
+
 public:
     static void InitStandardDenominations();
     static std::vector<CAmount> GetStandardDenominations() { return vecStandardDenominations; }
@@ -332,9 +329,10 @@ public:
     /// Get the denominations for a specific amount of gobyte.
     static int GetDenominationsByAmounts(const std::vector<CAmount>& vecAmount);
 
+    static bool IsDenominatedAmount(CAmount nInputAmount);
+
     /// Get the denominations for a list of outputs (returns a bitshifted integer)
     static int GetDenominations(const std::vector<CTxOut>& vecTxOut, bool fSingleRandomDenom = false);
-    static int GetDenominations(const std::vector<CTxDSOut>& vecTxDSOut);
     static std::string GetDenominationsToString(int nDenom);
     static bool GetDenominationsBits(int nDenom, std::vector<int> &vecBitsRet);
 
@@ -350,10 +348,12 @@ public:
     static CAmount GetCollateralAmount() { return COLLATERAL; }
     static CAmount GetMaxCollateralAmount() { return COLLATERAL*4; }
 
+    static bool IsCollateralAmount(CAmount nInputAmount);
+
     static void AddDSTX(const CDarksendBroadcastTx& dstx);
     static CDarksendBroadcastTx GetDSTX(const uint256& hash);
-    static void CheckDSTXes(int nHeight);
 
+    static void UpdatedBlockTip(const CBlockIndex *pindex);
     static void SyncTransaction(const CTransaction& tx, const CBlock* pblock);
 };
 

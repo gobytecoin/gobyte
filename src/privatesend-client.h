@@ -1,5 +1,5 @@
 // Copyright (c) 2014-2017 The Dash Core developers
-// Copyright (c) 2014-2017 The GoByte Core developers
+// Copyright (c) 2017-2018 The GoByte Core developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -35,8 +35,6 @@ extern CPrivateSendClient privateSendClient;
 class CPrivateSendClient : public CPrivateSendBase
 {
 private:
-    mutable CCriticalSection cs_darksend;
-
     // Keep track of the used Masternodes
     std::vector<COutPoint> vecMasternodesUsed;
 
@@ -55,6 +53,7 @@ private:
     std::string strLastMessage;
     std::string strAutoDenomResult;
 
+    masternode_info_t infoMixingMasternode;
     CMutableTransaction txMyCollateral; // client side collateral
 
     CKeyHolderStorage keyHolderStorage; // storage for keys used in PrepareDenominate
@@ -85,9 +84,9 @@ private:
     /// As a client, submit part of a future mixing transaction to a Masternode to start the process
     bool SubmitDenominate(CConnman& connman);
     /// step 1: prepare denominated inputs and outputs
-    bool PrepareDenominate(int nMinRounds, int nMaxRounds, std::string& strErrorRet, std::vector<CTxIn>& vecTxInRet, std::vector<CTxOut>& vecTxOutRet);
+    bool PrepareDenominate(int nMinRounds, int nMaxRounds, std::string& strErrorRet, std::vector<CTxDSIn>& vecTxDSInRet, std::vector<CTxOut>& vecTxOutRet);
     /// step 2: send denominated inputs and outputs prepared in step 1
-    bool SendDenominate(const std::vector<CTxIn>& vecTxIn, const std::vector<CTxOut>& vecTxOut, CConnman& connman);
+    bool SendDenominate(const std::vector<CTxDSIn>& vecTxDSIn, const std::vector<CTxOut>& vecTxOut, CConnman& connman);
 
     /// Get Masternode updates about the progress of mixing
     bool CheckPoolStateUpdate(PoolState nStateNew, int nEntriesCountNew, PoolStatusUpdate nStatusUpdate, PoolMessage nMessageID, int nSessionIDNew=0);
@@ -108,7 +107,6 @@ public:
     bool fEnablePrivateSend;
     bool fPrivateSendMultiSession;
 
-    masternode_info_t infoMixingMasternode;
     int nCachedNumBlocks; //used for the overview screen
     bool fCreateAutoBackups; //builtin support for automatic backups
 
@@ -130,19 +128,20 @@ public:
 
     void SetMinBlocksToWait(int nMinBlocksToWaitIn) { nMinBlocksToWait = nMinBlocksToWaitIn; }
 
+
     void ResetPool();
 
     void UnlockCoins();
 
     std::string GetStatus();
 
+    bool GetMixingMasternodeInfo(masternode_info_t& mnInfoRet);
+    bool IsMixingMasternode(const CNode* pnode);
+
     /// Passively run mixing in the background according to the configuration in settings
     bool DoAutomaticDenominating(CConnman& connman, bool fDryRun=false);
 
     void CheckTimeout();
-
-    /// Process a new block
-    void NewBlock();
 
     void UpdatedBlockTip(const CBlockIndex *pindex);
 };

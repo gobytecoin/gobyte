@@ -2,7 +2,6 @@
 // Copyright (c) 2017-2018 The GoByte Core developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
-
 #ifndef GOVERNANCE_VOTE_H
 #define GOVERNANCE_VOTE_H
 

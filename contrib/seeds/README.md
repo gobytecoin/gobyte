@@ -8,4 +8,3 @@ The seeds compiled into the release are created from sipa's DNS seed data, like 
     curl -s http://bitcoin.sipa.be/seeds.txt > seeds_main.txt
     python makeseeds.py < seeds_main.txt > nodes_main.txt
     python generate-seeds.py . > ../../src/chainparamsseeds.h
-
