@@ -328,6 +328,7 @@ crypto_libbitcoin_crypto_a_SOURCES += \
   crypto/keccak.c \
   crypto/luffa.c \
   crypto/neoscrypt.c \
+	crypto/neoscrypt.h \
   crypto/shavite.c \
   crypto/simd.c \
   crypto/skein.c \
