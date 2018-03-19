@@ -223,7 +223,7 @@ public:
         consensus.powLimit = uint256S("00000fffff000000000000000000000000000000000000000000000000000000");
         consensus.nPowTargetTimespan = 60 * 60; // GoByte: 1 hour, 24 blocks
         consensus.nPowTargetSpacing = 2.5 * 60; // GoByte: 150 seconds
-        consensus.fPowAllowMinDifficultyBlocks = false;
+        consensus.fPowAllowMinDifficultyBlocks = true;
         consensus.fPowNoRetargeting = false;
         consensus.nPowDGWHeight = 25;
         consensus.nRuleChangeActivationThreshold = 1512; // 75% for testchains
