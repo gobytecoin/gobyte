@@ -231,7 +231,7 @@ public:
         consensus.nPowTargetSpacing = 2.5 * 60; // GoByte: 150 seconds
         consensus.fPowAllowMinDifficultyBlocks = true;
         consensus.fPowNoRetargeting = false;
-        consensus.nPowDGWHeight = 25;
+        consensus.nPowDGWHeight = 650;
         consensus.nRuleChangeActivationThreshold = 1512; // 75% for testchains
         consensus.nMinerConfirmationWindow = 2016; // nPowTargetTimespan / nPowTargetSpacing
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].bit = 28;
