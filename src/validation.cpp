@@ -1258,6 +1258,7 @@ CAmount GetMasternodePayment(int nHeight, CAmount blockValue)
 
                                                                       // testnet:
     if(nHeight > nMNPIBlock)                  ret += blockValue / 20; // 55.0%
+    return ret;
 
 }
 
