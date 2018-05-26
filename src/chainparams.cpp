@@ -75,14 +75,14 @@ public:
         strNetworkID = "main";
         consensus.nSubsidyHalvingInterval = 210240; // one year
         consensus.nMasternodePaymentsStartBlock = 1152; // not true, but it's ok as long as it's less then nMasternodePaymentsIncreaseBlock
-        consensus.nMasternodePaymentsIncreaseBlock = 158000; // not used
-        consensus.nMasternodePaymentsIncreasePeriod = 576*30; // not used
+        consensus.nMasternodePaymentsIncreaseBlock = 140000; // actual historical value
+        consensus.nMasternodePaymentsIncreasePeriod = 576*30; // 17280 - actual historical value
         consensus.nInstantSendKeepLock = 24;
-        consensus.nBudgetPaymentsStartBlock = 120960; // 7 month after Genesis Started
+        consensus.nBudgetPaymentsStartBlock = 120000;
         consensus.nBudgetPaymentsCycleBlocks = 17280; // ~(60*24*30)/2.5 = 1 Month
         consensus.nBudgetPaymentsWindowBlocks = 100;
         consensus.nBudgetProposalEstablishingTime = 60*60*24;
-        consensus.nSuperblockStartBlock = 130960;
+        consensus.nSuperblockStartBlock = 130000;
         consensus.nSuperblockCycle = 17280; // ~(60*24*30)/2.5
         consensus.nGovernanceMinQuorum = 10;
         consensus.nGovernanceFilterElements = 20000;
@@ -117,10 +117,10 @@ public:
         consensus.vDeployments[Consensus::DEPLOYMENT_DIP0001].nThreshold = 3226; // 80% of 4032
 
         // The best chain should have at least this much work.
-        consensus.nMinimumChainWork = uint256S("0x0000000000000000000000000000000000000000000000000053170ef0424ea9"); // 10500
+        consensus.nMinimumChainWork = uint256S("0x00000000000000000000000000000000000000000000000004ce57668f63f9b4"); // 85000
 
         // By default assume that the signatures in ancestors of this block are valid.
-        consensus.defaultAssumeValid = uint256S("0x000000000018df60822b6fc7e13b2da59e5c7ee29e015bebb7cfaddc22001180"); // 10500
+        consensus.defaultAssumeValid = uint256S("0x0000000000465ca188f7524071debf90b7fa9716736673a8641a82805119b2f0"); // 85000
 
         /**
          * The message start string is designed to be unlikely to occur in normal data.
