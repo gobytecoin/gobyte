@@ -1256,7 +1256,11 @@ CAmount GetMasternodePayment(int nHeight, CAmount blockValue)
     int nMNPIBlock = Params().GetConsensus().nMasternodePaymentsIncreaseBlock;
     int nMNPIPeriod = Params().GetConsensus().nMasternodePaymentsIncreasePeriod;
 
-    if(nHeight > nMNPIBlock)                  ret += blockValue / 20; // 55.0%
+    if(nHeight > nMNPIBlock)                  ret += blockValue / 20; // - 55%
+    if(nHeight > nMNPIBlock+(nMNPIPeriod* 1)) ret += blockValue / 20; // - 60%
+    if(nHeight > nMNPIBlock+(nMNPIPeriod* 2)) ret += blockValue / 20; // - 65%
+    if(nHeight > nMNPIBlock+(nMNPIPeriod* 3)) ret += blockValue / 20; // - 70%
+
     return ret;
 
 }
