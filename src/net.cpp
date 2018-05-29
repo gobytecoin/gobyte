@@ -2816,7 +2816,7 @@ std::vector<unsigned char> CNode::CalculateKeyedNetGroup(CAddress& address)
 
 CDataStream CConnman::BeginMessage(CNode* pnode, int nVersion, int flags, const std::string& sCommand)
 {
-    return {SER_NETWORK, (nVersion ? nVersion : pnode->GetSendVersion()) | flags, CMessageHeader(Params().MessageStart(), sCommand.c_str(), 0) };
+    return {SER_NETWORK, (nVersion ? nVersion : INIT_PROTO_VERSION) | flags, CMessageHeader(Params().MessageStart(), sCommand.c_str(), 0) };
 }
 
 void CConnman::EndMessage(CDataStream& strm)
