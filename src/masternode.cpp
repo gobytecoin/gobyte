@@ -102,7 +102,7 @@ arith_uint256 CMasternode::CalculateScore(const uint256& blockHash)
     ss << vin.prevout << nCollateralMinConfBlockHash << blockHash;
     return UintToArith256(ss.GetHash());
     */
-uint256 aux = ArithToUint256(UintToArith256(vin.prevout.hash) + vin.prevout.n);
+    uint256 aux = ArithToUint256(UintToArith256(vin.prevout.hash) + vin.prevout.n);
 
     CHashWriter ss(SER_GETHASH, PROTOCOL_VERSION);
     ss << blockHash;
