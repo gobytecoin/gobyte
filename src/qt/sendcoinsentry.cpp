@@ -41,7 +41,7 @@ SendCoinsEntry::SendCoinsEntry(const PlatformStyle *platformStyle, QWidget *pare
     ui->deleteButton->setIcon(QIcon(":/icons/" + theme + "/remove"));
     ui->deleteButton_is->setIcon(QIcon(":/icons/" + theme + "/remove"));
     ui->deleteButton_s->setIcon(QIcon(":/icons/" + theme + "/remove"));
-      
+
     // normal gobyte address field
     GUIUtil::setupAddressWidget(ui->payTo, this);
     // just a label for displaying gobyte address(es)

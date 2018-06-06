@@ -1,7 +1,7 @@
 GoByte Core 0.12.1
 =====================
 
-This is the official reference wallet for GoByte digital currency and comprises the backbone of the GoByte peer-to-peer network. You can [download GoByte Core](https://www.gobyte.org/downloads/) or [build it yourself](#building) using the guides below.
+This is the official reference wallet for GoByte digital currency and comprises the backbone of the GoByte peer-to-peer network. You can [download GoByte Core](https://www.gobyte.network) or [build it yourself](#building) using the guides below.
 
 Running
 ---------------------
@@ -11,8 +11,8 @@ The following are some helpful notes on how to run GoByte on your native platfor
 
 Unpack the files into a directory and run:
 
-- `bin/bitcoin-qt` (GUI) or
-- `bin/bitcoind` (headless)
+- `bin/gobyte-qt` (GUI) or
+- `bin/gobyted` (headless)
 
 ### Windows
 
@@ -26,8 +26,8 @@ Drag GoByte-Qt to your applications folder, and then run GoByte-Qt.
 
 * See the [GoByte documentation](https://gobytecoin.atlassian.net/wiki/display/DOC)
 for help and more information.
-* Ask for help on [#gobytecoin](http://webchat.freenode.net?channels=gobytecoin) on Freenode. If you don't have an IRC client use [webchat here](http://webchat.freenode.net?channels=gobytecoin).
-* Ask for help on the [GoByteTalk](https://gobytetalk.org/) forums.
+* Ask for help on [#gobytecoin](http://webchat.freenode.net?channels=gobyte) on Freenode. If you don't have an IRC client use [webchat here](http://webchat.freenode.net?channels=gobyte).
+* Ask for help on [Discord](http://discord.gobyte.network) server.
 
 Building
 ---------------------
@@ -57,8 +57,8 @@ The GoByte Core repo's [root README](/README.md) contains relevant information o
 - [Dnsseed Policy](dnsseed-policy.md)
 
 ### Resources
-* Discuss on the [GoByteTalk](https://gobytetalk.org/) forums, in the Development & Technical Discussion board.
-* Discuss on [#gobytecoin](http://webchat.freenode.net/?channels=gobytecoin) on Freenode. If you don't have an IRC client use [webchat here](http://webchat.freenode.net/?channels=gobytecoin).
+* Discuss on the [Discord](http://discord.gobyte.network) server, in the #development channel.
+* Discuss on [#gobytecoin](http://webchat.freenode.net/?channels=gobyte) on Freenode. If you don't have an IRC client use [webchat here](http://webchat.freenode.net/?channels=gobyte).
 
 ### Miscellaneous
 - [Assets Attribution](assets-attribution.md)

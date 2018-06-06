@@ -6,7 +6,7 @@
 #ifndef DARKSEND_RELAY_H
 #define DARKSEND_RELAY_H
 
-#include "main.h"
+#include "validation.h"
 #include "activemasternode.h"
 #include "masternodeman.h"
 
@@ -24,7 +24,7 @@ public:
 
     CDarkSendRelay();
     CDarkSendRelay(CTxIn& vinMasternodeIn, vector<unsigned char>& vchSigIn, int nBlockHeightIn, int nRelayTypeIn, CTxIn& in2, CTxOut& out2);
-    
+
     ADD_SERIALIZE_METHODS;
 
     template <typename Stream, typename Operation>

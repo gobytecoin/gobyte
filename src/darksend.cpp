@@ -13,6 +13,7 @@
 #include "masternode-payments.h"
 #include "masternode-sync.h"
 #include "masternodeman.h"
+#include "messagesigner.h"
 #include "script/sign.h"
 #include "txmempool.h"
 #include "util.h"
@@ -27,7 +28,6 @@ bool fEnablePrivateSend = false;
 bool fPrivateSendMultiSession = DEFAULT_PRIVATESEND_MULTISESSION;
 
 CDarksendPool darkSendPool;
-CDarkSendSigner darkSendSigner;
 std::map<uint256, CDarksendBroadcastTx> mapDarksendBroadcastTxes;
 std::vector<CAmount> vecPrivateSendDenominations;
 
@@ -190,6 +190,18 @@ void CDarksendPool::ProcessMessage(CNode* pfrom, std::string& strCommand, CDataS
 
         LogPrint("privatesend", "DSVIN -- txCollateral %s", entry.txCollateral.ToString());
 
+        if(entry.vecTxDSIn.size() > PRIVATESEND_ENTRY_MAX_SIZE) {
+            LogPrintf("DSVIN -- ERROR: too many inputs! %d/%d\n", entry.vecTxDSIn.size(), PRIVATESEND_ENTRY_MAX_SIZE);
+            PushStatus(pfrom, STATUS_REJECTED, ERR_MAXIMUM);
+            return;
+        }
+
+        if(entry.vecTxDSOut.size() > PRIVATESEND_ENTRY_MAX_SIZE) {
+            LogPrintf("DSVIN -- ERROR: too many outputs! %d/%d\n", entry.vecTxDSOut.size(), PRIVATESEND_ENTRY_MAX_SIZE);
+            PushStatus(pfrom, STATUS_REJECTED, ERR_MAXIMUM);
+            return;
+        }
+
         //do we have the same denominations as the current session?
         if(!IsOutputsCompatibleWithSessionDenom(entry.vecTxDSOut)) {
             LogPrintf("DSVIN -- not compatible with existing transactions!\n");
@@ -237,16 +249,10 @@ void CDarksendPool::ProcessMessage(CNode* pfrom, std::string& strCommand, CDataS
                 }
             }
 
-            if(nValueIn > PRIVATESEND_POOL_MAX) {
-                LogPrintf("DSVIN -- more than PrivateSend pool max! nValueIn: %lld, tx=%s", nValueIn, tx.ToString());
-                PushStatus(pfrom, STATUS_REJECTED, ERR_MAXIMUM);
-                return;
-            }
-
-            // Allow lowest denom (at max) as a a fee. Normally shouldn't happen though.
-            // TODO: Or do not allow fees at all?
-            if(nValueIn - nValueOut > vecPrivateSendDenominations.back()) {
-                LogPrintf("DSVIN -- fees are too high! fees: %lld, tx=%s", nValueIn - nValueOut, tx.ToString());
+            // There should be no fee in mixing tx
+            CAmount nFee = nValueIn - nValueOut;
+            if(nFee != 0) {
+                LogPrintf("DSVIN -- there should be no fee in mixing tx! fees: %lld, tx=%s", nFee, tx.ToString());
                 PushStatus(pfrom, STATUS_REJECTED, ERR_FEES);
                 return;
             }
@@ -1644,13 +1650,13 @@ bool CDarksendPool::SubmitDenominate()
     std::vector<CTxOut> vecTxOutRet;
 
     // Submit transaction to the pool if we get here
-    // Try to use only inputs with the same number of rounds starting from lowest number of rounds possible
-    for(int i = 0; i < nPrivateSendRounds; i++) {
-        if(PrepareDenominate(i, i+1, strError, vecTxInRet, vecTxOutRet)) {
+    // Try to use only inputs with the same number of rounds starting from the highest number of rounds possible
+    for(int i = nPrivateSendRounds; i > 0; i--) {
+        if(PrepareDenominate(i - 1, i, strError, vecTxInRet, vecTxOutRet)) {
             LogPrintf("CDarksendPool::SubmitDenominate -- Running PrivateSend denominate for %d rounds, success\n", i);
             return SendDenominate(vecTxInRet, vecTxOutRet);
         }
-        LogPrintf("CDarksendPool::SubmitDenominate -- Running PrivateSend denominate for %d rounds, error: %s\n", i, strError);
+        LogPrint("privatesend", "CDarksendPool::SubmitDenominate -- Running PrivateSend denominate for %d rounds, error: %s\n", i, strError);
     }
 
     // We failed? That's strange but let's just make final attempt and try to mix everything
@@ -1667,6 +1673,11 @@ bool CDarksendPool::SubmitDenominate()
 
 bool CDarksendPool::PrepareDenominate(int nMinRounds, int nMaxRounds, std::string& strErrorRet, std::vector<CTxIn>& vecTxInRet, std::vector<CTxOut>& vecTxOutRet)
 {
+    if(!pwalletMain) {
+        strErrorRet = "Wallet is not initialized";
+        return false;
+    }
+
     if (pwalletMain->IsLocked(true)) {
         strErrorRet = "Wallet locked, unable to create transaction!";
         return false;
@@ -1697,7 +1708,7 @@ bool CDarksendPool::PrepareDenominate(int nMinRounds, int nMaxRounds, std::strin
         strErrorRet = "Incorrect session denom";
         return false;
     }
-    bool fSelected = pwalletMain->SelectCoinsByDenominations(nSessionDenom, vecPrivateSendDenominations[vecBits.front()], PRIVATESEND_POOL_MAX, vecTxIn, vCoins, nValueIn, nMinRounds, nMaxRounds);
+    bool fSelected = pwalletMain->SelectCoinsByDenominations(nSessionDenom, vecPrivateSendDenominations[vecBits.front()], GetMaxPoolAmount(), vecTxIn, vCoins, nValueIn, nMinRounds, nMaxRounds);
     if (nMinRounds >= 0 && !fSelected) {
         strErrorRet = "Can't select current denominated inputs";
         return false;
@@ -1714,11 +1725,11 @@ bool CDarksendPool::PrepareDenominate(int nMinRounds, int nMaxRounds, std::strin
 
     CAmount nValueLeft = nValueIn;
 
-    // Try to add every needed denomination, repeat up to 5-9 times.
+    // Try to add every needed denomination, repeat up to 5-PRIVATESEND_ENTRY_MAX_SIZE times.
     // NOTE: No need to randomize order of inputs because they were
     // initially shuffled in CWallet::SelectCoinsByDenominations already.
     int nStep = 0;
-    int nStepsMax = 5 + GetRandInt(5);
+    int nStepsMax = 5 + GetRandInt(PRIVATESEND_ENTRY_MAX_SIZE-5+1);
 
     while (nStep < nStepsMax) {
         BOOST_FOREACH(int nBit, vecBits) {
@@ -2242,7 +2253,7 @@ std::string CDarksendPool::GetMessageByID(PoolMessage nMessageID)
         case ERR_INVALID_INPUT:         return _("Input is not valid.");
         case ERR_INVALID_SCRIPT:        return _("Invalid script detected.");
         case ERR_INVALID_TX:            return _("Transaction not valid.");
-        case ERR_MAXIMUM:               return _("Value more than PrivateSend pool maximum allows.");
+        case ERR_MAXIMUM:               return _("Entry exceeds maximum size.");
         case ERR_MN_LIST:               return _("Not in the Masternode list.");
         case ERR_MODE:                  return _("Incompatible mode.");
         case ERR_NON_STANDARD_PUBKEY:   return _("Non-standard public key detected.");
@@ -2257,64 +2268,6 @@ std::string CDarksendPool::GetMessageByID(PoolMessage nMessageID)
         case MSG_ENTRIES_ADDED:         return _("Your entries added successfully.");
         default:                        return _("Unknown response.");
     }
-}
-
-bool CDarkSendSigner::IsVinAssociatedWithPubkey(const CTxIn& txin, const CPubKey& pubkey)
-{
-    CScript payee;
-    payee = GetScriptForDestination(pubkey.GetID());
-
-    CTransaction tx;
-    uint256 hash;
-    if(GetTransaction(txin.prevout.hash, tx, Params().GetConsensus(), hash, true)) {
-        BOOST_FOREACH(CTxOut out, tx.vout)
-            if(out.nValue == 1000*COIN && out.scriptPubKey == payee) return true;
-    }
-
-    return false;
-}
-
-bool CDarkSendSigner::GetKeysFromSecret(std::string strSecret, CKey& keyRet, CPubKey& pubkeyRet)
-{
-    CBitcoinSecret vchSecret;
-
-    if(!vchSecret.SetString(strSecret)) return false;
-
-    keyRet = vchSecret.GetKey();
-    pubkeyRet = keyRet.GetPubKey();
-
-    return true;
-}
-
-bool CDarkSendSigner::SignMessage(std::string strMessage, std::vector<unsigned char>& vchSigRet, CKey key)
-{
-    CHashWriter ss(SER_GETHASH, 0);
-    ss << strMessageMagic;
-    ss << strMessage;
-
-    return key.SignCompact(ss.GetHash(), vchSigRet);
-}
-
-bool CDarkSendSigner::VerifyMessage(CPubKey pubkey, const std::vector<unsigned char>& vchSig, std::string strMessage, std::string& strErrorRet)
-{
-    CHashWriter ss(SER_GETHASH, 0);
-    ss << strMessageMagic;
-    ss << strMessage;
-
-    CPubKey pubkeyFromSig;
-    if(!pubkeyFromSig.RecoverCompact(ss.GetHash(), vchSig)) {
-        strErrorRet = "Error recovering public key.";
-        return false;
-    }
-
-    if(pubkeyFromSig.GetID() != pubkey.GetID()) {
-        strErrorRet = strprintf("Keys don't match: pubkey=%s, pubkeyFromSig=%s, strMessage=%s, vchSig=%s",
-                    pubkey.GetID().ToString(), pubkeyFromSig.GetID().ToString(), strMessage,
-                    EncodeBase64(&vchSig[0], vchSig.size()));
-        return false;
-    }
-
-    return true;
 }
 
 bool CDarkSendEntry::AddScriptSig(const CTxIn& txin)
@@ -2340,7 +2293,7 @@ bool CDarksendQueue::Sign()
 
     std::string strMessage = vin.ToString() + boost::lexical_cast<std::string>(nDenom) + boost::lexical_cast<std::string>(nTime) + boost::lexical_cast<std::string>(fReady);
 
-    if(!darkSendSigner.SignMessage(strMessage, vchSig, activeMasternode.keyMasternode)) {
+    if(!CMessageSigner::SignMessage(strMessage, vchSig, activeMasternode.keyMasternode)) {
         LogPrintf("CDarksendQueue::Sign -- SignMessage() failed, %s\n", ToString());
         return false;
     }
@@ -2353,7 +2306,7 @@ bool CDarksendQueue::CheckSignature(const CPubKey& pubKeyMasternode)
     std::string strMessage = vin.ToString() + boost::lexical_cast<std::string>(nDenom) + boost::lexical_cast<std::string>(nTime) + boost::lexical_cast<std::string>(fReady);
     std::string strError = "";
 
-    if(!darkSendSigner.VerifyMessage(pubKeyMasternode, vchSig, strMessage, strError)) {
+    if(!CMessageSigner::VerifyMessage(pubKeyMasternode, vchSig, strMessage, strError)) {
         LogPrintf("CDarksendQueue::CheckSignature -- Got bad Masternode queue signature: %s; error: %s\n", ToString(), strError);
         return false;
     }
@@ -2378,7 +2331,7 @@ bool CDarksendBroadcastTx::Sign()
 
     std::string strMessage = tx.GetHash().ToString() + boost::lexical_cast<std::string>(sigTime);
 
-    if(!darkSendSigner.SignMessage(strMessage, vchSig, activeMasternode.keyMasternode)) {
+    if(!CMessageSigner::SignMessage(strMessage, vchSig, activeMasternode.keyMasternode)) {
         LogPrintf("CDarksendBroadcastTx::Sign -- SignMessage() failed\n");
         return false;
     }
@@ -2391,7 +2344,7 @@ bool CDarksendBroadcastTx::CheckSignature(const CPubKey& pubKeyMasternode)
     std::string strMessage = tx.GetHash().ToString() + boost::lexical_cast<std::string>(sigTime);
     std::string strError = "";
 
-    if(!darkSendSigner.VerifyMessage(pubKeyMasternode, vchSig, strMessage, strError)) {
+    if(!CMessageSigner::VerifyMessage(pubKeyMasternode, vchSig, strMessage, strError)) {
         LogPrintf("CDarksendBroadcastTx::CheckSignature -- Got bad dstx signature, error: %s\n", strError);
         return false;
     }

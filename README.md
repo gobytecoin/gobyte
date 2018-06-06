@@ -1,10 +1,9 @@
-GoByte Core staging tree 0.12.1
+GoByte Core staging tree 0.12.2
 ===============================
 
 `master:` [![Build Status](https://travis-ci.org/gobytecoin/gobyte.svg?branch=master)](https://travis-ci.org/gobytecoin/gobyte) `develop:` [![Build Status](https://travis-ci.org/gobytecoin/gobyte.svg?branch=develop)](https://travis-ci.org/gobytecoin/gobyte/branches)
 
 https://www.gobyte.network
-
 
 What is GoByte?
 ----------------
@@ -12,7 +11,6 @@ What is GoByte?
 GoByte (GBX) is an innovative cryptocurrency. A form of digital currency secured by cryptography and issued through a decentralized and advanced mining market. Based on Dash, it's an enhanced and further developed version, featuring the masternode technology with 50% Reward, near-instant and secure payments as well as anonymous transactions. GoByte has great potential for rapid growth and expansion. Based on a total Proof of Work and Masternode system, it is accesible to everyone, it ensures a fair and stable return of investment for the Graphics Processing Units (GPUs) miners and the Masternode holders.
 
 Additional information, wallets, specifications & roadmap: https://bitcointalk.org/index.php?topic=2442185.0
-
 
 License
 -------
@@ -56,4 +54,3 @@ Changes should be tested by somebody other than the developer who wrote the
 code. This is especially important for large or high-risk changes. It is useful
 to add a test plan to the pull request description if testing the changes is
 not straightforward.
-

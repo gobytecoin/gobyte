@@ -14,6 +14,42 @@ src/test/test_gobyte
 src/qt/test/test_gobyte-qt
 src/bench/bench_gobyte
 
+# autoreconf
+Makefile.in
+aclocal.m4
+autom4te.cache/
+build-aux/config.guess
+build-aux/config.sub
+build-aux/depcomp
+build-aux/install-sh
+build-aux/ltmain.sh
+build-aux/m4/libtool.m4
+build-aux/m4/lt~obsolete.m4
+build-aux/m4/ltoptions.m4
+build-aux/m4/ltsugar.m4
+build-aux/m4/ltversion.m4
+build-aux/missing
+build-aux/compile
+build-aux/test-driver
+config.log
+config.status
+configure
+libtool
+src/config/gobyte-config.h
+src/config/gobyte-config.h.in
+src/config/stamp-h1
+share/setup.nsi
+share/qt/Info.plist
+
+src/univalue/gen
+
+src/qt/*.moc
+src/qt/moc_*.cpp
+src/qt/forms/ui_*.h
+
+src/qt/test/moc*.cpp
+libconftest.dylib*
+
 .deps
 .dirstamp
 .libs
@@ -41,6 +77,11 @@ src/bench/bench_gobyte
 *.lo
 *.la
 
+# Compilation and Qt preprocessor part
+*.qm
+Makefile
+gobyte-qt
+GoByte-Qt.app
 # Unit-tests
 Makefile.test
 gobyte-qt_test
@@ -80,7 +121,7 @@ share/BitcoindComparisonTool.jar
 .autotools
 /doc/doxygen/
 
-libbitcoinconsensus.pc
+libgobyteconsensus.pc
 src/qt/gobyte-qt.bash
 qa/pull-tester/tests-config.sh
 

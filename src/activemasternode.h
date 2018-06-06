@@ -6,9 +6,10 @@
 #ifndef ACTIVEMASTERNODE_H
 #define ACTIVEMASTERNODE_H
 
-#include "net.h"
+#include "chainparams.h"
 #include "key.h"
-#include "wallet/wallet.h"
+#include "net.h"
+#include "primitives/transaction.h"
 
 class CActiveMasternode;
 
@@ -26,8 +27,7 @@ class CActiveMasternode
 public:
     enum masternode_type_enum_t {
         MASTERNODE_UNKNOWN = 0,
-        MASTERNODE_REMOTE  = 1,
-        MASTERNODE_LOCAL   = 2
+        MASTERNODE_REMOTE  = 1
     };
 
 private:
@@ -39,7 +39,11 @@ private:
     bool fPingerEnabled;
 
     /// Ping Masternode
-    bool SendMasternodePing();
+    bool SendMasternodePing(CConnman& connman);
+
+    //  sentinel ping data
+    int64_t nSentinelPingTime;
+    uint32_t nSentinelVersion;
 
 public:
     // Keys for the active Masternode
@@ -47,33 +51,35 @@ public:
     CKey keyMasternode;
 
     // Initialized while registering Masternode
-    CTxIn vin;
+    COutPoint outpoint;
     CService service;
 
     int nState; // should be one of ACTIVE_MASTERNODE_XXXX
     std::string strNotCapableReason;
+
 
     CActiveMasternode()
         : eType(MASTERNODE_UNKNOWN),
           fPingerEnabled(false),
           pubKeyMasternode(),
           keyMasternode(),
-          vin(),
+          outpoint(),
           service(),
           nState(ACTIVE_MASTERNODE_INITIAL)
     {}
 
     /// Manage state of active Masternode
-    void ManageState();
+    void ManageState(CConnman& connman);
 
     std::string GetStateString() const;
     std::string GetStatus() const;
     std::string GetTypeString() const;
 
+    bool UpdateSentinelPing(int version);
+
 private:
-    void ManageStateInitial();
+    void ManageStateInitial(CConnman& connman);
     void ManageStateRemote();
-    void ManageStateLocal();
 };
 
 #endif

@@ -173,6 +173,7 @@ enum
 };
 
 #define READWRITE(obj)      (::SerReadWrite(s, (obj), nType, nVersion, ser_action))
+#define READWRITEMANY(...)      (::SerReadWriteMany(s, nType, nVersion, ser_action, __VA_ARGS__))
 
 /** 
  * Implement three methods for serializable objects. These are actually wrappers over
@@ -385,6 +386,7 @@ I ReadVarInt(Stream& is)
 
 #define FLATDATA(obj) REF(CFlatData((char*)&(obj), (char*)&(obj) + sizeof(obj)))
 #define VARINT(obj) REF(WrapVarInt(REF(obj)))
+#define COMPACTSIZE(obj) REF(CCompactSize(REF(obj)))
 #define LIMITED_STRING(obj,n) REF(LimitedString< n >(REF(obj)))
 
 /** 
@@ -452,6 +454,28 @@ public:
     template<typename Stream>
     void Unserialize(Stream& s, int, int) {
         n = ReadVarInt<Stream,I>(s);
+    }
+};
+
+class CCompactSize
+{
+protected:
+    uint64_t &n;
+public:
+    CCompactSize(uint64_t& nIn) : n(nIn) { }
+
+    unsigned int GetSerializeSize(int, int) const {
+        return GetSizeOfCompactSize(n);
+    }
+
+    template<typename Stream>
+    void Serialize(Stream &s, int, int) const {
+        WriteCompactSize<Stream>(s, n);
+    }
+
+    template<typename Stream>
+    void Unserialize(Stream& s, int, int) {
+        n = ReadCompactSize<Stream>(s);
     }
 };
 
@@ -982,5 +1006,53 @@ public:
         return nSize;
     }
 };
+
+template<typename Stream>
+void SerializeMany(Stream& s, int nType, int nVersion)
+{
+}
+
+template<typename Stream, typename Arg>
+void SerializeMany(Stream& s, int nType, int nVersion, Arg&& arg)
+{
+    ::Serialize(s, std::forward<Arg>(arg), nType, nVersion);
+}
+
+template<typename Stream, typename Arg, typename... Args>
+void SerializeMany(Stream& s, int nType, int nVersion, Arg&& arg, Args&&... args)
+{
+    ::Serialize(s, std::forward<Arg>(arg), nType, nVersion);
+    ::SerializeMany(s, nType, nVersion, std::forward<Args>(args)...);
+}
+
+template<typename Stream>
+inline void UnserializeMany(Stream& s, int nType, int nVersion)
+{
+}
+
+template<typename Stream, typename Arg>
+inline void UnserializeMany(Stream& s, int nType, int nVersion, Arg& arg)
+{
+    ::Unserialize(s, arg, nType, nVersion);
+}
+
+template<typename Stream, typename Arg, typename... Args>
+inline void UnserializeMany(Stream& s, int nType, int nVersion, Arg& arg, Args&... args)
+{
+    ::Unserialize(s, arg, nType, nVersion);
+    ::UnserializeMany(s, nType, nVersion, args...);
+}
+
+template<typename Stream, typename... Args>
+inline void SerReadWriteMany(Stream& s, int nType, int nVersion, CSerActionSerialize ser_action, Args&&... args)
+{
+    ::SerializeMany(s, nType, nVersion, std::forward<Args>(args)...);
+}
+
+template<typename Stream, typename... Args>
+inline void SerReadWriteMany(Stream& s, int nType, int nVersion, CSerActionUnserialize ser_action, Args&... args)
+{
+    ::UnserializeMany(s, nType, nVersion, args...);
+}
 
 #endif // BITCOIN_SERIALIZE_H
