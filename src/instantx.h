@@ -85,6 +85,8 @@ private:
 public:
     CCriticalSection cs_instantsend;
 
+    int ActiveProtocol();
+    
     void ProcessMessage(CNode* pfrom, std::string& strCommand, CDataStream& vRecv, CConnman& connman);
 
     bool ProcessTxLockRequest(const CTxLockRequest& txLockRequest, CConnman& connman);
