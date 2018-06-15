@@ -324,6 +324,9 @@ private:
 
 public:
     static void InitStandardDenominations();
+    
+    static int ActiveProtocol()
+    
     static std::vector<CAmount> GetStandardDenominations() { return vecStandardDenominations; }
     static CAmount GetSmallestDenomination() { return vecStandardDenominations.back(); }
 
