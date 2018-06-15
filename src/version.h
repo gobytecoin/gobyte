@@ -11,7 +11,7 @@
  * network protocol versioning
  */
 
-static const int PROTOCOL_VERSION = 70208;
+static const int PROTOCOL_VERSION = 70209;
 
 //! initial proto version, to be increased after version/verack negotiation
 static const int INIT_PROTO_VERSION = 209;
@@ -20,7 +20,7 @@ static const int INIT_PROTO_VERSION = 209;
 static const int GETHEADERS_VERSION = 70077;
 
 //! disconnect from peers older than this proto version
-static const int MIN_PEER_PROTO_VERSION = 70208;
+static const int MIN_PEER_PROTO_VERSION = 70209;
 
 //! nTime field added to CAddress, starting with this version;
 //! if possible, avoid requesting addresses nodes older than this
@@ -43,6 +43,6 @@ static const int NO_BLOOM_VERSION = 70201;
 static const int SENDHEADERS_VERSION = 70201;
 
 //! DIP0001 was activated in this version
-static const int DIP0001_PROTOCOL_VERSION = 70208;
+static const int DIP0001_PROTOCOL_VERSION = 70209;
 
 #endif // BITCOIN_VERSION_H
