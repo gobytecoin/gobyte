@@ -1148,12 +1148,12 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv, 
             return false;
         }
 
-        if (nVersion < CConnman::ActiveProtocol())
+        if (nVersion < connman.ActiveProtocol())
         {
             // disconnect from peers older than this proto version
             LogPrintf("peer=%d using obsolete version %i; disconnecting\n", pfrom->id, nVersion);
             connman.PushMessageWithVersion(pfrom, INIT_PROTO_VERSION, NetMsgType::REJECT, strCommand, REJECT_OBSOLETE,
-                               strprintf("Version must be %d or greater", CConnman::ActiveProtocol()));
+                               strprintf("Version must be %d or greater", connman.ActiveProtocol()));
             pfrom->fDisconnect = true;
             return false;
         }
