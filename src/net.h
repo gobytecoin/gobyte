@@ -342,6 +342,8 @@ public:
     void SetBanned(const banmap_t &banmap);
 
     void AddOneShot(const std::string& strDest);
+    
+    int ActiveProtocol();
 
     bool AddNode(const std::string& node);
     bool RemoveAddedNode(const std::string& node);
