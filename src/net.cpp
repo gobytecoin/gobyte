@@ -102,7 +102,7 @@ unsigned short GetListenPort()
     return (unsigned short)(GetArg("-port", Params().GetDefaultPort()));
 }
   
-int ActiveProtocol()
+int CConnman::ActiveProtocol()
 {
     if(sporkManager.IsSporkActive(SPORK_15_STRICT_NEW_PROTO_FLAG)) return STRICT_PEER_PROTO_VERSION;
 
