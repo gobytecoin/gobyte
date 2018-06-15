@@ -101,6 +101,14 @@ unsigned short GetListenPort()
 {
     return (unsigned short)(GetArg("-port", Params().GetDefaultPort()));
 }
+  
+int ActiveProtocol()
+{
+    if(sporkManager.IsSporkActive(SPORK_15_STRICT_NEW_PROTO_FLAG)) return STRICT_PEER_PROTO_VERSION;
+
+    // Return the min protocol version if no spork is active.
+    return MIN_PEER_PROTO_VERSION;
+}
 
 // find 'best' local address for a particular peer
 bool GetLocal(CService& addr, const CNetAddr *paddrPeer)
