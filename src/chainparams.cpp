@@ -147,6 +147,12 @@ public:
         vSeeds.push_back(CDNSSeedData("gobyte.network", "seed2.gobyte.network"));
         vSeeds.push_back(CDNSSeedData("gobyte.network", "seed3.gobyte.network"));
         vSeeds.push_back(CDNSSeedData("gobyte.network", "seed4.gobyte.network"));
+        vSeeds.push_back(CDNSSeedData("gobyte.network", "seed5.gobyte.network"));
+        vSeeds.push_back(CDNSSeedData("gobyte.network", "seed6.gobyte.network"));
+        vSeeds.push_back(CDNSSeedData("gobyte.network", "seed7.gobyte.network"));
+        vSeeds.push_back(CDNSSeedData("gobyte.network", "seed8.gobyte.network"));
+        vSeeds.push_back(CDNSSeedData("gobyte.network", "seed9.gobyte.network"));
+        vSeeds.push_back(CDNSSeedData("gobyte.network", "seed10.gobyte.network"));
 
         // GoByte addresses start with 'G'
         base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1,38);
