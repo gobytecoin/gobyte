@@ -47,6 +47,14 @@ CInstantSend instantsend;
 // CInstantSend
 //
 
+int CInstantSend::ActiveProtocol()
+{
+    if(sporkManager.IsSporkActive(SPORK_15_STRICT_NEW_PROTO_FLAG)) return STRICT_INSTANTSEND_PROTO_VERSION;
+
+    // Return the current protocol version if no spork is active.
+    return MIN_INSTANTSEND_PROTO_VERSION;
+}
+
 void CInstantSend::ProcessMessage(CNode* pfrom, std::string& strCommand, CDataStream& vRecv, CConnman& connman)
 {
     if(fLiteMode) return; // disable all GoByte specific functionality
@@ -56,7 +64,7 @@ void CInstantSend::ProcessMessage(CNode* pfrom, std::string& strCommand, CDataSt
 
     if (strCommand == NetMsgType::TXLOCKVOTE) // InstantSend Transaction Lock Consensus Votes
     {
-        if(pfrom->nVersion < MIN_INSTANTSEND_PROTO_VERSION) return;
+        if(pfrom->nVersion < ActiveProtocol()) return;
 
         CTxLockVote vote;
         vRecv >> vote;
@@ -215,7 +223,7 @@ void CInstantSend::Vote(CTxLockCandidate& txLockCandidate, CConnman& connman)
         int nLockInputHeight = nPrevoutHeight + 4;
 
         int nRank;
-        if(!mnodeman.GetMasternodeRank(activeMasternode.outpoint, nRank, nLockInputHeight, MIN_INSTANTSEND_PROTO_VERSION)) {
+        if(!mnodeman.GetMasternodeRank(activeMasternode.outpoint, nRank, nLockInputHeight, ActiveProtocol())) {
             LogPrint("instantsend", "CInstantSend::Vote -- Can't calculate rank for masternode %s\n", activeMasternode.outpoint.ToStringShort());
             ++itOutpointLock;
             continue;

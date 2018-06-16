@@ -143,10 +143,16 @@ public:
         assert(genesis.hashMerkleRoot == uint256S("0xdc9a719dc1bcda39107ea55424f00cab512170a1cb69efa08531f483f2399f21"));
 
 
-        vSeeds.push_back(CDNSSeedData("gobyte.network", "seed1.gobyte.network"));
-        vSeeds.push_back(CDNSSeedData("gobyte.network", "seed2.gobyte.network"));
-        vSeeds.push_back(CDNSSeedData("gobyte.network", "seed3.gobyte.network"));
-        vSeeds.push_back(CDNSSeedData("gobyte.network", "seed4.gobyte.network"));
+        vSeeds.push_back(CDNSSeedData("seed1.gobyte.network", "seed1.gobyte.network"));
+        vSeeds.push_back(CDNSSeedData("seed2.gobyte.network", "seed2.gobyte.network"));
+        vSeeds.push_back(CDNSSeedData("seed3.gobyte.network", "seed3.gobyte.network"));
+        vSeeds.push_back(CDNSSeedData("seed4.gobyte.network", "seed4.gobyte.network"));
+        vSeeds.push_back(CDNSSeedData("seed5.gobyte.network", "seed5.gobyte.network"));
+        vSeeds.push_back(CDNSSeedData("seed6.gobyte.network", "seed6.gobyte.network"));
+        vSeeds.push_back(CDNSSeedData("seed7.gobyte.network", "seed7.gobyte.network"));
+        vSeeds.push_back(CDNSSeedData("seed8.gobyte.network", "seed8.gobyte.network"));
+        vSeeds.push_back(CDNSSeedData("seed9.gobyte.network", "seed9.gobyte.network"));
+        vSeeds.push_back(CDNSSeedData("seed10.gobyte.network", "seed10.gobyte.network"));
 
         // GoByte addresses start with 'G'
         base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1,38);
@@ -196,9 +202,10 @@ public:
             ( 85500, uint256S("0x00000000003ead42a3ba43e9c0a536b6aef038aea4d6b3961df2af6edec26106"))
             ( 90500, uint256S("0x000000000030eff4e52d37edee0dc14c13168fee49c743e32fcec206003844e0"))
             ( 95500, uint256S("0x000000000078e57c0dc90b7dd4027ea54279c63c62bb6b7a38349ec783613056"))
-            ( 100500, uint256S("0x00000000004f79e57507c1b26b962f25f5102d43cfab93de118346b4a0426626")),
-            1526768104, // * UNIX timestamp of last checkpoint block
-            218169,   // * total number of transactions between genesis and last checkpoint
+            ( 100500, uint256S("0x00000000004f79e57507c1b26b962f25f5102d43cfab93de118346b4a0426626"))
+            ( 115350, uint256S("0x0000000000004c32b0b20b153148e357b663e8948c0a561805442d1e7e034a1e")),
+            1529098510, // * UNIX timestamp of last checkpoint block
+            244296,   // * total number of transactions between genesis and last checkpoint
                         //   (the tx=... number in the SetBestChain debug.log lines)
             2800        // * estimated number of transactions per day after checkpoint
         };

@@ -24,7 +24,8 @@ static const int PRIVATESEND_QUEUE_TIMEOUT          = 30;
 static const int PRIVATESEND_SIGNING_TIMEOUT        = 15;
 
 //! minimum peer version accepted by mixing pool
-static const int MIN_PRIVATESEND_PEER_PROTO_VERSION = 70209;
+static const int MIN_PRIVATESEND_PEER_PROTO_VERSION = 70208;
+static const int STRICT_PRIVATESEND_PEER_PROTO_VERSION = 70209;
 
 static const CAmount PRIVATESEND_ENTRY_MAX_SIZE     = 9;
 
@@ -323,6 +324,9 @@ private:
 
 public:
     static void InitStandardDenominations();
+    
+    static int ActiveProtocol();
+    
     static std::vector<CAmount> GetStandardDenominations() { return vecStandardDenominations; }
     static CAmount GetSmallestDenomination() { return vecStandardDenominations.back(); }
 
