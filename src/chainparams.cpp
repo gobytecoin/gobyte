@@ -143,16 +143,16 @@ public:
         assert(genesis.hashMerkleRoot == uint256S("0xdc9a719dc1bcda39107ea55424f00cab512170a1cb69efa08531f483f2399f21"));
 
 
-        vSeeds.push_back(CDNSSeedData("gobyte.network", "seed1.gobyte.network"));
-        vSeeds.push_back(CDNSSeedData("gobyte.network", "seed2.gobyte.network"));
-        vSeeds.push_back(CDNSSeedData("gobyte.network", "seed3.gobyte.network"));
-        vSeeds.push_back(CDNSSeedData("gobyte.network", "seed4.gobyte.network"));
-        vSeeds.push_back(CDNSSeedData("gobyte.network", "seed5.gobyte.network"));
-        vSeeds.push_back(CDNSSeedData("gobyte.network", "seed6.gobyte.network"));
-        vSeeds.push_back(CDNSSeedData("gobyte.network", "seed7.gobyte.network"));
-        vSeeds.push_back(CDNSSeedData("gobyte.network", "seed8.gobyte.network"));
-        vSeeds.push_back(CDNSSeedData("gobyte.network", "seed9.gobyte.network"));
-        vSeeds.push_back(CDNSSeedData("gobyte.network", "seed10.gobyte.network"));
+        vSeeds.push_back(CDNSSeedData("seed1.gobyte.network", "seed1.gobyte.network"));
+        vSeeds.push_back(CDNSSeedData("seed2.gobyte.network", "seed2.gobyte.network"));
+        vSeeds.push_back(CDNSSeedData("seed3.gobyte.network", "seed3.gobyte.network"));
+        vSeeds.push_back(CDNSSeedData("seed4.gobyte.network", "seed4.gobyte.network"));
+        vSeeds.push_back(CDNSSeedData("seed5.gobyte.network", "seed5.gobyte.network"));
+        vSeeds.push_back(CDNSSeedData("seed6.gobyte.network", "seed6.gobyte.network"));
+        vSeeds.push_back(CDNSSeedData("seed7.gobyte.network", "seed7.gobyte.network"));
+        vSeeds.push_back(CDNSSeedData("seed8.gobyte.network", "seed8.gobyte.network"));
+        vSeeds.push_back(CDNSSeedData("seed9.gobyte.network", "seed9.gobyte.network"));
+        vSeeds.push_back(CDNSSeedData("seed10.gobyte.network", "seed10.gobyte.network"));
 
         // GoByte addresses start with 'G'
         base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1,38);
