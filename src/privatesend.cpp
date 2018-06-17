@@ -67,7 +67,7 @@ bool CDarksendQueue::Relay(CConnman& connman)
 {
     std::vector<CNode*> vNodesCopy = connman.CopyNodeVector();
     BOOST_FOREACH(CNode* pnode, vNodesCopy)
-        if(pnode->nVersion >= MIN_PRIVATESEND_PEER_PROTO_VERSION)
+        if(pnode->nVersion >= CPrivateSend::ActiveProtocol())
             connman.PushMessage(pnode, NetMsgType::DSQUEUE, (*this));
 
     connman.ReleaseNodeVector(vNodesCopy);
@@ -151,6 +151,14 @@ std::string CPrivateSendBase::GetStateString() const
 std::vector<CAmount> CPrivateSend::vecStandardDenominations;
 std::map<uint256, CDarksendBroadcastTx> CPrivateSend::mapDSTX;
 CCriticalSection CPrivateSend::cs_mapdstx;
+
+int CPrivateSend::ActiveProtocol()
+{
+    if(sporkManager.IsSporkActive(SPORK_15_STRICT_NEW_PROTO_FLAG)) return STRICT_PRIVATESEND_PEER_PROTO_VERSION;
+
+    // Return the current protocol version if no spork is active.
+    return MIN_PRIVATESEND_PEER_PROTO_VERSION;
+}
 
 void CPrivateSend::InitStandardDenominations()
 {
