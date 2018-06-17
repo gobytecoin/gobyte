@@ -193,7 +193,7 @@ This release includes experimental implementation of BIP39/BIP44 compatible HD w
 - [`5f4362cb8`] fix SPORK_5_INSTANTSEND_MAX_VALUE validation in CWallet::CreateTransaction (#1619)
 - [`d7a8489f3`] Fix masternode score/rank calculations (#1620)
 - [`b41f8d3dd`] fix instantsend-related RPC output (#1628)
-- [`502748487`] bump MIN_INSTANTSEND_PROTO_VERSION to 70208 (#1650)
+- [`502748487`] bump MIN_INSTANTSEND_PROTO_VERSION to 70209 (#1650)
 - [`788ae63ac`] Fix edge case for IS (skip inputs that are too large) (#1695)
 - [`470e5435c`] remove InstantSend votes for failed lock attemts after some timeout (#1705)
 - [`a9293ad03`] update setAskFor on TXLOCKVOTE (#1713)
