@@ -4,7 +4,7 @@
 
 GoByte Core version 0.12.0 is now available from:
 
-  https://www.gobyte.network
+  https://gobytecoin.io/downloads
 
 Please report bugs using the issue tracker at github:
 
@@ -19,7 +19,7 @@ shut down (which might take a few minutes for older versions), then run the
 installer (on Windows) or just copy over /Applications/GoByte-Qt (on Mac) or
 gobyted/gobyte-qt (on Linux).
 
-**This new version uses transaction indexing by default, you will need to reindex
+**This new version uses transaction indexing by default, you will need to reindex 
 the blockchain. To do so, start the client with --reindex.**
 
 
@@ -51,7 +51,7 @@ This does not affect wallet forward or backward compatibility.
 ----------------
 
 Switched to Bitcoin Core version 0.10 - https://bitcoin.org/en/release/v0.10.0
-- Implemented decentralized budget system
+- Implemented decentralized budget system 
 - Removed reference node
 - Implemented new decentralized masternode payment consensus system
 - Improved speed of DS

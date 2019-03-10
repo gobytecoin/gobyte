@@ -49,6 +49,7 @@ public:
         SpendZeroConfChange,    // bool
         ShowMasternodesTab,     // bool
         ShowAdvancedPSUI,       // bool
+        ShowPrivateSendPopups,  // bool
         LowKeysWarning,         // bool
         PrivateSendRounds,      // int
         PrivateSendAmount,      // int
@@ -92,12 +93,14 @@ private:
     QString strThirdPartyTxUrls;
     bool fCoinControlFeatures;
     bool fShowAdvancedPSUI;
-    /* settings that were overriden by command-line */
+    /* settings that were overridden by command-line */
     QString strOverriddenByCommandLine;
 
-    /// Add option to list of GUI options overridden through command line/config file
+    // Add option to list of GUI options overridden through command line/config file
     void addOverriddenOption(const std::string &option);
 
+    // Check settings version and upgrade default values if required
+    void checkAndMigrate();
 Q_SIGNALS:
     void displayUnitChanged(int unit);
     void privateSendRoundsChanged();

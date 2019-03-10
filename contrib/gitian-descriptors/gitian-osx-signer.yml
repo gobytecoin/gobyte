@@ -1,17 +1,16 @@
 ---
 name: "gobyte-dmg-signer"
 suites:
-- "trusty"
+- "bionic"
 architectures:
 - "amd64"
 packages:
 - "faketime"
-reference_datetime: "2017-01-01 00:00:00"
 remotes:
 - "url": "https://github.com/gobytecoin/gobyte-detached-sigs.git"
   "dir": "signature"
 files:
-- "gobyte-osx-unsigned.tar.gz"
+- "gobytecore-osx-unsigned.tar.gz"
 script: |
   WRAP_DIR=$HOME/wrapped
   mkdir -p ${WRAP_DIR}
@@ -28,10 +27,11 @@ script: |
     chmod +x ${WRAP_DIR}/${prog}
   done
 
-  UNSIGNED=gobyte-osx-unsigned.tar.gz
-  SIGNED=gobyte-osx-signed.dmg
+  UNSIGNED=gobytecore-osx-unsigned.tar.gz
+  SIGNED=gobytecore-osx-signed.dmg
 
   tar -xf ${UNSIGNED}
+  OSX_VOLNAME="$(cat osx_volname)"
   ./detached-sig-apply.sh ${UNSIGNED} signature/osx
-  ${WRAP_DIR}/genisoimage -no-cache-inodes -D -l -probe -V "GoByte-Core" -no-pad -r -dir-mode 0755 -apple -o uncompressed.dmg signed-app
+  ${WRAP_DIR}/genisoimage -no-cache-inodes -D -l -probe -V "${OSX_VOLNAME}" -no-pad -r -dir-mode 0755 -apple -o uncompressed.dmg signed-app
   ${WRAP_DIR}/dmg dmg uncompressed.dmg ${OUTDIR}/${SIGNED}

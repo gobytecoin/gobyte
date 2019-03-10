@@ -1,4 +1,3 @@
-// Copyright (c) 2014-2017 The Dash Core developers
 // Copyright (c) 2017-2019 The GoByte Core developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
@@ -13,6 +12,7 @@ class CKeyHolder
 private:
     CReserveKey reserveKey;
     CPubKey pubKey;
+
 public:
     CKeyHolder(CWallet* pwalletIn);
     CKeyHolder(CKeyHolder&&) = default;
@@ -21,7 +21,6 @@ public:
     void ReturnKey();
 
     CScript GetScriptForDestination() const;
-
 };
 
 class CKeyHolderStorage
@@ -34,6 +33,5 @@ public:
     CScript AddKey(CWallet* pwalletIn);
     void KeepAll();
     void ReturnAll();
-
 };
 #endif //PRIVATESENDUTIL_H

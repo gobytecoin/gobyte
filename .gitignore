@@ -61,7 +61,7 @@ libconftest.dylib*
 *.pyc
 *.o
 *.o-*
-.gobyte
+*.patch
 *.a
 *.pb.cc
 *.pb.h
@@ -82,6 +82,7 @@ libconftest.dylib*
 Makefile
 gobyte-qt
 GoByte-Qt.app
+
 # Unit-tests
 Makefile.test
 gobyte-qt_test
@@ -113,6 +114,7 @@ qa/pull-tester/test.*/*
 qa/tmp
 cache/
 share/BitcoindComparisonTool.jar
+qa/cache/*
 
 !src/leveldb*/Makefile
 
@@ -122,6 +124,7 @@ share/BitcoindComparisonTool.jar
 /doc/doxygen/
 
 libgobyteconsensus.pc
+contrib/devtools/split-debug.sh
 src/qt/gobyte-qt.bash
 qa/pull-tester/tests-config.sh
 
@@ -129,3 +132,9 @@ qa/pull-tester/tests-config.sh
 gobyte-cli
 gobyted
 gobyte-qt
+
+/docker/bin
+
+# CLion
+.idea
+cmake-build-debug

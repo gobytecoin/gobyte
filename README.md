@@ -1,11 +1,12 @@
 ![GitHub Logo](https://raw.githubusercontent.com/gobytecoin/gobyte/master/share/pixmaps/gobyte128.png "GoByte")
 
-GoByte Core v0.12.2.4 (GBX)
+GoByte Core staging tree 0.13.0
 ===============================
 
 `master:` [![Build Status](https://travis-ci.org/gobytecoin/gobyte.svg?branch=master)](https://travis-ci.org/gobytecoin/gobyte) `develop:` [![Build Status](https://travis-ci.org/gobytecoin/gobyte.svg?branch=develop)](https://travis-ci.org/gobytecoin/gobyte/branches)
 
 https://www.gobyte.network
+
 
 What is GoByte?
 ----------------
@@ -13,6 +14,7 @@ What is GoByte?
 GoByte (GBX) is an innovative cryptocurrency. A form of digital currency secured by cryptography and issued through a decentralized and advanced mining market. Based on Dash, it's an enhanced and further developed version, featuring the masternode technology with 50% Reward, near-instant and secure payments as well as anonymous transactions. GoByte has great potential for rapid growth and expansion. Based on a total Proof of Work and Masternode system, it is accesible to everyone, it ensures a fair and stable return of investment for the Graphics Processing Units (GPUs) miners and the Masternode holders.
 
 Additional information, wallets, specifications & roadmap: https://bitcointalk.org/index.php?topic=2442185.0
+
 
 License
 -------
@@ -39,16 +41,16 @@ lots of money.
 
 ### Automated Testing
 
-Developers are strongly encouraged to write [unit tests](/doc/unit-tests.md) for new code, and to
+Developers are strongly encouraged to write [unit tests](src/test/README.md) for new code, and to
 submit new unit tests for old code. Unit tests can be compiled and run
-(assuming they weren't disabled in configure) with: `make check`
+(assuming they weren't disabled in configure) with: `make check`. Further details on running
+and extending unit tests can be found in [/src/test/README.md](/src/test/README.md).
 
 There are also [regression and integration tests](/qa) of the RPC interface, written
 in Python, that are run automatically on the build server.
 These tests can be run (if the [test dependencies](/qa) are installed) with: `qa/pull-tester/rpc-tests.py`
 
-The Travis CI system makes sure that every pull request is built for Windows
-and Linux, OS X, and that unit and sanity tests are automatically run.
+The Travis CI system makes sure that every pull request is built for Windows, Linux, and OS X, and that unit/sanity tests are run automatically.
 
 ### Manual Quality Assurance (QA) Testing
 

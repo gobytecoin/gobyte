@@ -15,9 +15,9 @@
 
 //! These need to be macros, as clientversion.cpp's and gobyte*-res.rc's voodoo requires it
 #define CLIENT_VERSION_MAJOR 0
-#define CLIENT_VERSION_MINOR 12
-#define CLIENT_VERSION_REVISION 2
-#define CLIENT_VERSION_BUILD 4
+#define CLIENT_VERSION_MINOR 13
+#define CLIENT_VERSION_REVISION 1
+#define CLIENT_VERSION_BUILD 0
 
 //! Set to true for release, false for prerelease or test build
 #define CLIENT_VERSION_IS_RELEASE true
@@ -26,7 +26,7 @@
  * Copyright year (2009-this)
  * Todo: update this when changing our copyright comments in the source
  */
-#define COPYRIGHT_YEAR 2019
+#define COPYRIGHT_YEAR 2018
 
 #endif //HAVE_CONFIG_H
 
@@ -38,7 +38,7 @@
 #define DO_STRINGIZE(X) #X
 
 //! Copyright string used in Windows .rc files
-#define COPYRIGHT_STR "2009-" STRINGIZE(COPYRIGHT_YEAR) " The Bitcoin Core Developers, 2017-" STRINGIZE(COPYRIGHT_YEAR) " The GoByte Core Developers"
+#define COPYRIGHT_STR "2009-" STRINGIZE(COPYRIGHT_YEAR) " The Bitcoin Core Developers, 2017-" STRINGIZE(COPYRIGHT_YEAR) " " COPYRIGHT_HOLDERS_FINAL
 
 /**
  * gobyted-res.rc includes this file, but it cannot cope with real c++ code.
@@ -59,9 +59,8 @@ static const int CLIENT_VERSION =
 
 extern const std::string CLIENT_NAME;
 extern const std::string CLIENT_BUILD;
-extern const std::string CLIENT_DATE;
 
-
+std::string FormatVersion(int nVersion);
 std::string FormatFullVersion();
 std::string FormatSubVersion(const std::string& name, int nClientVersion, const std::vector<std::string>& comments);
 

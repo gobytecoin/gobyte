@@ -17,24 +17,22 @@
 #include <stdint.h>
 #include <fstream>
 
-using namespace std;
-
 /**
  * JSON-RPC protocol.  Bitcoin speaks version 1.0 for maximum compatibility,
  * but uses JSON-RPC 1.1/2.0 standards for parts of the 1.0 standard that were
  * unspecified (HTTP errors and contents of 'error').
- *
+ * 
  * 1.0 spec: http://json-rpc.org/wiki/specification
  * 1.2 spec: http://jsonrpc.org/historical/json-rpc-over-http.html
  */
 
-string JSONRPCRequest(const string& strMethod, const UniValue& params, const UniValue& id)
+UniValue JSONRPCRequestObj(const std::string& strMethod, const UniValue& params, const UniValue& id)
 {
     UniValue request(UniValue::VOBJ);
     request.push_back(Pair("method", strMethod));
     request.push_back(Pair("params", params));
     request.push_back(Pair("id", id));
-    return request.write() + "\n";
+    return request;
 }
 
 UniValue JSONRPCReplyObj(const UniValue& result, const UniValue& error, const UniValue& id)
@@ -49,13 +47,13 @@ UniValue JSONRPCReplyObj(const UniValue& result, const UniValue& error, const Un
     return reply;
 }
 
-string JSONRPCReply(const UniValue& result, const UniValue& error, const UniValue& id)
+std::string JSONRPCReply(const UniValue& result, const UniValue& error, const UniValue& id)
 {
     UniValue reply = JSONRPCReplyObj(result, error, id);
     return reply.write() + "\n";
 }
 
-UniValue JSONRPCError(int code, const string& message)
+UniValue JSONRPCError(int code, const std::string& message)
 {
     UniValue error(UniValue::VOBJ);
     error.push_back(Pair("code", code));
@@ -128,3 +126,4 @@ void DeleteAuthCookie()
         LogPrintf("%s: Unable to remove random auth cookie file: %s\n", __func__, e.what());
     }
 }
+

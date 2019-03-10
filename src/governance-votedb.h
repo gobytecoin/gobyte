@@ -1,4 +1,3 @@
-// Copyright (c) 2014-2017 The Dash Core developers
 // Copyright (c) 2017-2019 The GoByte Core developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
@@ -11,6 +10,7 @@
 
 #include "governance-vote.h"
 #include "serialize.h"
+#include "streams.h"
 #include "uint256.h"
 
 /**
@@ -30,7 +30,7 @@ public: // Types
 
     typedef vote_l_t::const_iterator vote_l_cit;
 
-    typedef std::map<uint256,vote_l_it> vote_m_t;
+    typedef std::map<uint256, vote_l_it> vote_m_t;
 
     typedef vote_m_t::iterator vote_m_it;
 
@@ -63,32 +63,35 @@ public:
     /**
      * Retrieve a vote cached in memory
      */
-    bool GetVote(const uint256& nHash, CGovernanceVote& vote) const;
+    bool SerializeVoteToStream(const uint256& nHash, CDataStream& ss) const;
 
-    int GetVoteCount() {
+    int GetVoteCount()
+    {
         return nMemoryVotes;
     }
 
     std::vector<CGovernanceVote> GetVotes() const;
 
-    CGovernanceObjectVoteFile& operator=(const CGovernanceObjectVoteFile& other);
-
     void RemoveVotesFromMasternode(const COutPoint& outpointMasternode);
+    std::set<uint256> RemoveInvalidProposalVotes(const COutPoint& outpointMasternode);
+
+    // TODO can be removed after full DIP3 deployment
+    std::vector<uint256> RemoveOldVotes(unsigned int nMinTime);
 
     ADD_SERIALIZE_METHODS;
 
     template <typename Stream, typename Operation>
-    inline void SerializationOp(Stream& s, Operation ser_action, int nType, int nVersion)
+    inline void SerializationOp(Stream& s, Operation ser_action)
     {
         READWRITE(nMemoryVotes);
         READWRITE(listVotes);
-        if(ser_action.ForRead()) {
+        if (ser_action.ForRead()) {
             RebuildIndex();
         }
     }
+
 private:
     void RebuildIndex();
-
 };
 
 #endif

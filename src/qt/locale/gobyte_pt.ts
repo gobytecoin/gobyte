@@ -3630,8 +3630,8 @@ https://www.transifex.com/projects/p/gobyte/</translation>
         <translation>Definir o limite de processadores quando a geração está activa (-1 = todos, omissão: %d)</translation>
     </message>
     <message>
-        <source>Show N confirmations for a successfully locked transaction (0-9999, default: %u)</source>
-        <translation>Mostrar N confirmações para uma transacção bloqueada com sucesso (0-9999, omissão: %u)</translation>
+        <source>Show N confirmations for a successfully locked transaction (0-12455, default: %u)</source>
+        <translation>Mostrar N confirmações para uma transacção bloqueada com sucesso (0-12455, omissão: %u)</translation>
     </message>
     <message>
         <source>This product includes software developed by the OpenSSL Project for use in the OpenSSL Toolkit &lt;https://www.openssl.org/&gt; and cryptographic software written by Eric Young and UPnP software written by Thomas Bernard.</source>
@@ -3654,8 +3654,8 @@ https://www.transifex.com/projects/p/gobyte/</translation>
         <translation>Aviso: Por favor verifique que a data e a hora do computador está correcta! Se o relógio estiver errado o GoByte Core não vai funcionar correctamente.</translation>
     </message>
     <message>
-        <source>(9999 could be used only on mainnet)</source>
-        <translation>(9999 apenas pode ser usado para mainnet)</translation>
+        <source>(12455 could be used only on mainnet)</source>
+        <translation>(12455 apenas pode ser usado para mainnet)</translation>
     </message>
     <message>
         <source>(default: %s)</source>
@@ -4064,8 +4064,8 @@ https://www.transifex.com/projects/p/gobyte/</translation>
         <translation>masternodeprivkey inválida. Por favor reveja a documentação.</translation>
     </message>
     <message>
-        <source>(must be 9999 for mainnet)</source>
-        <translation>(deve ser 9999 para mainnet)</translation>
+        <source>(must be 12455 for mainnet)</source>
+        <translation>(deve ser 12455 para mainnet)</translation>
     </message>
     <message>
         <source>Can't find random Masternode.</source>

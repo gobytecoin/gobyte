@@ -1,11 +1,10 @@
-// Copyright (c) 2014-2017 The Dash Core developers
 // Copyright (c) 2017-2019 The GoByte Core developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 #ifndef GOVERNANCE_CLASSES_H
 #define GOVERNANCE_CLASSES_H
 
-//#define ENABLE_GBX_DEBUG
+//#define ENABLE_GOBYTE_DEBUG
 
 #include "base58.h"
 #include "governance.h"
@@ -13,23 +12,14 @@
 #include "script/standard.h"
 #include "util.h"
 
-#include <boost/shared_ptr.hpp>
-
 class CSuperblock;
-class CGovernanceTrigger;
 class CGovernanceTriggerManager;
 class CSuperblockManager;
 
-static const int TRIGGER_UNKNOWN            = -1;
-static const int TRIGGER_SUPERBLOCK         = 1000;
-
-typedef boost::shared_ptr<CSuperblock> CSuperblock_sptr;
+typedef std::shared_ptr<CSuperblock> CSuperblock_sptr;
 
 // DECLARE GLOBAL VARIABLES FOR GOVERNANCE CLASSES
 extern CGovernanceTriggerManager triggerman;
-
-// SPLIT A STRING UP - USED FOR SUPERBLOCK PAYMENTS
-std::vector<std::string> SplitBy(std::string strCommand, std::string strDelimit);
 
 /**
 *   Trigger Mananger
@@ -46,7 +36,6 @@ class CGovernanceTriggerManager
 private:
     typedef std::map<uint256, CSuperblock_sptr> trigger_m_t;
     typedef trigger_m_t::iterator trigger_m_it;
-    typedef trigger_m_t::const_iterator trigger_m_cit;
 
     trigger_m_t mapTrigger;
 
@@ -55,7 +44,8 @@ private:
     void CleanAndRemove();
 
 public:
-    CGovernanceTriggerManager() : mapTrigger() {}
+    CGovernanceTriggerManager() :
+        mapTrigger() {}
 };
 
 /**
@@ -70,10 +60,10 @@ private:
     static bool GetBestSuperblock(CSuperblock_sptr& pSuperblockRet, int nBlockHeight);
 
 public:
-
     static bool IsSuperblockTriggered(int nBlockHeight);
 
-    static void CreateSuperblock(CMutableTransaction& txNewRet, int nBlockHeight, std::vector<CTxOut>& voutSuperblockRet);
+    static bool GetSuperblockPayments(int nBlockHeight, std::vector<CTxOut>& voutSuperblockRet);
+    static void ExecuteBestSuperblock(int nBlockHeight);
 
     static std::string GetRequiredPaymentsString(int nBlockHeight);
     static bool IsValid(const CTransaction& txNew, int nBlockHeight, CAmount blockReward);
@@ -93,33 +83,29 @@ public:
     CScript script;
     CAmount nAmount;
 
-    CGovernancePayment()
-        :fValid(false),
-         script(),
-         nAmount(0)
-    {}
-
-    CGovernancePayment(CBitcoinAddress addrIn, CAmount nAmountIn)
-        :fValid(false),
-         script(),
-         nAmount(0)
+    CGovernancePayment() :
+        fValid(false),
+        script(),
+        nAmount(0)
     {
-        try
-        {
+    }
+
+    CGovernancePayment(CBitcoinAddress addrIn, CAmount nAmountIn) :
+        fValid(false),
+        script(),
+        nAmount(0)
+    {
+        try {
             CTxDestination dest = addrIn.Get();
             script = GetScriptForDestination(dest);
             nAmount = nAmountIn;
             fValid = true;
-        }
-        catch(std::exception& e)
-        {
+        } catch (std::exception& e) {
             LogPrintf("CGovernancePayment Payment not valid: addrIn = %s, nAmountIn = %d, what = %s\n",
-                     addrIn.ToString(), nAmountIn, e.what());
-        }
-        catch(...)
-        {
+                addrIn.ToString(), nAmountIn, e.what());
+        } catch (...) {
             LogPrintf("CGovernancePayment Payment not valid: addrIn = %s, nAmountIn = %d\n",
-                      addrIn.ToString(), nAmountIn);
+                addrIn.ToString(), nAmountIn);
         }
     }
 
@@ -149,18 +135,18 @@ class CSuperblock : public CGovernanceObject
 private:
     uint256 nGovObjHash;
 
-    int nEpochStart;
+    int nBlockHeight;
     int nStatus;
     std::vector<CGovernancePayment> vecPayments;
 
-    void ParsePaymentSchedule(std::string& strPaymentAddresses, std::string& strPaymentAmounts);
+    void ParsePaymentSchedule(const std::string& strPaymentAddresses, const std::string& strPaymentAmounts);
 
 public:
-
     CSuperblock();
     CSuperblock(uint256& nHash);
 
     static bool IsValidBlockHeight(int nBlockHeight);
+    static void GetNearestSuperblocksHeights(int nBlockHeight, int& nLastSuperblockRet, int& nNextSuperblockRet);
     static CAmount GetPaymentsLimit(int nBlockHeight);
 
     int GetStatus() { return nStatus; }
@@ -178,26 +164,9 @@ public:
         return pObj;
     }
 
-    int GetBlockStart()
+    int GetBlockHeight()
     {
-        /* // 12.1 TRIGGER EXECUTION */
-        /* // NOTE : Is this over complicated? */
-
-        /* //int nRet = 0; */
-        /* int nTipEpoch = 0; */
-        /* int nTipBlock = chainActive.Tip()->nHeight+1; */
-
-        /* // GET TIP EPOCK / BLOCK */
-
-        /* // typically it should be more than the current time */
-        /* int nDiff = nEpochStart - nTipEpoch; */
-        /* int nBlockDiff = nDiff / (2.6*60); */
-
-        /* // calculate predicted block height */
-        /* int nMod = (nTipBlock + nBlockDiff) % Params().GetConsensus().nSuperblockCycle; */
-
-        /* return (nTipBlock + nBlockDiff)-nMod; */
-        return nEpochStart;
+        return nBlockHeight;
     }
 
     int CountPayments() { return (int)vecPayments.size(); }
@@ -205,6 +174,7 @@ public:
     CAmount GetPaymentsTotalAmount();
 
     bool IsValid(const CTransaction& txNew, int nBlockHeight, CAmount blockReward);
+    bool IsExpired();
 };
 
 #endif

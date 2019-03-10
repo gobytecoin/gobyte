@@ -53,11 +53,11 @@ see `contrib/debian/examples/gobyte.conf`.
 
 All three configurations assume several paths that might need to be adjusted.
 
-Binary:              `/usr/bin/gobyted`  
-Configuration file:  `/etc/gobytecore/gobyte.conf`  
-Data directory:      `/var/lib/gobyted`  
-PID file:            `/var/run/gobyted/gobyted.pid` (OpenRC and Upstart) or `/var/lib/gobyted/gobyted.pid` (systemd)  
-Lock file:           `/var/lock/subsys/gobyted` (CentOS)  
+Binary:              `/usr/bin/gobyted`
+Configuration file:  `/etc/gobytecore/gobyte.conf`
+Data directory:      `/var/lib/gobyted`
+PID file:            `/var/run/gobyted/gobyted.pid` (OpenRC and Upstart) or `/var/lib/gobyted/gobyted.pid` (systemd)
+Lock file:           `/var/lock/subsys/gobyted` (CentOS)
 
 The configuration file, PID directory (if applicable) and data directory
 should all be owned by the gobytecore user and group.  It is advised for security
@@ -67,8 +67,8 @@ can then be controlled by group membership.
 
 3b) Mac OS X
 
-Binary:              `/usr/local/bin/gobyted`  
-Configuration file:  `~/Library/Application Support/GoByteCore/gobyte.conf`  
+Binary:              `/usr/local/bin/gobyted`
+Configuration file:  `~/Library/Application Support/GoByteCore/gobyte.conf`
 Data directory:      `~/Library/Application Support/GoByteCore`
 Lock file:           `~/Library/Application Support/GoByteCore/.lock`
 
@@ -104,7 +104,7 @@ use old versions of Upstart and do not supply the start-stop-daemon utility.
 Copy gobyted.init to /etc/init.d/gobyted. Test by running `service gobyted start`.
 
 Using this script, you can adjust the path and flags to the gobyted program by
-setting the GBXD and FLAGS environment variables in the file
+setting the GOBYTED and FLAGS environment variables in the file
 /etc/sysconfig/gobyted. You can also use the DAEMONOPTS environment variable here.
 
 4e) Mac OS X

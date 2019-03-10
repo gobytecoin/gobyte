@@ -74,9 +74,9 @@ QString BitcoinUnits::description(int unit)
         switch(unit)
         {
             case GBX: return QString("GoByte");
-            case mGBX: return QString("Milli-GoByte (1 / 1" THIN_SP_UTF8 "000)");
-            case uGBX: return QString("Micro-GoByte (1 / 1" THIN_SP_UTF8 "000" THIN_SP_UTF8 "000)");
-            case duffs: return QString("Ten Nano-GoByte (1 / 100" THIN_SP_UTF8 "000" THIN_SP_UTF8 "000)");
+            case mGBX: return QString("Milli-GBX (1 / 1" THIN_SP_UTF8 "000)");
+            case uGBX: return QString("Micro-GBX (1 / 1" THIN_SP_UTF8 "000" THIN_SP_UTF8 "000)");
+            case duffs: return QString("Ten Nano-GBX (1 / 100" THIN_SP_UTF8 "000" THIN_SP_UTF8 "000)");
             default: return QString("???");
         }
     }
@@ -85,9 +85,9 @@ QString BitcoinUnits::description(int unit)
         switch(unit)
         {
             case GBX: return QString("TestGoBytes");
-            case mGBX: return QString("Milli-TestGoByte (1 / 1" THIN_SP_UTF8 "000)");
-            case uGBX: return QString("Micro-TestGoByte (1 / 1" THIN_SP_UTF8 "000" THIN_SP_UTF8 "000)");
-            case duffs: return QString("Ten Nano-TestGoByte (1 / 100" THIN_SP_UTF8 "000" THIN_SP_UTF8 "000)");
+            case mGBX: return QString("Milli-TestGBX (1 / 1" THIN_SP_UTF8 "000)");
+            case uGBX: return QString("Micro-TesGBX (1 / 1" THIN_SP_UTF8 "000" THIN_SP_UTF8 "000)");
+            case duffs: return QString("Ten Nano-TestGBX (1 / 100" THIN_SP_UTF8 "000" THIN_SP_UTF8 "000)");
             default: return QString("???");
         }
     }

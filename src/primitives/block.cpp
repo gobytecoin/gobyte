@@ -6,6 +6,7 @@
 #include "primitives/block.h"
 
 #include "hash.h"
+#include "streams.h"
 #include "tinyformat.h"
 #include "utilstrencodings.h"
 #include "crypto/common.h"
@@ -13,17 +14,19 @@
 
 uint256 CBlockHeader::GetHash() const
 {
-        uint256 thash;
-        unsigned int profile = 0x0;
-        neoscrypt((unsigned char *) &nVersion, (unsigned char *) &thash, profile);
-        return thash;
-
+    std::vector<unsigned char> vch(80);
+    CVectorWriter ss(SER_NETWORK, PROTOCOL_VERSION, vch, 0);
+    ss << *this;
+    uint256 thash;
+    unsigned int profile = 0x0;
+    neoscrypt((unsigned char *) &nVersion, (unsigned char *) &thash, profile);
+    return thash;
 }
 
 std::string CBlock::ToString() const
 {
     std::stringstream s;
-    s << strprintf("CBlock(hash=%s, ver=%d, hashPrevBlock=%s, hashMerkleRoot=%s, nTime=%u, nBits=%08x, nNonce=%u, vtx=%u)\n",
+    s << strprintf("CBlock(hash=%s, ver=0x%08x, hashPrevBlock=%s, hashMerkleRoot=%s, nTime=%u, nBits=%08x, nNonce=%u, vtx=%u)\n",
         GetHash().ToString(),
         nVersion,
         hashPrevBlock.ToString(),
@@ -32,7 +35,7 @@ std::string CBlock::ToString() const
         vtx.size());
     for (unsigned int i = 0; i < vtx.size(); i++)
     {
-        s << "  " << vtx[i].ToString() << "\n";
+        s << "  " << vtx[i]->ToString() << "\n";
     }
     return s.str();
 }

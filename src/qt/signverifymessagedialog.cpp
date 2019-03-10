@@ -22,11 +22,11 @@
 
 #include <QClipboard>
 
-SignVerifyMessageDialog::SignVerifyMessageDialog(const PlatformStyle *platformStyle, QWidget *parent) :
+SignVerifyMessageDialog::SignVerifyMessageDialog(const PlatformStyle *_platformStyle, QWidget *parent) :
     QDialog(parent),
     ui(new Ui::SignVerifyMessageDialog),
     model(0),
-    platformStyle(platformStyle)
+    platformStyle(_platformStyle)
 {
     ui->setupUi(this);
 
@@ -51,10 +51,10 @@ SignVerifyMessageDialog::SignVerifyMessageDialog(const PlatformStyle *platformSt
     // These icons are needed on Mac also
     ui->addressBookButton_SM->setIcon(QIcon(":/icons/" + theme + "/address-book"));
     ui->pasteButton_SM->setIcon(QIcon(":/icons/" + theme + "/editpaste"));
-    ui->copySignatureButton_SM->setIcon(QIcon(":/icons/" + theme + "/editcopy"));
+    ui->copySignatureButton_SM->setIcon(QIcon(":/icons/" + theme + "/editcopy"));   
     ui->addressBookButton_VM->setIcon(QIcon(":/icons/" + theme + "/address-book"));
 
-
+      
     GUIUtil::setupAddressWidget(ui->addressIn_SM, this);
     GUIUtil::setupAddressWidget(ui->addressIn_VM, this);
 
@@ -74,9 +74,9 @@ SignVerifyMessageDialog::~SignVerifyMessageDialog()
     delete ui;
 }
 
-void SignVerifyMessageDialog::setModel(WalletModel *model)
+void SignVerifyMessageDialog::setModel(WalletModel *_model)
 {
-    this->model = model;
+    this->model = _model;
 }
 
 void SignVerifyMessageDialog::setAddress_SM(const QString &address)
@@ -156,7 +156,7 @@ void SignVerifyMessageDialog::on_signMessageButton_SM_clicked()
     }
 
     CKey key;
-    if (!pwalletMain->GetKey(keyID, key))
+    if (!model->getPrivKey(keyID, key))
     {
         ui->statusLabel_SM->setStyleSheet("QLabel { color: red; }");
         ui->statusLabel_SM->setText(tr("Private key for the entered address is not available."));
