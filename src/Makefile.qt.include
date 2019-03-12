@@ -559,6 +559,32 @@ RES_IMAGES = \
   qt/res/images/light/drkblue_rightArrow_small.png \
   qt/res/images/light/drkblue_qtreeview_selected.png \
   qt/res/images/light/drkblue_walletFrame_bg.png \
+  qt/res/images/light-hires/about.png \
+  qt/res/images/light-hires/splash.png \
+  qt/res/images/light-hires/splash_testnet.png \
+  qt/res/images/light-hires/gobyte_logo_horizontal.png \
+  qt/res/images/light-hires/unchecked.png \
+  qt/res/images/light-hires/checked.png \
+  qt/res/images/light-hires/drkblue_downArrow.png \
+  qt/res/images/light-hires/drkblue_downArrow_small.png \
+  qt/res/images/light-hires/drkblue_upArrow_small.png \
+  qt/res/images/light-hires/drkblue_leftArrow_small.png \
+  qt/res/images/light-hires/drkblue_rightArrow_small.png \
+  qt/res/images/light-hires/drkblue_qtreeview_selected.png \
+  qt/res/images/light-hires/drkblue_walletFrame_bg.png \
+  qt/res/images/light-hires-retro/about.png \
+  qt/res/images/light-hires-retro/splash.png \
+  qt/res/images/light-hires-retro/splash_testnet.png \
+  qt/res/images/light-hires-retro/gobyte_logo_horizontal.png \
+  qt/res/images/light-hires-retro/unchecked.png \
+  qt/res/images/light-hires-retro/checked.png \
+  qt/res/images/light-hires-retro/drkblue_downArrow.png \
+  qt/res/images/light-hires-retro/drkblue_downArrow_small.png \
+  qt/res/images/light-hires-retro/drkblue_upArrow_small.png \
+  qt/res/images/light-hires-retro/drkblue_leftArrow_small.png \
+  qt/res/images/light-hires-retro/drkblue_rightArrow_small.png \
+  qt/res/images/light-hires-retro/drkblue_qtreeview_selected.png \
+  qt/res/images/light-hires-retro/drkblue_walletFrame_bg.png \
   qt/res/images/light-retro/about.png \
   qt/res/images/light-retro/splash.png \
   qt/res/images/light-retro/splash_testnet.png \

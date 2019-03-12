@@ -338,6 +338,36 @@
         <file alias="splash">res/images/light/splash.png</file>
         <file alias="splash_testnet">res/images/light/splash_testnet.png</file>
     </qresource>
+    <qresource prefix="/images/light-hires">
+        <file alias="about">res/images/light-hires/about.png</file>
+        <file alias="gobyte_logo_horizontal">res/images/light-hires/gobyte_logo_horizontal.png</file>
+        <file alias="unchecked">res/images/light-hires/unchecked.png</file>
+        <file alias="checked">res/images/light-hires/checked.png</file>
+        <file alias="drkblue_downArrow">res/images/light-hires/drkblue_downArrow.png</file>
+        <file alias="drkblue_downArrow_small">res/images/light-hires/drkblue_downArrow_small.png</file>
+        <file alias="drkblue_upArrow_small">res/images/light-hires/drkblue_upArrow_small.png</file>
+        <file alias="drkblue_leftArrow_small">res/images/light-hires/drkblue_leftArrow_small.png</file>
+        <file alias="drkblue_rightArrow_small">res/images/light-hires/drkblue_rightArrow_small.png</file>
+        <file alias="drkblue_qtreeview_selected">res/images/light-hires/drkblue_qtreeview_selected.png</file>
+        <file alias="drkblue_walletFrame_bg">res/images/light-hires/drkblue_walletFrame_bg.png</file>
+        <file alias="splash">res/images/light-hires/splash.png</file>
+        <file alias="splash_testnet">res/images/light-hires/splash_testnet.png</file>
+    </qresource>
+    <qresource prefix="/images/light-hires-retro">
+        <file alias="about">res/images/light-hires-retro/about.png</file>
+        <file alias="gobyte_logo_horizontal">res/images/light-hires-retro/gobyte_logo_horizontal.png</file>
+        <file alias="unchecked">res/images/light-hires-retro/unchecked.png</file>
+        <file alias="checked">res/images/light-hires-retro/checked.png</file>
+        <file alias="drkblue_downArrow">res/images/light-hires-retro/drkblue_downArrow.png</file>
+        <file alias="drkblue_downArrow_small">res/images/light-hires-retro/drkblue_downArrow_small.png</file>
+        <file alias="drkblue_upArrow_small">res/images/light-hires-retro/drkblue_upArrow_small.png</file>
+        <file alias="drkblue_leftArrow_small">res/images/light-hires-retro/drkblue_leftArrow_small.png</file>
+        <file alias="drkblue_rightArrow_small">res/images/light-hires-retro/drkblue_rightArrow_small.png</file>
+        <file alias="drkblue_qtreeview_selected">res/images/light-hires-retro/drkblue_qtreeview_selected.png</file>
+        <file alias="drkblue_walletFrame_bg">res/images/light-hires-retro/drkblue_walletFrame_bg.png</file>
+        <file alias="splash">res/images/light-hires-retro/splash.png</file>
+        <file alias="splash_testnet">res/images/light-hires-retro/splash_testnet.png</file>
+    </qresource>
     <qresource prefix="/images/light-retro">
         <file alias="about">res/images/light-retro/about.png</file>
         <file alias="gobyte_logo_horizontal">res/images/light-retro/gobyte_logo_horizontal.png</file>
