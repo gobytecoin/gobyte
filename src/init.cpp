@@ -650,7 +650,7 @@ std::string HelpMessage(HelpMessageMode mode)
 std::string LicenseInfo()
 {
     const std::string URL_SOURCE_CODE = "<https://github.com/gobytecoin/gobyte>";
-    const std::string URL_WEBSITE = "<https://gobyte.org>";
+    const std::string URL_WEBSITE = "<https://www.gobyte.network>";
 
     return CopyrightHolders(_("Copyright (C)"), 2017, COPYRIGHT_YEAR) + "\n" +
            "\n" +

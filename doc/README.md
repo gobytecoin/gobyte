@@ -27,7 +27,7 @@ Drag GoByte-Qt to your applications folder, and then run GoByte-Qt.
 * See the [GoByte documentation](https://docs.gobyte.org)
 for help and more information.
 * Ask for help on [GoByte Nation Discord](http://gobytechat.org)
-* Ask for help on the [GoByte Forum](https://gobyte.org/forum)
+* Ask for help on the [GoByte Forum](https://www.gobyte.network/forum)
 
 Building
 ---------------------
@@ -57,7 +57,7 @@ The GoByte Core repo's [root README](/README.md) contains relevant information o
 - [Benchmarking](benchmarking.md)
 
 ### Resources
-* Discuss on the [GoByte Forum](https://gobyte.org/forum), in the Development & Technical Discussion board.
+* Discuss on the [GoByte Forum](https://www.gobyte.network/forum), in the Development & Technical Discussion board.
 * Discuss on [GoByte Nation Discord](http://gobytechat.org)
 
 ### Miscellaneous
