@@ -139,3 +139,5 @@ gobyte-qt
 # CLion
 .idea
 cmake-build-debug
+# Visual studio
+.vs
