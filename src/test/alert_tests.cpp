@@ -109,7 +109,7 @@ struct ReadAlerts : public TestingSetup
 {
     ReadAlerts()
     {
-        std::vector<unsigned char> vch(raw_tests::alertTests, raw_tests::alertTests + sizeof(raw_tests::alertTests));
+        std::vector<unsigned char> vch(alert_tests::alertTests, alert_tests::alertTests + sizeof(alert_tests::alertTests));
         CDataStream stream(vch, SER_DISK, CLIENT_VERSION);
         try {
             while (!stream.eof())
