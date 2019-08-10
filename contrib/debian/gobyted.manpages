@@ -1,3 +1,2 @@
-debian/manpages/gobyted.1
-debian/manpages/gobyte.conf.5
-debian/manpages/gobyte-cli.1
+doc/man/gobyted.1
+doc/man/gobyte-cli.1

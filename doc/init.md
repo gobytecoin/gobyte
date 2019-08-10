@@ -104,7 +104,7 @@ use old versions of Upstart and do not supply the start-stop-daemon utility.
 Copy gobyted.init to /etc/init.d/gobyted. Test by running `service gobyted start`.
 
 Using this script, you can adjust the path and flags to the gobyted program by
-setting the GBXD and FLAGS environment variables in the file
+setting the gobyted and FLAGS environment variables in the file
 /etc/sysconfig/gobyted. You can also use the DAEMONOPTS environment variable here.
 
 4e) Mac OS X

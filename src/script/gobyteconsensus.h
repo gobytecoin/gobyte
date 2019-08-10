@@ -39,6 +39,7 @@ typedef enum gobyteconsensus_error_t
     gobyteconsensus_ERR_TX_INDEX,
     gobyteconsensus_ERR_TX_SIZE_MISMATCH,
     gobyteconsensus_ERR_TX_DESERIALIZE,
+    gobyteconsensus_ERR_INVALID_FLAGS,
 } gobyteconsensus_error;
 
 /** Script verification flags */
@@ -47,7 +48,12 @@ enum
     gobyteconsensus_SCRIPT_FLAGS_VERIFY_NONE                = 0,
     gobyteconsensus_SCRIPT_FLAGS_VERIFY_P2SH                = (1U << 0), // evaluate P2SH (BIP16) subscripts
     gobyteconsensus_SCRIPT_FLAGS_VERIFY_DERSIG              = (1U << 2), // enforce strict DER (BIP66) compliance
+    gobyteconsensus_SCRIPT_FLAGS_VERIFY_NULLDUMMY           = (1U << 4), // enforce NULLDUMMY (BIP147)
     gobyteconsensus_SCRIPT_FLAGS_VERIFY_CHECKLOCKTIMEVERIFY = (1U << 9), // enable CHECKLOCKTIMEVERIFY (BIP65)
+    gobyteconsensus_SCRIPT_FLAGS_VERIFY_CHECKSEQUENCEVERIFY = (1U << 10), // enable CHECKSEQUENCEVERIFY (BIP112)
+    gobyteconsensus_SCRIPT_FLAGS_VERIFY_ALL                 = gobyteconsensus_SCRIPT_FLAGS_VERIFY_P2SH | gobyteconsensus_SCRIPT_FLAGS_VERIFY_DERSIG |
+                                                            gobyteconsensus_SCRIPT_FLAGS_VERIFY_NULLDUMMY | gobyteconsensus_SCRIPT_FLAGS_VERIFY_CHECKLOCKTIMEVERIFY |
+                                                            gobyteconsensus_SCRIPT_FLAGS_VERIFY_CHECKSEQUENCEVERIFY
 };
 
 /// Returns 1 if the input nIn of the serialized transaction pointed to by

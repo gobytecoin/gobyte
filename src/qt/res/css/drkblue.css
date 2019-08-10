@@ -1582,6 +1582,16 @@ QDialog#ReceiveRequestDialog QTextEdit { /* Contents of Receive Coin Dialog */
 border:1px solid #d7d7d7;
 }
 
+/* General QR-code DIALOG */
+
+QDialog#QRDialog {
+background-color:#F8F6F6;
+}
+
+QDialog#QRDialog QTextEdit { /* Contents of QR-code Dialog */
+border:1px solid #d7d7d7;
+}
+
 /* TRANSACTIONS PAGE */
 
 TransactionView QLineEdit { /* Filters */
@@ -1614,7 +1624,7 @@ QLabel#transactionSumLabel { /* Example of setObjectName for widgets without nam
 color:#333333;
 font-weight:bold;
 }
-
+ 
 QLabel#transactionSum { /* Example of setObjectName for widgets without name */
 color:#333333;
 }
@@ -1628,3 +1638,5 @@ background-color:#F8F6F6;
 QDialog#TransactionDescDialog QTextEdit { /* Contents of Receive Coin Dialog */
 border:1px solid #d7d7d7;
 }
+
+

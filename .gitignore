@@ -61,7 +61,6 @@ libconftest.dylib*
 *.pyc
 *.o
 *.o-*
-.gobyte
 *.a
 *.pb.cc
 *.pb.h
@@ -106,13 +105,8 @@ coverage_percent.txt
 linux-coverage-build
 linux-build
 win32-build
-qa/pull-tester/run-bitcoind-for-test.sh
 qa/pull-tester/tests_config.py
-qa/pull-tester/cache/*
-qa/pull-tester/test.*/*
-qa/tmp
-cache/
-share/BitcoindComparisonTool.jar
+qa/cache/*
 
 !src/leveldb*/Makefile
 
@@ -122,6 +116,7 @@ share/BitcoindComparisonTool.jar
 /doc/doxygen/
 
 libgobyteconsensus.pc
+contrib/devtools/split-debug.sh
 src/qt/gobyte-qt.bash
 qa/pull-tester/tests-config.sh
 
@@ -129,3 +124,10 @@ qa/pull-tester/tests-config.sh
 gobyte-cli
 gobyted
 gobyte-qt
+make
+
+/docker/bin
+
+# CLion
+.idea
+cmake-build-debug

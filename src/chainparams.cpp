@@ -12,6 +12,8 @@
 #include "util.h"
 #include "utilstrencodings.h"
 
+#include "arith_uint256.h"
+
 #include <assert.h>
 
 #include <boost/assign/list_of.hpp>
@@ -33,8 +35,32 @@ static CBlock CreateGenesisBlock(const char* pszTimestamp, const CScript& genesi
     genesis.nBits    = nBits;
     genesis.nNonce   = nNonce;
     genesis.nVersion = nVersion;
-    genesis.vtx.push_back(txNew);
+    genesis.vtx.push_back(MakeTransactionRef(std::move(txNew)));
     genesis.hashPrevBlock.SetNull();
+    genesis.hashMerkleRoot = BlockMerkleRoot(genesis);
+    return genesis;
+}
+
+static CBlock CreateDevNetGenesisBlock(const uint256 &prevBlockHash, const std::string& devNetName, uint32_t nTime, uint32_t nNonce, uint32_t nBits, const CAmount& genesisReward)
+{
+    assert(!devNetName.empty());
+
+    CMutableTransaction txNew;
+    txNew.nVersion = 1;
+    txNew.vin.resize(1);
+    txNew.vout.resize(1);
+    // put height (BIP34) and devnet name into coinbase
+    txNew.vin[0].scriptSig = CScript() << 1 << std::vector<unsigned char>(devNetName.begin(), devNetName.end());
+    txNew.vout[0].nValue = genesisReward;
+    txNew.vout[0].scriptPubKey = CScript() << OP_RETURN;
+
+    CBlock genesis;
+    genesis.nTime    = nTime;
+    genesis.nBits    = nBits;
+    genesis.nNonce   = nNonce;
+    genesis.nVersion = 4;
+    genesis.vtx.push_back(MakeTransactionRef(std::move(txNew)));
+    genesis.hashPrevBlock = prevBlockHash;
     genesis.hashMerkleRoot = BlockMerkleRoot(genesis);
     return genesis;
 }
@@ -57,6 +83,30 @@ static CBlock CreateGenesisBlock(uint32_t nTime, uint32_t nNonce, uint32_t nBits
     return CreateGenesisBlock(pszTimestamp, genesisOutputScript, nTime, nNonce, nBits, nVersion, genesisReward);
 }
 
+static CBlock FindDevNetGenesisBlock(const Consensus::Params& params, const CBlock &prevBlock, const CAmount& reward)
+{
+    std::string devNetName = GetDevNetName();
+    assert(!devNetName.empty());
+
+    CBlock block = CreateDevNetGenesisBlock(prevBlock.GetHash(), devNetName.c_str(), prevBlock.nTime + 1, 0, prevBlock.nBits, reward);
+
+    arith_uint256 bnTarget;
+    bnTarget.SetCompact(block.nBits);
+
+    for (uint32_t nNonce = 0; nNonce < UINT32_MAX; nNonce++) {
+        block.nNonce = nNonce;
+
+        uint256 hash = block.GetHash();
+        if (UintToArith256(hash) <= bnTarget)
+            return block;
+    }
+
+    // This is very unlikely to happen as we start the devnet with a very low difficulty. In many cases even the first
+    // iteration of the above loop will give a result already
+    error("FindDevNetGenesisBlock: could not find devnet genesis block for %s", devNetName);
+    assert(false);
+}
+
 /**
  * Main network
  */
@@ -77,22 +127,23 @@ public:
         consensus.nMasternodePaymentsStartBlock = 1152; // not true, but it's ok as long as it's less then nMasternodePaymentsIncreaseBlock
         consensus.nMasternodePaymentsIncreaseBlock = 124000; // actual historical value
         consensus.nMasternodePaymentsIncreasePeriod = 576*30; // 17280 - actual historical value
+        consensus.nInstantSendConfirmationsRequired = 6;
         consensus.nInstantSendKeepLock = 24;
         consensus.nBudgetPaymentsStartBlock = 158560;
         consensus.nBudgetPaymentsCycleBlocks = 17280; // ~(60*24*30)/2.5 = 1 Month
         consensus.nBudgetPaymentsWindowBlocks = 100;
-        consensus.nBudgetProposalEstablishingTime = 60*60*24;
         consensus.nSuperblockStartBlock = 162592;
+        consensus.nSuperblockStartHash = uint256S("0000000000308a40afb7d54bf4b7a159170e558017fd36646536c56813aa33a1");
         consensus.nSuperblockCycle = 17280; // ~(60*24*30)/2.5
         consensus.nGovernanceMinQuorum = 10;
         consensus.nGovernanceFilterElements = 20000;
         consensus.nMasternodeMinimumConfirmations = 15;
-        consensus.nMajorityEnforceBlockUpgrade = 750;
-        consensus.nMajorityRejectBlockOutdated = 950;
-        consensus.nMajorityWindow = 1000;
-        consensus.BIP34Height = 1;
-        consensus.BIP34Hash = uint256S("0x00000c8a1ff01bae3f3875c81cb14115429af5744643b34b4ad1cbb7d2d59ca2");
-        consensus.powLimit = uint256S("00000fffff000000000000000000000000000000000000000000000000000000");
+        consensus.BIP34Height = 951;
+        consensus.BIP34Hash = uint256S("00000c8a1ff01bae3f3875c81cb14115429af5744643b34b4ad1cbb7d2d59ca2");
+        consensus.BIP65Height = 2431; // 0000039cf01242c7f921dcb4806a5994bc003b48c1973ae0c89b67809c2bb2ab
+        consensus.BIP66Height = 2075; // 0000002acdd29a14583540cb72e1c5cc83783560e38fa7081495d474fe1671f7
+        consensus.DIP0001Height = 5500;
+        consensus.powLimit = uint256S("00000fffffffffffffffffffffffffffffffffffffffffffffffffffffffffff");
         consensus.nPowTargetTimespan = 60 * 60; // GoByte: 1 hour, 24 blocks
         consensus.nPowTargetSpacing = 2.5 * 60; // GoByte: 150 seconds
         consensus.fPowAllowMinDifficultyBlocks = false;
@@ -116,6 +167,13 @@ public:
         consensus.vDeployments[Consensus::DEPLOYMENT_DIP0001].nWindowSize = 4032;
         consensus.vDeployments[Consensus::DEPLOYMENT_DIP0001].nThreshold = 3226; // 80% of 4032
 
+        // Deployment of BIP147
+        consensus.vDeployments[Consensus::DEPLOYMENT_BIP147].bit = 2;
+        consensus.vDeployments[Consensus::DEPLOYMENT_BIP147].nStartTime = 1565827200; // 15 Aug, 2019
+        consensus.vDeployments[Consensus::DEPLOYMENT_BIP147].nTimeout = 1597449600; // 15 Aug, 2020
+        consensus.vDeployments[Consensus::DEPLOYMENT_BIP147].nWindowSize = 4032;
+        consensus.vDeployments[Consensus::DEPLOYMENT_BIP147].nThreshold = 3226; // 80% of 4032
+
         // The best chain should have at least this much work.
         consensus.nMinimumChainWork = uint256S("0x00000000000000000000000000000000000000000000000004ce57668f63f9b4"); // 85000
 
@@ -133,8 +191,6 @@ public:
         pchMessageStart[3] = 0xd4;
         vAlertPubKey = ParseHex("045f6f7880946beb809b89610a5c1fa3a25604e6a1fe0642576390f3c3be43f7d175cd3e62cbe90fac8868a3ba25ebcefb382f3ddaf0de20ca3a2697ed21b75110");
         nDefaultPort = 12455;
-        nMaxTipAge = 6 * 60 * 60; // ~144 blocks behind -> 2 x fork detection time, was 24 * 60 * 60 in bitcoin
-        nDelayGetHeadersTime = 24 * 60 * 60;
         nPruneAfterHeight = 100000;
 
         genesis = CreateGenesisBlock(1510848000, 1631855, 0x1e0ffff0, 1, 50 * COIN);
@@ -173,11 +229,13 @@ public:
         fDefaultConsistencyChecks = false;
         fRequireStandard = true;
         fMineBlocksOnDemand = false;
-        fTestnetToBeDeprecatedFieldRPC = false;
+        fAllowMultipleAddressesFromGroup = false;
+        fAllowMultiplePorts = false;
 
         nPoolMaxTransactions = 3;
         nFulfilledRequestExpireTime = 60*60; // fulfilled requests expire in 1 hour
-        strSporkPubKey = "0436e3a43b74cb522c19cd0c2c8073152b60c227f1360c7d3249f995cc19466ee132d3843fcb3379f10c0ea2336112f1283dc78c04df5c7bd39c8896627ac60d4c";
+
+        strSporkAddress = "GX324HN5jrHLZg1oV1QLsTeuFsPBzhAXNd";
 
         checkpointData = (CCheckpointData) {
             boost::assign::map_list_of
@@ -206,12 +264,16 @@ public:
             ( 110500, uint256S("0x000000000028fe8242eb23e939c7e6b2063d5a4cea533402e35a3c6557d02bc6"))
             ( 115500, uint256S("0x000000000074763fd76ef4a344d4f7e049c1dc55395c3814ac608b6fde6c7ecb"))
             ( 115890, uint256S("0x0000000000a8de066324ed2575d7e2b5ba21bc8eeaaa5dae2c37d6177953ac3c"))
-            ( 234000, uint256S("0x00000000006bc1e30c637f0ed0d573d90e63e71f0baedac29af78e6311007e3d")),
+            ( 210500, uint256S("0x0000000000be1d1d62b9738afc39f360b5aff6da357350a0d14ed0727f1f634c"))
+            ( 310500, uint256S("0x00000000020fb478b1531ba112834e968714bac2177e19372ecfa25860c41e51"))
+            ( 340167, uint256S("0x00000000003d9253ae426d4610573b72fad19d60f1401ef15c64d2ce1c575e4e"))
+        };
 
-            1547875545, // * UNIX timestamp of last checkpoint block
-            445996,   // * total number of transactions between genesis and last checkpoint
+        chainTxData = ChainTxData{
+            1564627752, // * UNIX timestamp of last checkpoint block
+            605720,   // * total number of transactions between genesis and last checkpoint
                         //   (the tx=... number in the SetBestChain debug.log lines)
-            2800        // * estimated number of transactions per day after checkpoint
+            0.1        // * estimated number of transactions per day after checkpoint
         };
     }
 };
@@ -228,21 +290,22 @@ public:
         consensus.nMasternodePaymentsStartBlock = 1024; // not true, but it's ok as long as it's less then nMasternodePaymentsIncreaseBlock
         consensus.nMasternodePaymentsIncreaseBlock = 21100;
         consensus.nMasternodePaymentsIncreasePeriod = 100;
+        consensus.nInstantSendConfirmationsRequired = 2;
         consensus.nInstantSendKeepLock = 6;
         consensus.nBudgetPaymentsStartBlock = 15500;
         consensus.nBudgetPaymentsCycleBlocks = 50; // ~(60*24*30)/2.5
         consensus.nBudgetPaymentsWindowBlocks = 10;
-        consensus.nBudgetProposalEstablishingTime = 60*20;
         consensus.nSuperblockStartBlock = 15600; // NOTE: Should satisfy nSuperblockStartBlock > nBudgetPeymentsStartBlock
+		consensus.nSuperblockStartHash = uint256();
         consensus.nSuperblockCycle = 24; // Superblocks can be issued hourly on testnet
         consensus.nGovernanceMinQuorum = 1;
         consensus.nGovernanceFilterElements = 500;
         consensus.nMasternodeMinimumConfirmations = 1;
-        consensus.nMajorityEnforceBlockUpgrade = 51;
-        consensus.nMajorityRejectBlockOutdated = 75;
-        consensus.nMajorityWindow = 100;
         consensus.BIP34Height = 1;
         consensus.BIP34Hash = uint256S("0x0000064a72bc327f2c93169784623348d8ad8975873563a2c3e0e1deb6bcc9f7");
+        consensus.BIP65Height = 2431; // 0000039cf01242c7f921dcb4806a5994bc003b48c1973ae0c89b67809c2bb2ab
+        consensus.BIP66Height = 2075; // 0000002acdd29a14583540cb72e1c5cc83783560e38fa7081495d474fe1671f7
+        consensus.DIP0001Height = 5500;
         consensus.powLimit = uint256S("00000fffff000000000000000000000000000000000000000000000000000000");
         consensus.nPowTargetTimespan = 60 * 60; // GoByte: 1 hour, 24 blocks
         consensus.nPowTargetSpacing = 2.5 * 60; // GoByte: 150 seconds
@@ -267,6 +330,13 @@ public:
         consensus.vDeployments[Consensus::DEPLOYMENT_DIP0001].nWindowSize = 100;
         consensus.vDeployments[Consensus::DEPLOYMENT_DIP0001].nThreshold = 50; // 50% of 100
 
+        // Deployment of BIP147
+        consensus.vDeployments[Consensus::DEPLOYMENT_BIP147].bit = 2;
+        consensus.vDeployments[Consensus::DEPLOYMENT_BIP147].nStartTime = 1544655600; // Dec 13th, 2018
+        consensus.vDeployments[Consensus::DEPLOYMENT_BIP147].nTimeout = 1576191600; // Dec 13th, 2019
+        consensus.vDeployments[Consensus::DEPLOYMENT_BIP147].nWindowSize = 100;
+        consensus.vDeployments[Consensus::DEPLOYMENT_BIP147].nThreshold = 50; // 50% of 100
+
         // The best chain should have at least this much work.
         consensus.nMinimumChainWork = uint256S("0x000000000000000000000000000000000000000000000000000006a96dd9119d"); // 14500
 
@@ -279,8 +349,6 @@ public:
         pchMessageStart[3] = 0x7a;
         vAlertPubKey = ParseHex("0458b688c478d2a3febf4e86db1b1c2f862cfb31780b6247c7caa35145e9cb16f55a60cc476654fedaa1dcd807c8432ee5a5f2324f727a0531713c66f7734b351c");
         nDefaultPort = 13455;
-        nMaxTipAge = 0x7fffffff; // allow mining on top of old blocks for testnet
-        nDelayGetHeadersTime = 24 * 60 * 60;
         nPruneAfterHeight = 1000;
 
         genesis = CreateGenesisBlock(1510727200, 2998459, 0x1e0ffff0, 1, 50 * COIN);
@@ -307,17 +375,17 @@ public:
         // Testnet GoByte BIP44 coin type is '1' (All coin's testnet default)
         nExtCoinType = 1;
 
-        vFixedSeeds = std::vector<SeedSpec6>(pnSeed6_test, pnSeed6_test + ARRAYLEN(pnSeed6_test));
-
         fMiningRequiresPeers = true;
         fDefaultConsistencyChecks = false;
         fRequireStandard = false;
         fMineBlocksOnDemand = false;
-        fTestnetToBeDeprecatedFieldRPC = true;
+        fAllowMultipleAddressesFromGroup = false;
+        fAllowMultiplePorts = false;
 
         nPoolMaxTransactions = 3;
         nFulfilledRequestExpireTime = 5*60; // fulfilled requests expire in 5 minutes
-        strSporkPubKey = "0488ee83bcfcfaff3b270d8b23ce7956f0e4f2ae710941f6029a1eaf04169186e586e2b0e4d0b25580e729264c76b5d7da73f3bb3a7641ba1c114268d3d8e68d9c";
+
+        strSporkAddress = "nJtKPFc1ERZx8kwEtDPLnJZzScC5qiCGSB";
 
         checkpointData = (CCheckpointData) {
             boost::assign::map_list_of
@@ -325,6 +393,9 @@ public:
             (  1000, uint256S("0x0000000302c5f739c94680415cfed780e5f90f6ab6b62e39c8cac9dc267acffd"))
             (  5000, uint256S("0x000000023af784ca843c9bf0003cb3586e626936346456f6948586b71851f7a8"))
             ( 10000, uint256S("0x000000041bcae477bee46f37d851a185c26b2fa5558fab12c72f43cd70bfe1fc")),
+        };
+
+        chainTxData = ChainTxData{
             1524132951, // * UNIX timestamp of last checkpoint block
             10485,       // * total number of transactions between genesis and last checkpoint
                         //   (the tx=... number in the SetBestChain debug.log lines)
@@ -334,6 +405,131 @@ public:
     }
 };
 static CTestNetParams testNetParams;
+
+/**
+ * Devnet
+ */
+class CDevNetParams : public CChainParams {
+public:
+    CDevNetParams() {
+        strNetworkID = "dev";
+        consensus.nSubsidyHalvingInterval = 210240;
+        consensus.nMasternodePaymentsStartBlock = 4010; // not true, but it's ok as long as it's less then nMasternodePaymentsIncreaseBlock
+        consensus.nMasternodePaymentsIncreaseBlock = 4030;
+        consensus.nMasternodePaymentsIncreasePeriod = 10;
+        consensus.nInstantSendConfirmationsRequired = 2;
+        consensus.nInstantSendKeepLock = 6;
+        consensus.nBudgetPaymentsStartBlock = 4100;
+        consensus.nBudgetPaymentsCycleBlocks = 50;
+        consensus.nBudgetPaymentsWindowBlocks = 10;
+        consensus.nSuperblockStartBlock = 4200; // NOTE: Should satisfy nSuperblockStartBlock > nBudgetPeymentsStartBlock
+        consensus.nSuperblockStartHash = uint256(); // do not check this on devnet
+        consensus.nSuperblockCycle = 24; // Superblocks can be issued hourly on devnet
+        consensus.nGovernanceMinQuorum = 1;
+        consensus.nGovernanceFilterElements = 500;
+        consensus.nMasternodeMinimumConfirmations = 1;
+        consensus.BIP34Height = 1; // BIP34 activated immediately on devnet
+        consensus.BIP65Height = 1; // BIP65 activated immediately on devnet
+        consensus.BIP66Height = 1; // BIP66 activated immediately on devnet
+        consensus.DIP0001Height = 2; // DIP0001 activated immediately on devnet
+        consensus.powLimit = uint256S("7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"); // ~uint256(0) >> 1
+        consensus.nPowTargetTimespan = 24 * 60 * 60; // GoByte: 1 day
+        consensus.nPowTargetSpacing = 2.5 * 60; // GoByte: 2.5 minutes
+        consensus.fPowAllowMinDifficultyBlocks = true;
+        consensus.fPowNoRetargeting = false;
+        consensus.nPowDGWHeight = 4001;
+        consensus.nRuleChangeActivationThreshold = 1512; // 75% for testchains
+        consensus.nMinerConfirmationWindow = 2016; // nPowTargetTimespan / nPowTargetSpacing
+        consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].bit = 28;
+        consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].nStartTime = 1199145601; // January 1, 2008
+        consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].nTimeout = 1230767999; // December 31, 2008
+
+        // Deployment of BIP68, BIP112, and BIP113.
+        consensus.vDeployments[Consensus::DEPLOYMENT_CSV].bit = 0;
+        consensus.vDeployments[Consensus::DEPLOYMENT_CSV].nStartTime = 1565827200; // 15 Aug, 2019
+        consensus.vDeployments[Consensus::DEPLOYMENT_CSV].nTimeout = 1597449600; // 15 Aug, 2020
+
+        // Deployment of DIP0001
+        consensus.vDeployments[Consensus::DEPLOYMENT_DIP0001].bit = 1;
+        consensus.vDeployments[Consensus::DEPLOYMENT_DIP0001].nStartTime = 1565827200; // 15 Aug, 2019
+        consensus.vDeployments[Consensus::DEPLOYMENT_DIP0001].nTimeout = 1597449600; // 15 Aug, 2020
+        consensus.vDeployments[Consensus::DEPLOYMENT_DIP0001].nWindowSize = 100;
+        consensus.vDeployments[Consensus::DEPLOYMENT_DIP0001].nThreshold = 50; // 50% of 100
+
+        // Deployment of BIP147
+        consensus.vDeployments[Consensus::DEPLOYMENT_BIP147].bit = 2;
+        consensus.vDeployments[Consensus::DEPLOYMENT_BIP147].nStartTime = 1565827200; // 15 Aug, 2019
+        consensus.vDeployments[Consensus::DEPLOYMENT_BIP147].nTimeout = 1597449600; // 15 Aug, 2020
+        consensus.vDeployments[Consensus::DEPLOYMENT_BIP147].nWindowSize = 100;
+        consensus.vDeployments[Consensus::DEPLOYMENT_BIP147].nThreshold = 50; // 50% of 100
+
+        // The best chain should have at least this much work.
+        consensus.nMinimumChainWork = uint256S("0x000000000000000000000000000000000000000000000000000000000000000");
+
+        // By default assume that the signatures in ancestors of this block are valid.
+        consensus.defaultAssumeValid = uint256S("0x000000000000000000000000000000000000000000000000000000000000000");
+
+        pchMessageStart[0] = 0x2e;
+        pchMessageStart[1] = 0xca;
+        pchMessageStart[2] = 0xff;
+        pchMessageStart[3] = 0xce;
+        vAlertPubKey = ParseHex("0458b688c478d2a3febf4e86db1b1c2f862cfb31780b6247c7caa35145e9cb16f55a60cc476654fedaa1dcd807c8432ee5a5f2324f727a0531713c66f7734b351c");
+        nDefaultPort = 13455;
+        nPruneAfterHeight = 1000;
+
+        genesis = CreateGenesisBlock(1564741609, 1096447, 0x207fffff, 1, 50 * COIN);
+        consensus.hashGenesisBlock = genesis.GetHash();
+        assert(consensus.hashGenesisBlock == uint256S("0x0000016e388ef82ceeee54a65f885b66216cd0bbf8f30d31ce3ec995d9374d68"));
+        assert(genesis.hashMerkleRoot == uint256S("0xdc9a719dc1bcda39107ea55424f00cab512170a1cb69efa08531f483f2399f21"));
+
+        devnetGenesis = FindDevNetGenesisBlock(consensus, genesis, 50 * COIN);
+        consensus.hashDevnetGenesisBlock = devnetGenesis.GetHash();
+
+        vFixedSeeds.clear();
+        vSeeds.clear();
+        //vSeeds.push_back(CDNSSeedData("gobyte.network",  "devnet-seed.gobyte.network"));
+
+        // Testnet GoByte addresses start with 'n'
+        base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1,112);
+        // Testnet GoByte script addresses start with '9'
+        base58Prefixes[SCRIPT_ADDRESS] = std::vector<unsigned char>(1,20);
+        // Testnet private keys start with '9' or 'c' (Bitcoin defaults) (?)
+        base58Prefixes[SECRET_KEY] =     std::vector<unsigned char>(1,240);
+        // Testnet GoByte BIP32 pubkeys start with 'tpub' (Bitcoin defaults)
+        base58Prefixes[EXT_PUBLIC_KEY] = boost::assign::list_of(0x04)(0x35)(0x87)(0xCF).convert_to_container<std::vector<unsigned char> >();
+        // Testnet GoByte BIP32 prvkeys start with 'tprv' (Bitcoin defaults)
+        base58Prefixes[EXT_SECRET_KEY] = boost::assign::list_of(0x04)(0x35)(0x83)(0x94).convert_to_container<std::vector<unsigned char> >();
+
+        // Testnet GoByte BIP44 coin type is '1' (All coin's testnet default)
+        nExtCoinType = 1;
+
+        fMiningRequiresPeers = true;
+        fDefaultConsistencyChecks = false;
+        fRequireStandard = false;
+        fMineBlocksOnDemand = false;
+        fAllowMultipleAddressesFromGroup = true;
+        fAllowMultiplePorts = true;
+
+        nPoolMaxTransactions = 3;
+        nFulfilledRequestExpireTime = 5*60; // fulfilled requests expire in 5 minutes
+
+        strSporkAddress = "nJtKPFc1ERZx8kwEtDPLnJZzScC5qiCGSB";
+
+        checkpointData = (CCheckpointData) {
+            boost::assign::map_list_of
+            (      0, uint256S("0x0000016e388ef82ceeee54a65f885b66216cd0bbf8f30d31ce3ec995d9374d68"))
+            (      1, devnetGenesis.GetHash())
+        };
+
+        chainTxData = ChainTxData{
+            devnetGenesis.GetBlockTime(), // * UNIX timestamp of devnet genesis block
+            2,                            // * we only have 2 coinbase transactions when a devnet is started up
+            0.01                          // * estimated number of transactions per second
+        };
+    }
+};
+static CDevNetParams *devNetParams;
+
 
 /**
  * Regression test
@@ -346,24 +542,25 @@ public:
         consensus.nMasternodePaymentsStartBlock = 240;
         consensus.nMasternodePaymentsIncreaseBlock = 350;
         consensus.nMasternodePaymentsIncreasePeriod = 10;
+        consensus.nInstantSendConfirmationsRequired = 2;
         consensus.nInstantSendKeepLock = 6;
         consensus.nBudgetPaymentsStartBlock = 1000;
         consensus.nBudgetPaymentsCycleBlocks = 50;
         consensus.nBudgetPaymentsWindowBlocks = 10;
-        consensus.nBudgetProposalEstablishingTime = 60*20;
         consensus.nSuperblockStartBlock = 1500;
+        consensus.nSuperblockStartHash = uint256(); // do not check this on regtest
         consensus.nSuperblockCycle = 10;
         consensus.nGovernanceMinQuorum = 1;
         consensus.nGovernanceFilterElements = 100;
         consensus.nMasternodeMinimumConfirmations = 1;
-        consensus.nMajorityEnforceBlockUpgrade = 750;
-        consensus.nMajorityRejectBlockOutdated = 950;
-        consensus.nMajorityWindow = 1000;
-        consensus.BIP34Height = -1; // BIP34 has not necessarily activated on regtest
+        consensus.BIP34Height = 100000000; // BIP34 has not activated on regtest (far in the future so block v1 are not rejected in tests)
         consensus.BIP34Hash = uint256();
-        consensus.powLimit = uint256S("7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff");
-        consensus.nPowTargetTimespan = 60 * 60; // GoByte: 1 hour, 24 blocks
-        consensus.nPowTargetSpacing = 2.5 * 60; // GoByte: 150 seconds
+        consensus.BIP65Height = 1351; // BIP65 activated on regtest (Used in rpc activation tests)
+        consensus.BIP66Height = 1251; // BIP66 activated on regtest (Used in rpc activation tests)
+        consensus.DIP0001Height = 2000;
+        consensus.powLimit = uint256S("7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"); // ~uint256(0) >> 1
+        consensus.nPowTargetTimespan = 24 * 60 * 60; // GoByte: 1 day
+        consensus.nPowTargetSpacing = 2.5 * 60; // GoByte: 2.5 minutes
         consensus.fPowAllowMinDifficultyBlocks = true;
         consensus.fPowNoRetargeting = true;
         consensus.nPowDGWHeight = 700; // same as mainnet
@@ -378,6 +575,9 @@ public:
         consensus.vDeployments[Consensus::DEPLOYMENT_DIP0001].bit = 1;
         consensus.vDeployments[Consensus::DEPLOYMENT_DIP0001].nStartTime = 0;
         consensus.vDeployments[Consensus::DEPLOYMENT_DIP0001].nTimeout = 999999999999ULL;
+        consensus.vDeployments[Consensus::DEPLOYMENT_BIP147].bit = 2;
+        consensus.vDeployments[Consensus::DEPLOYMENT_BIP147].nStartTime = 0;
+        consensus.vDeployments[Consensus::DEPLOYMENT_BIP147].nTimeout = 999999999999ULL;
 
         // The best chain should have at least this much work.
         consensus.nMinimumChainWork = uint256S("0x00");
@@ -389,8 +589,6 @@ public:
         pchMessageStart[1] = 0xb3;
         pchMessageStart[2] = 0xd5;
         pchMessageStart[3] = 0x7b;
-        nMaxTipAge = 6 * 60 * 60; // ~144 blocks behind -> 2 x fork detection time, was 24 * 60 * 60 in bitcoin
-        nDelayGetHeadersTime = 0; // never delay GETHEADERS in regtests
         nDefaultPort = 13565;
         nPruneAfterHeight = 1000;
 
@@ -406,13 +604,17 @@ public:
         fDefaultConsistencyChecks = true;
         fRequireStandard = false;
         fMineBlocksOnDemand = true;
-        fTestnetToBeDeprecatedFieldRPC = false;
+        fAllowMultipleAddressesFromGroup = true;
+        fAllowMultiplePorts = true;
 
         nFulfilledRequestExpireTime = 5*60; // fulfilled requests expire in 5 minutes
 
         checkpointData = (CCheckpointData){
             boost::assign::map_list_of
             ( 0, uint256S("0x00000dbc9aa1686b4dfb177300185c6a3e0b13d1d4d346c5bccdd19fdf9ebc5a")),
+        };
+
+        chainTxData = ChainTxData{
             0,
             0,
             0
@@ -431,6 +633,12 @@ public:
         // Regtest GoByte BIP44 coin type is '1' (All coin's testnet default)
         nExtCoinType = 1;
    }
+
+    void UpdateBIP9Parameters(Consensus::DeploymentPos d, int64_t nStartTime, int64_t nTimeout)
+    {
+        consensus.vDeployments[d].nStartTime = nStartTime;
+        consensus.vDeployments[d].nTimeout = nTimeout;
+    }
 };
 static CRegTestParams regTestParams;
 
@@ -447,7 +655,10 @@ CChainParams& Params(const std::string& chain)
             return mainParams;
     else if (chain == CBaseChainParams::TESTNET)
             return testNetParams;
-    else if (chain == CBaseChainParams::REGTEST)
+    else if (chain == CBaseChainParams::DEVNET) {
+            assert(devNetParams);
+            return *devNetParams;
+    } else if (chain == CBaseChainParams::REGTEST)
             return regTestParams;
     else
         throw std::runtime_error(strprintf("%s: Unknown chain %s.", __func__, chain));
@@ -455,6 +666,15 @@ CChainParams& Params(const std::string& chain)
 
 void SelectParams(const std::string& network)
 {
+    if (network == CBaseChainParams::DEVNET) {
+        devNetParams = new CDevNetParams();
+    }
+
     SelectBaseParams(network);
     pCurrentParams = &Params(network);
+}
+
+void UpdateRegtestBIP9Parameters(Consensus::DeploymentPos d, int64_t nStartTime, int64_t nTimeout)
+{
+    regTestParams.UpdateBIP9Parameters(d, nStartTime, nTimeout);
 }

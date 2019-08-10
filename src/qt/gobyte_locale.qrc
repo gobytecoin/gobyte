@@ -8,6 +8,7 @@
         <file alias="fr">locale/gobyte_fr.qm</file>
         <file alias="it">locale/gobyte_it.qm</file>
         <file alias="ja">locale/gobyte_ja.qm</file>
+        <file alias="nl">locale/gobyte_nl.qm</file>
         <file alias="pl">locale/gobyte_pl.qm</file>
         <file alias="pt">locale/gobyte_pt.qm</file>
         <file alias="ru">locale/gobyte_ru.qm</file>

@@ -11,6 +11,7 @@
  * network protocol versioning
  */
 
+
 static const int PROTOCOL_VERSION = 70209;
 
 //! initial proto version, to be increased after version/verack negotiation
@@ -21,15 +22,10 @@ static const int GETHEADERS_VERSION = 70077;
 
 //! disconnect from peers older than this proto version
 static const int MIN_PEER_PROTO_VERSION = 70208;
-static const int STRICT_PEER_PROTO_VERSION = 70209;
 
 //! nTime field added to CAddress, starting with this version;
 //! if possible, avoid requesting addresses nodes older than this
 static const int CADDR_TIME_VERSION = 31402;
-
-//! only request blocks from nodes outside this range of versions
-static const int NOBLKS_VERSION_START = 32000;
-static const int NOBLKS_VERSION_END = 32400;
 
 //! BIP 0031, pong message, is enabled for all versions AFTER this one
 static const int BIP0031_VERSION = 60000;
@@ -45,5 +41,8 @@ static const int SENDHEADERS_VERSION = 70201;
 
 //! DIP0001 was activated in this version
 static const int DIP0001_PROTOCOL_VERSION = 70208;
+
+//! short-id-based block download starts with this version
+static const int SHORT_IDS_BLOCKS_VERSION = 70209;
 
 #endif // BITCOIN_VERSION_H

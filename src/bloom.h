@@ -73,7 +73,7 @@ public:
     ADD_SERIALIZE_METHODS;
 
     template <typename Stream, typename Operation>
-    inline void SerializationOp(Stream& s, Operation ser_action, int nType, int nVersion) {
+    inline void SerializationOp(Stream& s, Operation ser_action) {
         READWRITE(vData);
         READWRITE(nHashFuncs);
         READWRITE(nTweak);
@@ -129,9 +129,12 @@ public:
     void reset();
 
 private:
-    unsigned int nBloomSize;
-    unsigned int nInsertions;
-    CBloomFilter b1, b2;
+    int nEntriesPerGeneration;
+    int nEntriesThisGeneration;
+    int nGeneration;
+    std::vector<uint64_t> data;
+    unsigned int nTweak;
+    int nHashFuncs;
 };
 
 

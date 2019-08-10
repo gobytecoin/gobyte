@@ -9,8 +9,6 @@
 #include "masternode.h"
 #include "sync.h"
 
-using namespace std;
-
 class CMasternodeMan;
 class CConnman;
 
@@ -19,9 +17,9 @@ extern CMasternodeMan mnodeman;
 class CMasternodeMan
 {
 public:
-    typedef std::pair<arith_uint256, CMasternode*> score_pair_t;
+    typedef std::pair<arith_uint256, const CMasternode*> score_pair_t;
     typedef std::vector<score_pair_t> score_pair_vec_t;
-    typedef std::pair<int, CMasternode> rank_pair_t;
+    typedef std::pair<int, const CMasternode> rank_pair_t;
     typedef std::vector<rank_pair_t> rank_pair_vec_t;
 
 private:
@@ -29,7 +27,7 @@ private:
 
     static const int DSEG_UPDATE_SECONDS        = 3 * 60 * 60;
 
-    static const int LAST_PAID_SCAN_BLOCKS      = 100;
+    static const int LAST_PAID_SCAN_BLOCKS;
 
     static const int MIN_POSE_PROTO_VERSION     = 70203;
     static const int MAX_POSE_CONNECTIONS       = 10;
@@ -52,18 +50,22 @@ private:
     // map to hold all MNs
     std::map<COutPoint, CMasternode> mapMasternodes;
     // who's asked for the Masternode list and the last time
-    std::map<CNetAddr, int64_t> mAskedUsForMasternodeList;
+    std::map<CService, int64_t> mAskedUsForMasternodeList;
     // who we asked for the Masternode list and the last time
-    std::map<CNetAddr, int64_t> mWeAskedForMasternodeList;
+    std::map<CService, int64_t> mWeAskedForMasternodeList;
     // which Masternodes we've asked for
-    std::map<COutPoint, std::map<CNetAddr, int64_t> > mWeAskedForMasternodeListEntry;
+    std::map<COutPoint, std::map<CService, int64_t> > mWeAskedForMasternodeListEntry;
+
     // who we asked for the masternode verification
-    std::map<CNetAddr, CMasternodeVerification> mWeAskedForVerification;
+    std::map<CService, CMasternodeVerification> mWeAskedForVerification;
 
     // these maps are used for masternode recovery from MASTERNODE_NEW_START_REQUIRED state
-    std::map<uint256, std::pair< int64_t, std::set<CNetAddr> > > mMnbRecoveryRequests;
+    std::map<uint256, std::pair< int64_t, std::set<CService> > > mMnbRecoveryRequests;
     std::map<uint256, std::vector<CMasternodeBroadcast> > mMnbRecoveryGoodReplies;
     std::list< std::pair<CService, uint256> > listScheduledMnbRequestConnections;
+    std::map<CService, std::pair<int64_t, std::set<uint256> > > mapPendingMNB;
+    std::map<CService, std::pair<int64_t, CMasternodeVerification> > mapPendingMNV;
+    CCriticalSection cs_mapPendingMNV;
 
     /// Set when masternodes are added, cleared when CGovernanceManager is notified
     bool fMasternodesAdded;
@@ -73,13 +75,18 @@ private:
 
     std::vector<uint256> vecDirtyGovernanceObjectHashes;
 
-    int64_t nLastWatchdogVoteTime;
+    int64_t nLastSentinelPingTime;
 
     friend class CMasternodeSync;
     /// Find an entry
     CMasternode* Find(const COutPoint& outpoint);
 
     bool GetMasternodeScores(const uint256& nBlockHash, score_pair_vec_t& vecMasternodeScoresRet, int nMinProtocol = 0);
+
+    void SyncSingle(CNode* pnode, const COutPoint& outpoint, CConnman& connman);
+    void SyncAll(CNode* pnode, CConnman& connman);
+
+    void PushDsegInvs(CNode* pnode, const CMasternode& mn);
 
 public:
     // Keep track of all broadcasts I've seen
@@ -95,14 +102,14 @@ public:
     ADD_SERIALIZE_METHODS;
 
     template <typename Stream, typename Operation>
-    inline void SerializationOp(Stream& s, Operation ser_action, int nType, int nVersion) {
+    inline void SerializationOp(Stream& s, Operation ser_action) {
         LOCK(cs);
         std::string strVersion;
         if(ser_action.ForRead()) {
             READWRITE(strVersion);
         }
         else {
-            strVersion = SERIALIZATION_VERSION_STRING;
+            strVersion = SERIALIZATION_VERSION_STRING; 
             READWRITE(strVersion);
         }
 
@@ -112,7 +119,7 @@ public:
         READWRITE(mWeAskedForMasternodeListEntry);
         READWRITE(mMnbRecoveryRequests);
         READWRITE(mMnbRecoveryGoodReplies);
-        READWRITE(nLastWatchdogVoteTime);
+        READWRITE(nLastSentinelPingTime);
         READWRITE(nDsqCount);
 
         READWRITE(mapSeenMasternodeBroadcast);
@@ -181,12 +188,14 @@ public:
 
     void ProcessMasternodeConnections(CConnman& connman);
     std::pair<CService, std::set<uint256> > PopScheduledMnbRequestConnection();
+    void ProcessPendingMnbRequests(CConnman& connman);
 
-    void ProcessMessage(CNode* pfrom, std::string& strCommand, CDataStream& vRecv, CConnman& connman);
+    void ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStream& vRecv, CConnman& connman);
 
     void DoFullVerificationStep(CConnman& connman);
     void CheckSameAddr();
-    bool SendVerifyRequest(const CAddress& addr, const std::vector<CMasternode*>& vSortedByAddr, CConnman& connman);
+    bool SendVerifyRequest(const CAddress& addr, const std::vector<const CMasternode*>& vSortedByAddr, CConnman& connman);
+    void ProcessPendingMnvRequests(CConnman& connman);
     void SendVerifyReply(CNode* pnode, CMasternodeVerification& mnv, CConnman& connman);
     void ProcessVerifyReply(CNode* pnode, CMasternodeVerification& mnv);
     void ProcessVerifyBroadcast(CNode* pnode, const CMasternodeVerification& mnv);
@@ -196,9 +205,7 @@ public:
 
     std::string ToString() const;
 
-    /// Update masternode list and maps using provided CMasternodeBroadcast
-    void UpdateMasternodeList(CMasternodeBroadcast mnb, CConnman& connman);
-    /// Perform complete check and only then update list and maps
+    /// Perform complete check and only then update masternode list and maps using provided CMasternodeBroadcast
     bool CheckMnbAndUpdateMasternodeList(CNode* pfrom, CMasternodeBroadcast mnb, int& nDos, CConnman& connman);
     bool IsMnbRecoveryRequested(const uint256& hash) { return mMnbRecoveryRequests.count(hash); }
 
@@ -218,8 +225,8 @@ public:
         return vecTmp;;
     }
 
-    bool IsWatchdogActive();
-    void UpdateWatchdogVoteTime(const COutPoint& outpoint, uint64_t nVoteTime = 0);
+    bool IsSentinelPingActive();
+    void UpdateLastSentinelPingTime();
     bool AddGovernanceVote(const COutPoint& outpoint, uint256 nGovernanceObjectHash);
     void RemoveGovernanceObject(uint256 nGovernanceObjectHash);
 
@@ -229,6 +236,8 @@ public:
     void SetMasternodeLastPing(const COutPoint& outpoint, const CMasternodePing& mnp);
 
     void UpdatedBlockTip(const CBlockIndex *pindex);
+
+    void WarnMasternodeDaemonUpdates();
 
     /**
      * Called to notify CGovernanceManager that the masternode index has been updated.
