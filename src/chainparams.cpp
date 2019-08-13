@@ -248,7 +248,7 @@ public:
             ( 115500, uint256S("0x000000000074763fd76ef4a344d4f7e049c1dc55395c3814ac608b6fde6c7ecb"))
             ( 210500, uint256S("0x0000000000be1d1d62b9738afc39f360b5aff6da357350a0d14ed0727f1f634c"))
             ( 310500, uint256S("0x00000000020fb478b1531ba112834e968714bac2177e19372ecfa25860c41e51"))
-			( 346272, uint256S("0x0000000001d13a9cf0bd932a82474c392e4301ffe259b23a5c2af987fee0fb00"))
+            ( 346272, uint256S("0x0000000001d13a9cf0bd932a82474c392e4301ffe259b23a5c2af987fee0fb00"))
         };
 
         chainTxData = ChainTxData{
@@ -278,7 +278,7 @@ public:
         consensus.nBudgetPaymentsCycleBlocks = 50; // ~(60*24*30)/2.5
         consensus.nBudgetPaymentsWindowBlocks = 10;
         consensus.nSuperblockStartBlock = 15600; // NOTE: Should satisfy nSuperblockStartBlock > nBudgetPeymentsStartBlock
-		consensus.nSuperblockStartHash = uint256();
+	consensus.nSuperblockStartHash = uint256();
         consensus.nSuperblockCycle = 24; // Superblocks can be issued hourly on testnet
         consensus.nGovernanceMinQuorum = 1;
         consensus.nGovernanceFilterElements = 500;
