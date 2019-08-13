@@ -1,6 +1,6 @@
 ![GitHub Logo](https://raw.githubusercontent.com/gobytecoin/gobyte/master/share/pixmaps/gobyte128.png "GoByte")
 
-GoByte Core v0.12.2.4 (GBX)
+GoByte Core v0.12.3 (GBX)
 ===============================
 
 `master:` [![Build Status](https://travis-ci.org/gobytecoin/gobyte.svg?branch=master)](https://travis-ci.org/gobytecoin/gobyte) `develop:` [![Build Status](https://travis-ci.org/gobytecoin/gobyte.svg?branch=develop)](https://travis-ci.org/gobytecoin/gobyte/branches)
