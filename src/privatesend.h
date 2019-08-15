@@ -24,9 +24,7 @@ static const int PRIVATESEND_QUEUE_TIMEOUT          = 30;
 static const int PRIVATESEND_SIGNING_TIMEOUT        = 15;
 
 //! minimum peer version accepted by mixing pool
-static const int MIN_PRIVATESEND_PEER_PROTO_VERSION = 70208;
-// IDK
-static const int STRICT_PRIVATESEND_PEER_PROTO_VERSION = 70209;
+static const int MIN_PRIVATESEND_PEER_PROTO_VERSION = 70209;
 
 static const size_t PRIVATESEND_ENTRY_MAX_SIZE      = 9;
 
@@ -124,7 +122,7 @@ public:
     inline void SerializationOp(Stream& s, Operation ser_action) {
         READWRITE(nDenom);
         int nVersion = s.GetVersion();
-        if (nVersion > 70208) {
+        if (nVersion > 70209) {
             READWRITE(nInputCount);
         } else if (ser_action.ForRead()) {
             nInputCount = 0;
@@ -216,12 +214,12 @@ public:
     inline void SerializationOp(Stream& s, Operation ser_action) {
         READWRITE(nDenom);
         int nVersion = s.GetVersion();
-        if (nVersion > 70208) {
+        if (nVersion > 70209) {
             READWRITE(nInputCount);
         } else if (ser_action.ForRead()) {
             nInputCount = 0;
         }
-        if (nVersion == 70208 && (s.GetType() & SER_NETWORK)) {
+        if (nVersion == 70209 && (s.GetType() & SER_NETWORK)) {
             // converting from/to old format
             CTxIn txin{};
             if (ser_action.ForRead()) {
@@ -308,7 +306,7 @@ public:
     inline void SerializationOp(Stream& s, Operation ser_action) {
         READWRITE(tx);
         int nVersion = s.GetVersion();
-        if (nVersion == 70208 && (s.GetType() & SER_NETWORK)) {
+        if (nVersion == 70209 && (s.GetType() & SER_NETWORK)) {
             // converting from/to old format
             CTxIn txin{};
             if (ser_action.ForRead()) {

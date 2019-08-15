@@ -26,7 +26,7 @@ class CGovernanceObject;
 class CGovernanceVote;
 
 static const int MAX_GOVERNANCE_OBJECT_DATA_SIZE = 16 * 1024;
-static const int MIN_GOVERNANCE_PEER_PROTO_VERSION = 70208;
+static const int MIN_GOVERNANCE_PEER_PROTO_VERSION = 70209;
 static const int GOVERNANCE_FILTER_PROTO_VERSION = 70206;
 
 static const double GOVERNANCE_FILTER_FP_RATE = 0.001;
@@ -311,7 +311,7 @@ public:
         READWRITE(nRevision);
         READWRITE(nTime);
         READWRITE(nCollateralHash);
-        if (nVersion == 70208 && (s.GetType() & SER_NETWORK)) {
+        if (nVersion == 70209 && (s.GetType() & SER_NETWORK)) {
             // converting from/to old format
             std::string strDataHex;
             if (ser_action.ForRead()) {
@@ -326,7 +326,7 @@ public:
             READWRITE(vchData);
         }
         READWRITE(nObjectType);
-        if (nVersion == 70208 && (s.GetType() & SER_NETWORK)) {
+        if (nVersion == 70209 && (s.GetType() & SER_NETWORK)) {
             // converting from/to old format
             CTxIn txin;
             if (ser_action.ForRead()) {
