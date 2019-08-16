@@ -320,10 +320,10 @@ public:
         consensus.vDeployments[Consensus::DEPLOYMENT_BIP147].nThreshold = 50; // 50% of 100
 
         // The best chain should have at least this much work.
-        consensus.nMinimumChainWork = uint256S("0x000000000000000000000000000000000000000000000000000006a96dd9119d"); // 14500
+        consensus.nMinimumChainWork = uint256S("0x00"); // 0
 
         // By default assume that the signatures in ancestors of this block are valid.
-        consensus.defaultAssumeValid = uint256S("0x0000000c94299ee914c5f7d6322c4f51759ddaa848ea881b0280bb00591bb7f1"); // 14500
+        consensus.defaultAssumeValid = uint256S("0x00"); // 0
 
         pchMessageStart[0] = 0xd1;
         pchMessageStart[1] = 0x2b;
@@ -333,9 +333,9 @@ public:
         nDefaultPort = 13455;
         nPruneAfterHeight = 1000;
 
-        genesis = CreateGenesisBlock(1510727200, 2998459, 0x1e0ffff0, 1, 50 * COIN);
+        genesis = CreateGenesisBlock(1565964700, 616762, 0x1e0ffff0, 1, 50 * COIN);
         consensus.hashGenesisBlock = genesis.GetHash();
-        assert(consensus.hashGenesisBlock == uint256S("0x00000c958ba1a0fe2174effe57a7f39c4c32b8341f1efa20be78b48b6b6bb353"));
+        assert(consensus.hashGenesisBlock == uint256S("0x0000060d86999c27d86a8b53f2a4bf0eacc9c72bd955c7c7ef4136968d8ce169"));
         assert(genesis.hashMerkleRoot == uint256S("0xdc9a719dc1bcda39107ea55424f00cab512170a1cb69efa08531f483f2399f21"));
 
         vFixedSeeds.clear();
@@ -371,10 +371,7 @@ public:
 
         checkpointData = (CCheckpointData) {
             boost::assign::map_list_of
-            (   500, uint256S("0x0000000a074e448fcae79552631e7e90047f55e272e85f3db93df86c4bcd4fc1"))
-            (  1000, uint256S("0x0000000302c5f739c94680415cfed780e5f90f6ab6b62e39c8cac9dc267acffd"))
-            (  5000, uint256S("0x000000023af784ca843c9bf0003cb3586e626936346456f6948586b71851f7a8"))
-            ( 10000, uint256S("0x000000041bcae477bee46f37d851a185c26b2fa5558fab12c72f43cd70bfe1fc")),
+            (   0, uint256S("0x0000060d86999c27d86a8b53f2a4bf0eacc9c72bd955c7c7ef4136968d8ce169"))
         };
 
         chainTxData = ChainTxData{
