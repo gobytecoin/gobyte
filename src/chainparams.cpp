@@ -278,7 +278,7 @@ public:
         consensus.nBudgetPaymentsCycleBlocks = 50; // ~(60*24*30)/2.5
         consensus.nBudgetPaymentsWindowBlocks = 10;
         consensus.nSuperblockStartBlock = 15600; // NOTE: Should satisfy nSuperblockStartBlock > nBudgetPeymentsStartBlock
-	consensus.nSuperblockStartHash = uint256();
+        consensus.nSuperblockStartHash = uint256();
         consensus.nSuperblockCycle = 24; // Superblocks can be issued hourly on testnet
         consensus.nGovernanceMinQuorum = 1;
         consensus.nGovernanceFilterElements = 500;
@@ -320,10 +320,10 @@ public:
         consensus.vDeployments[Consensus::DEPLOYMENT_BIP147].nThreshold = 50; // 50% of 100
 
         // The best chain should have at least this much work.
-        consensus.nMinimumChainWork = uint256S("0x00"); // 0
+        consensus.nMinimumChainWork = uint256S("0x0000000000000000000000000000000000000000000000000000000014439b6c"); // 313
 
         // By default assume that the signatures in ancestors of this block are valid.
-        consensus.defaultAssumeValid = uint256S("0x00"); // 0
+        consensus.defaultAssumeValid = uint256S("0x000001c2d24bd3e66514d5a267f0805376ec48cda5219ad15fcd827289593213"); // 313
 
         pchMessageStart[0] = 0xd1;
         pchMessageStart[1] = 0x2b;
@@ -372,13 +372,14 @@ public:
         checkpointData = (CCheckpointData) {
             boost::assign::map_list_of
             (   0, uint256S("0x0000060d86999c27d86a8b53f2a4bf0eacc9c72bd955c7c7ef4136968d8ce169"))
+			( 313, uint256S("0x000001c2d24bd3e66514d5a267f0805376ec48cda5219ad15fcd827289593213"))
         };
 
         chainTxData = ChainTxData{
-            0, // * UNIX timestamp of last checkpoint block
-            0,          // * total number of transactions between genesis and last checkpoint
+            1567994739, // * UNIX timestamp of last known number of transactions
+            315,        // * total number of transactions between genesis and that timestamp
                         //   (the tx=... number in the SetBestChain debug.log lines)
-            500         // * estimated number of transactions per day after checkpoint
+            0.01        // * estimated number of transactions per second after that timestamp
         };
 
     }
