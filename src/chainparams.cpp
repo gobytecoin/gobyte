@@ -274,7 +274,7 @@ public:
         consensus.nMasternodePaymentsIncreasePeriod = 100;
         consensus.nInstantSendConfirmationsRequired = 2;
         consensus.nInstantSendKeepLock = 6;
-        consensus.nBudgetPaymentsStartBlock = 15500;
+        consensus.nBudgetPaymentsStartBlock = 1750;
         consensus.nBudgetPaymentsCycleBlocks = 50; // ~(60*24*30)/2.5
         consensus.nBudgetPaymentsWindowBlocks = 10;
         consensus.nSuperblockStartBlock = 15600; // NOTE: Should satisfy nSuperblockStartBlock > nBudgetPeymentsStartBlock
@@ -372,7 +372,8 @@ public:
         checkpointData = (CCheckpointData) {
             boost::assign::map_list_of
             (   0, uint256S("0x0000060d86999c27d86a8b53f2a4bf0eacc9c72bd955c7c7ef4136968d8ce169"))
-			( 313, uint256S("0x000001c2d24bd3e66514d5a267f0805376ec48cda5219ad15fcd827289593213"))
+            ( 500, uint256S("0x000000f11a77aea134a85d40a1ea0deda00cd535d7174610b13a10902a79cb42"))
+            ( 1500, uint256S("0x00000499239468942794239ad73adcd68ab7347658d0fb3a8630e5026815c669"))
         };
 
         chainTxData = ChainTxData{
