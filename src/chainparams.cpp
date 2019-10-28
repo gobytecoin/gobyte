@@ -333,9 +333,9 @@ public:
         nDefaultPort = 13455;
         nPruneAfterHeight = 1000;
 
-        genesis = CreateGenesisBlock(1565964700, 616762, 0x1e0ffff0, 1, 50 * COIN);
+        genesis = CreateGenesisBlock(1571915315, 713836, 0x1e0ffff0, 1, 50 * COIN);
         consensus.hashGenesisBlock = genesis.GetHash();
-        assert(consensus.hashGenesisBlock == uint256S("0x0000060d86999c27d86a8b53f2a4bf0eacc9c72bd955c7c7ef4136968d8ce169"));
+        assert(consensus.hashGenesisBlock == uint256S("0x000008532acd4d1287d6adf9c27996e6c52af941b42851a3c5b7d542571c7717"));
         assert(genesis.hashMerkleRoot == uint256S("0xdc9a719dc1bcda39107ea55424f00cab512170a1cb69efa08531f483f2399f21"));
 
         vFixedSeeds.clear();
@@ -371,16 +371,15 @@ public:
 
         checkpointData = (CCheckpointData) {
             boost::assign::map_list_of
-            (   0, uint256S("0x0000060d86999c27d86a8b53f2a4bf0eacc9c72bd955c7c7ef4136968d8ce169"))
-            ( 500, uint256S("0x000000f11a77aea134a85d40a1ea0deda00cd535d7174610b13a10902a79cb42"))
-            ( 1500, uint256S("0x00000499239468942794239ad73adcd68ab7347658d0fb3a8630e5026815c669"))
+            (   0, uint256S("0x000008532acd4d1287d6adf9c27996e6c52af941b42851a3c5b7d542571c7717")),
+            ( 500, uint256S("0x000008c164a679b9e6f23859b17a9e6158367d1ffaee457e7ca320355e3c8a42"))
         };
 
-        chainTxData = ChainTxData{
-            1567994739, // * UNIX timestamp of last known number of transactions
-            315,        // * total number of transactions between genesis and that timestamp
-                        //   (the tx=... number in the SetBestChain debug.log lines)
-            0.01        // * estimated number of transactions per second after that timestamp
+        chainTxData = ChainTxData{};
+	  1572056576,	// * UNIX timestamp of last known number of transactions
+	  501,		// * total number of transactions between genesis and that timestamp
+			//   (the tx=... number in the SetBestChain debug.log lines)
+	  0.01		// * estimated number of transactions per second after that timestamp
         };
 
     }
