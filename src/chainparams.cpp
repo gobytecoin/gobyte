@@ -138,8 +138,8 @@ public:
         consensus.nGovernanceMinQuorum = 10;
         consensus.nGovernanceFilterElements = 20000;
         consensus.nMasternodeMinimumConfirmations = 15;
-        consensus.BIP34Height = 951;
-        consensus.BIP34Hash = uint256S("00000c8a1ff01bae3f3875c81cb14115429af5744643b34b4ad1cbb7d2d59ca2");
+        consensus.BIP34Height = 1;
+        consensus.BIP34Hash = uint256S("0x00000c8a1ff01bae3f3875c81cb14115429af5744643b34b4ad1cbb7d2d59ca2");
         consensus.BIP65Height = 2431; // 0000039cf01242c7f921dcb4806a5994bc003b48c1973ae0c89b67809c2bb2ab
         consensus.BIP66Height = 2075; // 0000002acdd29a14583540cb72e1c5cc83783560e38fa7081495d474fe1671f7
         consensus.DIP0001Height = 5500;
@@ -169,16 +169,16 @@ public:
 
         // Deployment of BIP147
         consensus.vDeployments[Consensus::DEPLOYMENT_BIP147].bit = 2;
-        consensus.vDeployments[Consensus::DEPLOYMENT_BIP147].nStartTime = 1565827200; // 15 Aug, 2019
-        consensus.vDeployments[Consensus::DEPLOYMENT_BIP147].nTimeout = 1597449600; // 15 Aug, 2020
+        consensus.vDeployments[Consensus::DEPLOYMENT_BIP147].nStartTime = 1565827200; // Aug 15th, 2019
+        consensus.vDeployments[Consensus::DEPLOYMENT_BIP147].nTimeout = 1604102400; // Oct 31th, 2020
         consensus.vDeployments[Consensus::DEPLOYMENT_BIP147].nWindowSize = 4032;
         consensus.vDeployments[Consensus::DEPLOYMENT_BIP147].nThreshold = 3226; // 80% of 4032
 
         // The best chain should have at least this much work.
-        consensus.nMinimumChainWork = uint256S("0x00000000000000000000000000000000000000000000000007df1a3ffa714939"); // 346272
+        consensus.nMinimumChainWork = uint256S("0x0000000000000000000000000000000000000000000000000834cecbb4f08db0"); // 550000
 
         // By default assume that the signatures in ancestors of this block are valid.
-        consensus.defaultAssumeValid = uint256S("0x0000000001d13a9cf0bd932a82474c392e4301ffe259b23a5c2af987fee0fb00"); // 346272
+        consensus.defaultAssumeValid = uint256S("0x0000000005cb9e2d69d623e8fadeed26436d83b1b83ca870f2757335df286b22"); // 550000
 
         /**
          * The message start string is designed to be unlikely to occur in normal data.
