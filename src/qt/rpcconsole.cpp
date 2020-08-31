@@ -1,6 +1,6 @@
 // Copyright (c) 2011-2015 The Bitcoin Core developers
 // Copyright (c) 2014-2017 The Dash Core developers
-// Copyright (c) 2017-2019 The GoByte Core developers
+// Copyright (c) 2017-2020 The GoByte Core developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -371,7 +371,7 @@ bool RPCConsole::RPCParseCommandLine(std::string &strResult, const std::string &
         }
         *pstrFilteredOut = strCommand;
         for (auto i = filter_ranges.rbegin(); i != filter_ranges.rend(); ++i) {
-            pstrFilteredOut->replace(i->first, i->second - i->first, "(…)");
+            pstrFilteredOut->replace(i->first, i->second - i->first, "(ï¿½)");
         }
     }
     switch(state) // final state
