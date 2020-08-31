@@ -138,11 +138,11 @@ public:
         consensus.nGovernanceMinQuorum = 10;
         consensus.nGovernanceFilterElements = 20000;
         consensus.nMasternodeMinimumConfirmations = 15;
-        consensus.BIP34Height = 1;
-        consensus.BIP34Hash = uint256S("0x00000c8a1ff01bae3f3875c81cb14115429af5744643b34b4ad1cbb7d2d59ca2");
-        consensus.BIP65Height = 2431; // 0000039cf01242c7f921dcb4806a5994bc003b48c1973ae0c89b67809c2bb2ab
-        consensus.BIP66Height = 2075; // 0000002acdd29a14583540cb72e1c5cc83783560e38fa7081495d474fe1671f7
-        consensus.DIP0001Height = 5500;
+        consensus.BIP34Height = 951;
+        consensus.BIP34Hash = uint256S("0x00000000003c01d8b55ea3105eeca49912300af2493f8b57ad1e4007f71fee4b");
+        consensus.BIP65Height = 195184; // 00000000011034b7006986034a244d90efa97523f37164dad065af789d8df6ed
+        consensus.BIP66Height = 104300; // 00000000001d426ad4d818e054f192cbe620cf7e9489350a624c0ed10aeb329a
+        consensus.DIP0001Height = 280000;
         consensus.powLimit = uint256S("00000fffffffffffffffffffffffffffffffffffffffffffffffffffffffffff");
         consensus.nPowTargetTimespan = 60 * 60; // GoByte: 1 hour, 24 blocks
         consensus.nPowTargetSpacing = 2.5 * 60; // GoByte: 150 seconds
