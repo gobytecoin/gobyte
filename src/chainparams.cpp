@@ -286,7 +286,7 @@ public:
         consensus.nGovernanceFilterElements = 500;
         consensus.nMasternodeMinimumConfirmations = 1;
         consensus.BIP34Height = 76;
-        consensus.BIP34Hash = uint256S("0x");
+        consensus.BIP34Hash = uint256S("0x000000adcc2e559a1a8ef5fd1d5c9276eab5e38c2a46c37db17c6e12024833f6");
         consensus.BIP65Height = 2431; // 0000039cf01242c7f921dcb4806a5994bc003b48c1973ae0c89b67809c2bb2ab
         consensus.BIP66Height = 2075; // 0000002acdd29a14583540cb72e1c5cc83783560e38fa7081495d474fe1671f7
         consensus.DIP0001Height = 5500;
