@@ -556,13 +556,13 @@ void PrintExceptionContinue(const std::exception* pex, const char* pszThread)
 boost::filesystem::path GetDefaultDataDir()
 {
     namespace fs = boost::filesystem;
-    // Windows < Vista: C:\Documents and Settings\Username\Application Data\GobyteCore
-    // Windows >= Vista: C:\Users\Username\AppData\Roaming\GobyteCore
-    // Mac: ~/Library/Application Support/GobyteCore
+    // Windows < Vista: C:\Documents and Settings\Username\Application Data\GoByteCore
+    // Windows >= Vista: C:\Users\Username\AppData\Roaming\GoByteCore
+    // Mac: ~/Library/Application Support/GoByteCore
     // Unix: ~/.gobytecore
 #ifdef WIN32
     // Windows
-    return GetSpecialFolderPath(CSIDL_APPDATA) / "GobyteCore";
+    return GetSpecialFolderPath(CSIDL_APPDATA) / "GoByteCore";
 #else
     fs::path pathRet;
     char* pszHome = getenv("HOME");
@@ -572,7 +572,7 @@ boost::filesystem::path GetDefaultDataDir()
         pathRet = fs::path(pszHome);
 #ifdef MAC_OSX
     // Mac
-    return pathRet / "Library/Application Support/GobyteCore";
+    return pathRet / "Library/Application Support/GoByteCore";
 #else
     // Unix
     return pathRet / ".gobytecore";
@@ -1014,4 +1014,3 @@ std::string SafeIntVersionToString(uint32_t nVersion)
         return "invalid_version";
     }
 }
-
