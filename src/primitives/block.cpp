@@ -13,10 +13,14 @@
 
 uint256 CBlockHeader::GetHash() const
 {
+    if (!powHash.IsNull()) return powHash;
+
     std::vector<unsigned char> vch(80);
     CVectorWriter ss(SER_NETWORK, PROTOCOL_VERSION, vch, 0);
     ss << *this;
-    return HashNeoscrypt((const char *)vch.data(), (const char *)vch.data() + vch.size());
+    const uint256 cache = HashNeoscrypt((const char *)vch.data(), (const char *)vch.data() + vch.size());
+    SetCache(cache);
+    return cache;
 }
 
 std::string CBlock::ToString() const
