@@ -74,7 +74,7 @@ int main(int argc, char *argv[])
     // Don't remove this, it's needed to access
     // QApplication:: and QCoreApplication:: in the tests
     QApplication app(argc, argv);
-    app.setApplicationName("Dash-Qt-test");
+    app.setApplicationName("GoByte-Qt-test");
 
     SSL_library_init();
 

@@ -202,7 +202,7 @@ private:
     void handleRunawayException(const std::exception_ptr e);
 };
 
-/** Main Dash application object */
+/** Main GoByte application object */
 class BitcoinApplication: public QApplication
 {
     Q_OBJECT

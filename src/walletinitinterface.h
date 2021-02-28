@@ -31,7 +31,7 @@ public:
     /** Close wallets */
     virtual void Close() = 0;
 
-    // Dash Specific WalletInitInterface
+    // GoByte Specific WalletInitInterface
     virtual void AutoLockMasternodeCollaterals() = 0;
     virtual void InitPrivateSendSettings() = 0;
     virtual void InitKeePass() = 0;

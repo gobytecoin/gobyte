@@ -89,7 +89,7 @@
 // Application startup time (used for uptime calculation)
 const int64_t nStartupTime = GetTime();
 
-//Dash only features
+//GoByte only features
 bool fMasternodeMode = false;
 bool fDisableGovernance = false;
 /**
@@ -271,7 +271,7 @@ const CLogCategoryDesc LogCategories[] =
     {BCLog::ALL, "1"},
     {BCLog::ALL, "all"},
 
-    //Start Dash
+    //Start GoByte
     {BCLog::CHAINLOCKS, "chainlocks"},
     {BCLog::GOBJECT, "gobject"},
     {BCLog::INSTANTSEND, "instantsend"},
@@ -284,7 +284,7 @@ const CLogCategoryDesc LogCategories[] =
     {BCLog::PRIVATESEND, "privatesend"},
     {BCLog::SPORK, "spork"},
     {BCLog::NETCONN, "netconn"},
-    //End Dash
+    //End GoByte
 
 };
 
@@ -589,7 +589,7 @@ public:
         std::pair<bool,std::string> found_result(false, std::string());
 
         // We pass "true" to GetArgHelper in order to return the last
-        // argument value seen from the command line (so "dashd -foo=bar
+        // argument value seen from the command line (so "gobyted -foo=bar
         // -foo=baz" gives GetArg(am,"foo")=={true,"baz"}
         found_result = GetArgHelper(am.m_override_args, arg, true);
         if (found_result.first) {
@@ -897,9 +897,9 @@ void PrintExceptionContinue(const std::exception_ptr pex, const char* pszExcepti
 
 fs::path GetDefaultDataDir()
 {
-    // Windows < Vista: C:\Documents and Settings\Username\Application Data\DashCore
-    // Windows >= Vista: C:\Users\Username\AppData\Roaming\DashCore
-    // Mac: ~/Library/Application Support/DashCore
+    // Windows < Vista: C:\Documents and Settings\Username\Application Data\GoByteCore
+    // Windows >= Vista: C:\Users\Username\AppData\Roaming\GoByteCore
+    // Mac: ~/Library/Application Support/GoByteCore
     // Unix: ~/.dashcore
 #ifdef WIN32
     // Windows
