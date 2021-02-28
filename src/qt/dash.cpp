@@ -95,7 +95,7 @@ static void InitMessage(const std::string &message)
  */
 static std::string Translate(const char* psz)
 {
-    return QCoreApplication::translate("dash-core", psz).toStdString();
+    return QCoreApplication::translate("gobyte-core", psz).toStdString();
 }
 
 static QString GetLangTerritory()
