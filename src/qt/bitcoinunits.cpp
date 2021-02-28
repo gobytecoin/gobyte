@@ -72,10 +72,10 @@ QString BitcoinUnits::description(int unit)
     {
         switch(unit)
         {
-            case DASH: return QString("Gobyte");
-            case mDASH: return QString("Milli-Gobyte (1 / 1" THIN_SP_UTF8 "000)");
-            case uDASH: return QString("Micro-Gobyte (1 / 1" THIN_SP_UTF8 "000" THIN_SP_UTF8 "000)");
-            case duffs: return QString("Ten Nano-Gobyte (1 / 100" THIN_SP_UTF8 "000" THIN_SP_UTF8 "000)");
+            case DASH: return QString("GoByte");
+            case mDASH: return QString("Milli-GoByte (1 / 1" THIN_SP_UTF8 "000)");
+            case uDASH: return QString("Micro-GoByte (1 / 1" THIN_SP_UTF8 "000" THIN_SP_UTF8 "000)");
+            case duffs: return QString("Ten Nano-GoByte (1 / 100" THIN_SP_UTF8 "000" THIN_SP_UTF8 "000)");
             default: return QString("???");
         }
     }
@@ -83,10 +83,10 @@ QString BitcoinUnits::description(int unit)
     {
         switch(unit)
         {
-            case DASH: return QString("TestGobytes");
-            case mDASH: return QString("Milli-TestGobyte (1 / 1" THIN_SP_UTF8 "000)");
-            case uDASH: return QString("Micro-TestGobyte (1 / 1" THIN_SP_UTF8 "000" THIN_SP_UTF8 "000)");
-            case duffs: return QString("Ten Nano-TestGobyte (1 / 100" THIN_SP_UTF8 "000" THIN_SP_UTF8 "000)");
+            case DASH: return QString("TestGoBytes");
+            case mDASH: return QString("Milli-TestGoByte (1 / 1" THIN_SP_UTF8 "000)");
+            case uDASH: return QString("Micro-TestGoByte (1 / 1" THIN_SP_UTF8 "000" THIN_SP_UTF8 "000)");
+            case duffs: return QString("Ten Nano-TestGoByte (1 / 100" THIN_SP_UTF8 "000" THIN_SP_UTF8 "000)");
             default: return QString("???");
         }
     }
