@@ -1,9 +1,9 @@
 # Contents
-This directory contains tools to automatically get data about the memory consumption by some objects in dashd process with the help of GDB debugger.
+This directory contains tools to automatically get data about the memory consumption by some objects in gobyted process with the help of GDB debugger.
 
-## dash_dbg.sh
-This shell script attaches GDB to the running dashd process (should be built with debug info), executes debug.gdb script and detaches.
-By default it uses testnet settings, see script comments to attach it to mainnet dashd.
+## gobyte_dbg.sh
+This shell script attaches GDB to the running gobyted process (should be built with debug info), executes debug.gdb script and detaches.
+By default it uses testnet settings, see script comments to attach it to mainnet gobyted.
 
 ## debug.gdb
 Contains debugger instructions to execute during attach: loads python code and executes it for the objects we want to investigate.
@@ -42,4 +42,3 @@ If a type is not listed here, its size is the return of sizeof (except STL conta
 
 ## common_helpers.py
 Several helper functions that are used in other python code.
-

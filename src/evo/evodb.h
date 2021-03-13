@@ -2,8 +2,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef DASH_EVODB_H
-#define DASH_EVODB_H
+#ifndef GOBYTE_EVODB_H
+#define GOBYTE_EVODB_H
 
 #include <dbwrapper.h>
 #include <sync.h>
@@ -110,4 +110,4 @@ private:
 
 extern std::unique_ptr<CEvoDB> evoDb;
 
-#endif //DASH_EVODB_H
+#endif //GOBYTE_EVODB_H

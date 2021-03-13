@@ -19,9 +19,9 @@ BitcoinUnits::BitcoinUnits(QObject *parent):
 QList<BitcoinUnits::Unit> BitcoinUnits::availableUnits()
 {
     QList<BitcoinUnits::Unit> unitlist;
-    unitlist.append(DASH);
-    unitlist.append(mDASH);
-    unitlist.append(uDASH);
+    unitlist.append(GBX);
+    unitlist.append(mGBX);
+    unitlist.append(uGBX);
     unitlist.append(duffs);
     return unitlist;
 }
@@ -30,9 +30,9 @@ bool BitcoinUnits::valid(int unit)
 {
     switch(unit)
     {
-    case DASH:
-    case mDASH:
-    case uDASH:
+    case GBX:
+    case mGBX:
+    case uGBX:
     case duffs:
         return true;
     default:
@@ -46,9 +46,9 @@ QString BitcoinUnits::name(int unit)
     {
         switch(unit)
         {
-            case DASH: return QString("GBX");
-            case mDASH: return QString("mGBX");
-            case uDASH: return QString::fromUtf8("μGBX");
+            case GBX: return QString("GBX");
+            case mGBX: return QString("mGBX");
+            case uGBX: return QString::fromUtf8("μGBX");
             case duffs: return QString("guffs");
             default: return QString("???");
         }
@@ -57,9 +57,9 @@ QString BitcoinUnits::name(int unit)
     {
         switch(unit)
         {
-            case DASH: return QString("tGBX");
-            case mDASH: return QString("mtGBX");
-            case uDASH: return QString::fromUtf8("μtGBX");
+            case GBX: return QString("tGBX");
+            case mGBX: return QString("mtGBX");
+            case uGBX: return QString::fromUtf8("μtGBX");
             case duffs: return QString("tguffs");
             default: return QString("???");
         }
@@ -72,9 +72,9 @@ QString BitcoinUnits::description(int unit)
     {
         switch(unit)
         {
-            case DASH: return QString("GoByte");
-            case mDASH: return QString("Milli-GoByte (1 / 1" THIN_SP_UTF8 "000)");
-            case uDASH: return QString("Micro-GoByte (1 / 1" THIN_SP_UTF8 "000" THIN_SP_UTF8 "000)");
+            case GBX: return QString("GoByte");
+            case mGBX: return QString("Milli-GoByte (1 / 1" THIN_SP_UTF8 "000)");
+            case uGBX: return QString("Micro-GoByte (1 / 1" THIN_SP_UTF8 "000" THIN_SP_UTF8 "000)");
             case duffs: return QString("Ten Nano-GoByte (1 / 100" THIN_SP_UTF8 "000" THIN_SP_UTF8 "000)");
             default: return QString("???");
         }
@@ -83,9 +83,9 @@ QString BitcoinUnits::description(int unit)
     {
         switch(unit)
         {
-            case DASH: return QString("TestGoBytes");
-            case mDASH: return QString("Milli-TestGoByte (1 / 1" THIN_SP_UTF8 "000)");
-            case uDASH: return QString("Micro-TestGoByte (1 / 1" THIN_SP_UTF8 "000" THIN_SP_UTF8 "000)");
+            case GBX: return QString("TestGoBytes");
+            case mGBX: return QString("Milli-TestGoByte (1 / 1" THIN_SP_UTF8 "000)");
+            case uGBX: return QString("Micro-TestGoByte (1 / 1" THIN_SP_UTF8 "000" THIN_SP_UTF8 "000)");
             case duffs: return QString("Ten Nano-TestGoByte (1 / 100" THIN_SP_UTF8 "000" THIN_SP_UTF8 "000)");
             default: return QString("???");
         }
@@ -96,9 +96,9 @@ qint64 BitcoinUnits::factor(int unit)
 {
     switch(unit)
     {
-    case DASH:  return 100000000;
-    case mDASH: return 100000;
-    case uDASH: return 100;
+    case GBX:  return 100000000;
+    case mGBX: return 100000;
+    case uGBX: return 100;
     case duffs: return 1;
     default:   return 100000000;
     }
@@ -108,9 +108,9 @@ int BitcoinUnits::decimals(int unit)
 {
     switch(unit)
     {
-    case DASH: return 8;
-    case mDASH: return 5;
-    case uDASH: return 2;
+    case GBX: return 8;
+    case mGBX: return 5;
+    case uGBX: return 2;
     case duffs: return 0;
     default: return 0;
     }

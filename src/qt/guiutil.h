@@ -180,9 +180,9 @@ namespace GUIUtil
 
     // Open debug.log
     void openDebugLogfile();
-	
-    // Open dash.conf
-    void openConfigfile();	
+
+    // Open gobyte.conf
+    void openConfigfile();
 
     // Browse backup folder
     void showBackups();
@@ -320,7 +320,7 @@ namespace GUIUtil
     /** get font size with GUIUtil::fontScale applied */
     double getScaledFontSize(int nSize);
 
-    /** Load dash specific appliciation fonts */
+    /** Load gobyte specific appliciation fonts */
     bool loadFonts();
 
     /** Set an application wide default font, depends on the selected theme */
@@ -356,8 +356,8 @@ namespace GUIUtil
     /** Return the name of the currently active theme.*/
     QString getActiveTheme();
 
-    /** Check if a dash specific theme is activated (light/dark).*/
-    bool dashThemeActive();
+    /** Check if a gobyte specific theme is activated (light/dark).*/
+    bool gobyteThemeActive();
 
     /** Load the theme and update all UI elements according to the appearance settings. */
     void loadTheme(QWidget* widget = nullptr, bool fForce = false);

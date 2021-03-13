@@ -13,7 +13,7 @@
 - (NSString *)__bundleIdentifier
 {
     if (self == [NSBundle mainBundle]) {
-        return @"org.dash.Dash-Qt";
+        return @"org.GoByte.GoByte-Qt";
     } else {
         return [self __bundleIdentifier];
     }
@@ -64,7 +64,7 @@ MacNotificationHandler *MacNotificationHandler::instance()
     static MacNotificationHandler *s_instance = nullptr;
     if (!s_instance) {
         s_instance = new MacNotificationHandler();
-        
+
         Class aPossibleClass = objc_getClass("NSBundle");
         if (aPossibleClass) {
             // change NSBundle -bundleIdentifier method to return a correct bundle identifier

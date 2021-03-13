@@ -9,7 +9,7 @@
 #include <qt/transactiontablemodel.h>
 #include <qt/transactionview.h>
 #include <qt/walletmodel.h>
-#include <test/test_dash.h>
+#include <test/test_gobyte.h>
 #include <validation.h>
 #include <wallet/wallet.h>
 #include <qt/overviewpage.h>
@@ -104,9 +104,9 @@ QModelIndex FindTx(const QAbstractItemModel& model, const uint256& txid)
 //
 // This also requires overriding the default minimal Qt platform:
 //
-//     src/qt/test/test_dash-qt -platform xcb      # Linux
-//     src/qt/test/test_dash-qt -platform windows  # Windows
-//     src/qt/test/test_dash-qt -platform cocoa    # macOS
+//     src/qt/test/test_gobyte-qt -platform xcb      # Linux
+//     src/qt/test/test_gobyte-qt -platform windows  # Windows
+//     src/qt/test/test_gobyte-qt -platform cocoa    # macOS
 void TestGUI()
 {
     GUIUtil::loadFonts();

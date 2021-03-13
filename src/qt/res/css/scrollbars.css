@@ -1,12 +1,13 @@
 /**
 Copyright (c) 2020 The Dash Core developers
+Copyright (c) 2021 The GoByte Core developers
 Distributed under the MIT/X11 software license, see the accompanying
 file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 ---------------------------------------------------------------------
 
 This file contains style to customize the scrollbars. It's only loaded
-for dash themes (dark/light) and also only by windwos and linux,
+for gobyte themes (dark/light) and also only by windwos and linux,
 not by macOS clients.
 
 NOTE: This file is getting appended to the general.css while its
