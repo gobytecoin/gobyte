@@ -90,13 +90,13 @@
     </message>
     <message>
         <location line="+7"/>
-        <source>These are your Gobyte addresses for sending payments. Always check the amount and the receiving address before sending coins.</source>
-        <translation>These are your Gobyte addresses for sending payments. Always check the amount and the receiving address before sending coins.</translation>
+        <source>These are your GoByte addresses for sending payments. Always check the amount and the receiving address before sending coins.</source>
+        <translation>These are your GoByte addresses for sending payments. Always check the amount and the receiving address before sending coins.</translation>
     </message>
     <message>
         <location line="+4"/>
-        <source>These are your Gobyte addresses for receiving payments. It is recommended to use a new receiving address for each transaction.</source>
-        <translation>These are your Gobyte addresses for receiving payments. It is recommended to use a new receiving address for each transaction.</translation>
+        <source>These are your GoByte addresses for receiving payments. It is recommended to use a new receiving address for each transaction.</source>
+        <translation>These are your GoByte addresses for receiving payments. It is recommended to use a new receiving address for each transaction.</translation>
     </message>
     <message>
         <location line="+6"/>
@@ -396,13 +396,13 @@
     <name>BitcoinGUI</name>
     <message>
         <location filename="../gobyte.cpp" line="+556"/>
-        <source>A fatal error occurred. Gobyte Core can no longer continue safely and will quit.</source>
-        <translation>A fatal error occurred. Gobyte Core can no longer continue safely and will quit.</translation>
+        <source>A fatal error occurred. GoByte Core can no longer continue safely and will quit.</source>
+        <translation>A fatal error occurred. GoByte Core can no longer continue safely and will quit.</translation>
     </message>
     <message>
         <location filename="../bitcoingui.cpp" line="+1355"/>
-        <source>Gobyte Core</source>
-        <translation>Gobyte Core</translation>
+        <source>GoByte Core</source>
+        <translation>GoByte Core</translation>
     </message>
     <message>
         <location line="-1210"/>
@@ -431,8 +431,8 @@
     </message>
     <message>
         <location line="+1"/>
-        <source>Send coins to a Gobyte address</source>
-        <translation>Send coins to a Gobyte address</translation>
+        <source>Send coins to a GoByte address</source>
+        <translation>Send coins to a GoByte address</translation>
     </message>
     <message>
         <location line="+21"/>
@@ -476,8 +476,8 @@
     </message>
     <message>
         <location line="+4"/>
-        <source>Show information about Gobyte Core</source>
-        <translation>Show information about Gobyte Core</translation>
+        <source>Show information about GoByte Core</source>
+        <translation>Show information about GoByte Core</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -501,8 +501,8 @@
     </message>
     <message>
         <location line="-70"/>
-        <source>PrivateSend coins to a Gobyte address</source>
-        <translation>PrivateSend coins to a Gobyte address</translation>
+        <source>PrivateSend coins to a GoByte address</source>
+        <translation>PrivateSend coins to a GoByte address</translation>
     </message>
     <message>
         <location line="+78"/>
@@ -571,8 +571,8 @@
     </message>
     <message>
         <location line="+1"/>
-        <source>Sign messages with your Gobyte addresses to prove you own them</source>
-        <translation>Sign messages with your Gobyte addresses to prove you own them</translation>
+        <source>Sign messages with your GoByte addresses to prove you own them</source>
+        <translation>Sign messages with your GoByte addresses to prove you own them</translation>
     </message>
     <message>
         <location line="+1"/>
@@ -581,8 +581,8 @@
     </message>
     <message>
         <location line="+1"/>
-        <source>Verify messages to ensure they were signed with specified Gobyte addresses</source>
-        <translation>Verify messages to ensure they were signed with specified Gobyte addresses</translation>
+        <source>Verify messages to ensure they were signed with specified GoByte addresses</source>
+        <translation>Verify messages to ensure they were signed with specified GoByte addresses</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -691,8 +691,8 @@
     </message>
     <message>
         <location line="+2"/>
-        <source>Show the %1 help message to get a list with possible Gobyte command-line options</source>
-        <translation>Show the %1 help message to get a list with possible Gobyte command-line options</translation>
+        <source>Show the %1 help message to get a list with possible GoByte command-line options</source>
+        <translation>Show the %1 help message to get a list with possible GoByte command-line options</translation>
     </message>
     <message>
         <location line="+318"/>
@@ -741,10 +741,10 @@
     </message>
     <message numerus="yes">
         <location line="+442"/>
-        <source>%n active connection(s) to Gobyte network</source>
+        <source>%n active connection(s) to GoByte network</source>
         <translation>
-            <numerusform>%n active connection to Gobyte network</numerusform>
-            <numerusform>%n active connections to Gobyte network</numerusform>
+            <numerusform>%n active connection to GoByte network</numerusform>
+            <numerusform>%n active connections to GoByte network</numerusform>
         </translation>
     </message>
     <message>
@@ -1224,8 +1224,8 @@
     </message>
     <message>
         <location line="+71"/>
-        <source>The entered address &quot;%1&quot; is not a valid Gobyte address.</source>
-        <translation>The entered address &quot;%1&quot; is not a valid Gobyte address.</translation>
+        <source>The entered address &quot;%1&quot; is not a valid GoByte address.</source>
+        <translation>The entered address &quot;%1&quot; is not a valid GoByte address.</translation>
     </message>
     <message>
         <location line="+5"/>
@@ -1366,8 +1366,8 @@
     </message>
     <message>
         <location line="+4"/>
-        <source>&lt;h3&gt;PrivateSend Basics&lt;/h3&gt; PrivateSend gives you true financial privacy by obscuring the origins of your funds. All the Gobyte in your wallet is comprised of different &quot;inputs&quot; which you can think of as separate, discrete coins.&lt;br&gt; PrivateSend uses an innovative process to mix your inputs with the inputs of two or more other people, without having your coins ever leave your wallet. You retain control of your money at all times.&lt;hr&gt; &lt;b&gt;The PrivateSend process works like this:&lt;/b&gt;&lt;ol type=&quot;1&quot;&gt; &lt;li&gt;PrivateSend begins by breaking your transaction inputs down into standard denominations. These denominations are 0.001 GBX, 0.01 GBX, 0.1 GBX, 1 GBX and 10 GBX -- sort of like the paper money you use every day.&lt;/li&gt; &lt;li&gt;Your wallet then sends requests to specially configured software nodes on the network, called &quot;masternodes.&quot; These masternodes are informed then that you are interested in mixing a certain denomination. No identifiable information is sent to the masternodes, so they never know &quot;who&quot; you are.&lt;/li&gt; &lt;li&gt;When two or more other people send similar messages, indicating that they wish to mix the same denomination, a mixing session begins. The masternode mixes up the inputs and instructs all three users&apos; wallets to pay the now-transformed input back to themselves. Your wallet pays that denomination directly to itself, but in a different address (called a change address).&lt;/li&gt; &lt;li&gt;In order to fully obscure your funds, your wallet must repeat this process a number of times with each denomination. Each time the process is completed, it&apos;s called a &quot;round.&quot; Each round of PrivateSend makes it exponentially more difficult to determine where your funds originated.&lt;/li&gt; &lt;li&gt;This mixing process happens in the background without any intervention on your part. When you wish to make a transaction, your funds will already be mixed. No additional waiting is required.&lt;/li&gt; &lt;/ol&gt; &lt;hr&gt;&lt;b&gt;IMPORTANT:&lt;/b&gt; Your wallet only contains 1000 of these &quot;change addresses.&quot; Every time a mixing event happens, up to 9 of your addresses are used up. This means those 1000 addresses last for about 100 mixing events. When 900 of them are used, your wallet must create more addresses. It can only do this, however, if you have automatic backups enabled.&lt;br&gt; Consequently, users who have backups disabled will also have PrivateSend disabled. &lt;hr&gt;For more information, see the &lt;a style=&quot;%1&quot; href=&quot;https://docs.gobyte.org/en/stable/wallets/gobytecore/privatesend-instantsend.html&quot;&gt;PrivateSend documentation&lt;/a&gt;.</source>
-        <translation>&lt;h3&gt;PrivateSend Basics&lt;/h3&gt; PrivateSend gives you true financial privacy by obscuring the origins of your funds. All the Gobyte in your wallet is comprised of different &quot;inputs&quot; which you can think of as separate, discrete coins.&lt;br&gt; PrivateSend uses an innovative process to mix your inputs with the inputs of two or more other people, without having your coins ever leave your wallet. You retain control of your money at all times.&lt;hr&gt; &lt;b&gt;The PrivateSend process works like this:&lt;/b&gt;&lt;ol type=&quot;1&quot;&gt; &lt;li&gt;PrivateSend begins by breaking your transaction inputs down into standard denominations. These denominations are 0.001 GBX, 0.01 GBX, 0.1 GBX, 1 GBX and 10 GBX -- sort of like the paper money you use every day.&lt;/li&gt; &lt;li&gt;Your wallet then sends requests to specially configured software nodes on the network, called &quot;masternodes.&quot; These masternodes are informed then that you are interested in mixing a certain denomination. No identifiable information is sent to the masternodes, so they never know &quot;who&quot; you are.&lt;/li&gt; &lt;li&gt;When two or more other people send similar messages, indicating that they wish to mix the same denomination, a mixing session begins. The masternode mixes up the inputs and instructs all three users&apos; wallets to pay the now-transformed input back to themselves. Your wallet pays that denomination directly to itself, but in a different address (called a change address).&lt;/li&gt; &lt;li&gt;In order to fully obscure your funds, your wallet must repeat this process a number of times with each denomination. Each time the process is completed, it&apos;s called a &quot;round.&quot; Each round of PrivateSend makes it exponentially more difficult to determine where your funds originated.&lt;/li&gt; &lt;li&gt;This mixing process happens in the background without any intervention on your part. When you wish to make a transaction, your funds will already be mixed. No additional waiting is required.&lt;/li&gt; &lt;/ol&gt; &lt;hr&gt;&lt;b&gt;IMPORTANT:&lt;/b&gt; Your wallet only contains 1000 of these &quot;change addresses.&quot; Every time a mixing event happens, up to 9 of your addresses are used up. This means those 1000 addresses last for about 100 mixing events. When 900 of them are used, your wallet must create more addresses. It can only do this, however, if you have automatic backups enabled.&lt;br&gt; Consequently, users who have backups disabled will also have PrivateSend disabled. &lt;hr&gt;For more information, see the &lt;a style=&quot;%1&quot; href=&quot;https://docs.gobyte.org/en/stable/wallets/gobytecore/privatesend-instantsend.html&quot;&gt;PrivateSend documentation&lt;/a&gt;.</translation>
+        <source>&lt;h3&gt;PrivateSend Basics&lt;/h3&gt; PrivateSend gives you true financial privacy by obscuring the origins of your funds. All the GoByte in your wallet is comprised of different &quot;inputs&quot; which you can think of as separate, discrete coins.&lt;br&gt; PrivateSend uses an innovative process to mix your inputs with the inputs of two or more other people, without having your coins ever leave your wallet. You retain control of your money at all times.&lt;hr&gt; &lt;b&gt;The PrivateSend process works like this:&lt;/b&gt;&lt;ol type=&quot;1&quot;&gt; &lt;li&gt;PrivateSend begins by breaking your transaction inputs down into standard denominations. These denominations are 0.001 GBX, 0.01 GBX, 0.1 GBX, 1 GBX and 10 GBX -- sort of like the paper money you use every day.&lt;/li&gt; &lt;li&gt;Your wallet then sends requests to specially configured software nodes on the network, called &quot;masternodes.&quot; These masternodes are informed then that you are interested in mixing a certain denomination. No identifiable information is sent to the masternodes, so they never know &quot;who&quot; you are.&lt;/li&gt; &lt;li&gt;When two or more other people send similar messages, indicating that they wish to mix the same denomination, a mixing session begins. The masternode mixes up the inputs and instructs all three users&apos; wallets to pay the now-transformed input back to themselves. Your wallet pays that denomination directly to itself, but in a different address (called a change address).&lt;/li&gt; &lt;li&gt;In order to fully obscure your funds, your wallet must repeat this process a number of times with each denomination. Each time the process is completed, it&apos;s called a &quot;round.&quot; Each round of PrivateSend makes it exponentially more difficult to determine where your funds originated.&lt;/li&gt; &lt;li&gt;This mixing process happens in the background without any intervention on your part. When you wish to make a transaction, your funds will already be mixed. No additional waiting is required.&lt;/li&gt; &lt;/ol&gt; &lt;hr&gt;&lt;b&gt;IMPORTANT:&lt;/b&gt; Your wallet only contains 1000 of these &quot;change addresses.&quot; Every time a mixing event happens, up to 9 of your addresses are used up. This means those 1000 addresses last for about 100 mixing events. When 900 of them are used, your wallet must create more addresses. It can only do this, however, if you have automatic backups enabled.&lt;br&gt; Consequently, users who have backups disabled will also have PrivateSend disabled. &lt;hr&gt;For more information, see the &lt;a style=&quot;%1&quot; href=&quot;https://docs.gobyte.org/en/stable/wallets/gobytecore/privatesend-instantsend.html&quot;&gt;PrivateSend documentation&lt;/a&gt;.</source>
+        <translation>&lt;h3&gt;PrivateSend Basics&lt;/h3&gt; PrivateSend gives you true financial privacy by obscuring the origins of your funds. All the GoByte in your wallet is comprised of different &quot;inputs&quot; which you can think of as separate, discrete coins.&lt;br&gt; PrivateSend uses an innovative process to mix your inputs with the inputs of two or more other people, without having your coins ever leave your wallet. You retain control of your money at all times.&lt;hr&gt; &lt;b&gt;The PrivateSend process works like this:&lt;/b&gt;&lt;ol type=&quot;1&quot;&gt; &lt;li&gt;PrivateSend begins by breaking your transaction inputs down into standard denominations. These denominations are 0.001 GBX, 0.01 GBX, 0.1 GBX, 1 GBX and 10 GBX -- sort of like the paper money you use every day.&lt;/li&gt; &lt;li&gt;Your wallet then sends requests to specially configured software nodes on the network, called &quot;masternodes.&quot; These masternodes are informed then that you are interested in mixing a certain denomination. No identifiable information is sent to the masternodes, so they never know &quot;who&quot; you are.&lt;/li&gt; &lt;li&gt;When two or more other people send similar messages, indicating that they wish to mix the same denomination, a mixing session begins. The masternode mixes up the inputs and instructs all three users&apos; wallets to pay the now-transformed input back to themselves. Your wallet pays that denomination directly to itself, but in a different address (called a change address).&lt;/li&gt; &lt;li&gt;In order to fully obscure your funds, your wallet must repeat this process a number of times with each denomination. Each time the process is completed, it&apos;s called a &quot;round.&quot; Each round of PrivateSend makes it exponentially more difficult to determine where your funds originated.&lt;/li&gt; &lt;li&gt;This mixing process happens in the background without any intervention on your part. When you wish to make a transaction, your funds will already be mixed. No additional waiting is required.&lt;/li&gt; &lt;/ol&gt; &lt;hr&gt;&lt;b&gt;IMPORTANT:&lt;/b&gt; Your wallet only contains 1000 of these &quot;change addresses.&quot; Every time a mixing event happens, up to 9 of your addresses are used up. This means those 1000 addresses last for about 100 mixing events. When 900 of them are used, your wallet must create more addresses. It can only do this, however, if you have automatic backups enabled.&lt;br&gt; Consequently, users who have backups disabled will also have PrivateSend disabled. &lt;hr&gt;For more information, see the &lt;a style=&quot;%1&quot; href=&quot;https://docs.gobyte.org/en/stable/wallets/gobytecore/privatesend-instantsend.html&quot;&gt;PrivateSend documentation&lt;/a&gt;.</translation>
     </message>
 </context>
 <context>
@@ -1424,8 +1424,8 @@
     </message>
     <message>
         <location line="+8"/>
-        <source>%1 will download and store a copy of the Gobyte block chain.</source>
-        <translation>%1 will download and store a copy of the Gobyte block chain.</translation>
+        <source>%1 will download and store a copy of the GoByte block chain.</source>
+        <translation>%1 will download and store a copy of the GoByte block chain.</translation>
     </message>
     <message>
         <location line="+2"/>
@@ -1624,13 +1624,13 @@
     </message>
     <message>
         <location line="+100"/>
-        <source>Recent transactions may not yet be visible, and therefore your wallet&apos;s balance might be incorrect. This information will be correct once your wallet has finished synchronizing with the Gobyte network, as detailed below.</source>
-        <translation>Recent transactions may not yet be visible, and therefore your wallet&apos;s balance might be incorrect. This information will be correct once your wallet has finished synchronizing with the Gobyte network, as detailed below.</translation>
+        <source>Recent transactions may not yet be visible, and therefore your wallet&apos;s balance might be incorrect. This information will be correct once your wallet has finished synchronizing with the GoByte network, as detailed below.</source>
+        <translation>Recent transactions may not yet be visible, and therefore your wallet&apos;s balance might be incorrect. This information will be correct once your wallet has finished synchronizing with the GoByte network, as detailed below.</translation>
     </message>
     <message>
         <location line="+13"/>
-        <source>Attempting to spend Gobyte that are affected by not-yet-displayed transactions will not be accepted by the network.</source>
-        <translation>Attempting to spend Gobyte that are affected by not-yet-displayed transactions will not be accepted by the network.</translation>
+        <source>Attempting to spend GoByte that are affected by not-yet-displayed transactions will not be accepted by the network.</source>
+        <translation>Attempting to spend GoByte that are affected by not-yet-displayed transactions will not be accepted by the network.</translation>
     </message>
     <message>
         <location line="+60"/>
@@ -1813,8 +1813,8 @@
     </message>
     <message>
         <location line="+42"/>
-        <source>Automatically open the Gobyte Core client port on the router. This only works when your router supports UPnP and it is enabled.</source>
-        <translation>Automatically open the Gobyte Core client port on the router. This only works when your router supports UPnP and it is enabled.</translation>
+        <source>Automatically open the GoByte Core client port on the router. This only works when your router supports UPnP and it is enabled.</source>
+        <translation>Automatically open the GoByte Core client port on the router. This only works when your router supports UPnP and it is enabled.</translation>
     </message>
     <message>
         <location line="+10"/>
@@ -1828,8 +1828,8 @@
     </message>
     <message>
         <location line="+7"/>
-        <source>Connect to the Gobyte network through a SOCKS5 proxy.</source>
-        <translation>Connect to the Gobyte network through a SOCKS5 proxy.</translation>
+        <source>Connect to the GoByte network through a SOCKS5 proxy.</source>
+        <translation>Connect to the GoByte network through a SOCKS5 proxy.</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -1970,8 +1970,8 @@
     </message>
     <message>
         <location line="+22"/>
-        <source>Connect to the Gobyte network through a separate SOCKS5 proxy for Tor hidden services.</source>
-        <translation>Connect to the Gobyte network through a separate SOCKS5 proxy for Tor hidden services.</translation>
+        <source>Connect to the GoByte network through a separate SOCKS5 proxy for Tor hidden services.</source>
+        <translation>Connect to the GoByte network through a separate SOCKS5 proxy for Tor hidden services.</translation>
     </message>
     <message>
         <location line="-450"/>
@@ -2093,8 +2093,8 @@ https://www.transifex.com/projects/p/gobyte/</translation>
         <location line="+60"/>
         <location line="+298"/>
         <location line="+237"/>
-        <source>The displayed information may be out of date. Your wallet automatically synchronizes with the Gobyte network after a connection is established, but this process has not completed yet.</source>
-        <translation>The displayed information may be out of date. Your wallet automatically synchronizes with the Gobyte network after a connection is established, but this process has not completed yet.</translation>
+        <source>The displayed information may be out of date. Your wallet automatically synchronizes with the GoByte network after a connection is established, but this process has not completed yet.</source>
+        <translation>The displayed information may be out of date. Your wallet automatically synchronizes with the GoByte network after a connection is established, but this process has not completed yet.</translation>
     </message>
     <message>
         <location line="-325"/>
@@ -2422,8 +2422,8 @@ https://www.transifex.com/projects/p/gobyte/</translation>
     </message>
     <message>
         <location line="+8"/>
-        <source>URI cannot be parsed! This can be caused by an invalid Gobyte address or malformed URI parameters.</source>
-        <translation>URI cannot be parsed! This can be caused by an invalid Gobyte address or malformed URI parameters.</translation>
+        <source>URI cannot be parsed! This can be caused by an invalid GoByte address or malformed URI parameters.</source>
+        <translation>URI cannot be parsed! This can be caused by an invalid GoByte address or malformed URI parameters.</translation>
     </message>
     <message>
         <location line="+13"/>
@@ -2559,8 +2559,8 @@ https://www.transifex.com/projects/p/gobyte/</translation>
     </message>
     <message>
         <location filename="../guiutil.cpp" line="+317"/>
-        <source>Enter a Gobyte address (e.g. %1)</source>
-        <translation>Enter a Gobyte address (e.g. %1)</translation>
+        <source>Enter a GoByte address (e.g. %1)</source>
+        <translation>Enter a GoByte address (e.g. %1)</translation>
     </message>
     <message>
         <location line="+29"/>
@@ -3316,8 +3316,8 @@ https://www.transifex.com/projects/p/gobyte/</translation>
     <name>ReceiveCoinsDialog</name>
     <message>
         <location filename="../forms/receivecoinsdialog.ui" line="+34"/>
-        <source>An optional message to attach to the payment request, which will be displayed when the request is opened. Note: The message will not be sent with the payment over the Gobyte network.</source>
-        <translation>An optional message to attach to the payment request, which will be displayed when the request is opened. Note: The message will not be sent with the payment over the Gobyte network.</translation>
+        <source>An optional message to attach to the payment request, which will be displayed when the request is opened. Note: The message will not be sent with the payment over the GoByte network.</source>
+        <translation>An optional message to attach to the payment request, which will be displayed when the request is opened. Note: The message will not be sent with the payment over the GoByte network.</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -3332,8 +3332,8 @@ https://www.transifex.com/projects/p/gobyte/</translation>
     </message>
     <message>
         <location line="-14"/>
-        <source>An optional message to attach to the payment request, which will be displayed when the request is opened.&lt;br&gt;Note: The message will not be sent with the payment over the Gobyte network.</source>
-        <translation>An optional message to attach to the payment request, which will be displayed when the request is opened.&lt;br&gt;Note: The message will not be sent with the payment over the Gobyte network.</translation>
+        <source>An optional message to attach to the payment request, which will be displayed when the request is opened.&lt;br&gt;Note: The message will not be sent with the payment over the GoByte network.</source>
+        <translation>An optional message to attach to the payment request, which will be displayed when the request is opened.&lt;br&gt;Note: The message will not be sent with the payment over the GoByte network.</translation>
     </message>
     <message>
         <location line="+7"/>
@@ -3896,8 +3896,8 @@ https://www.transifex.com/projects/p/gobyte/</translation>
     </message>
     <message>
         <location line="+101"/>
-        <source>Warning: Invalid Gobyte address</source>
-        <translation>Warning: Invalid Gobyte address</translation>
+        <source>Warning: Invalid GoByte address</source>
+        <translation>Warning: Invalid GoByte address</translation>
     </message>
     <message>
         <location line="+5"/>
@@ -3934,8 +3934,8 @@ https://www.transifex.com/projects/p/gobyte/</translation>
     </message>
     <message>
         <location line="+18"/>
-        <source>The Gobyte address to send the payment to</source>
-        <translation>The Gobyte address to send the payment to</translation>
+        <source>The GoByte address to send the payment to</source>
+        <translation>The GoByte address to send the payment to</translation>
     </message>
     <message>
         <location line="+7"/>
@@ -3983,8 +3983,8 @@ https://www.transifex.com/projects/p/gobyte/</translation>
     </message>
     <message>
         <location line="-1053"/>
-        <source>The fee will be deducted from the amount being sent. The recipient will receive a lower amount of Gobyte than you enter in the amount field. If multiple recipients are selected, the fee is split equally.</source>
-        <translation>The fee will be deducted from the amount being sent. The recipient will receive a lower amount of Gobyte than you enter in the amount field. If multiple recipients are selected, the fee is split equally.</translation>
+        <source>The fee will be deducted from the amount being sent. The recipient will receive a lower amount of GoByte than you enter in the amount field. If multiple recipients are selected, the fee is split equally.</source>
+        <translation>The fee will be deducted from the amount being sent. The recipient will receive a lower amount of GoByte than you enter in the amount field. If multiple recipients are selected, the fee is split equally.</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -4003,8 +4003,8 @@ https://www.transifex.com/projects/p/gobyte/</translation>
     </message>
     <message>
         <location line="+10"/>
-        <source>A message that was attached to the gobyte: URI which will be stored with the transaction for your reference. Note: This message will not be sent over the Gobyte network.</source>
-        <translation>A message that was attached to the gobyte: URI which will be stored with the transaction for your reference. Note: This message will not be sent over the Gobyte network.</translation>
+        <source>A message that was attached to the gobyte: URI which will be stored with the transaction for your reference. Note: This message will not be sent over the GoByte network.</source>
+        <translation>A message that was attached to the gobyte: URI which will be stored with the transaction for your reference. Note: This message will not be sent over the GoByte network.</translation>
     </message>
     <message>
         <location line="+433"/>
@@ -4070,13 +4070,13 @@ https://www.transifex.com/projects/p/gobyte/</translation>
     </message>
     <message>
         <location line="+35"/>
-        <source>You can sign messages/agreements with your addresses to prove you can receive Gobyte sent to them. Be careful not to sign anything vague or random, as phishing attacks may try to trick you into signing your identity over to them. Only sign fully-detailed statements you agree to.</source>
-        <translation>You can sign messages/agreements with your addresses to prove you can receive Gobyte sent to them. Be careful not to sign anything vague or random, as phishing attacks may try to trick you into signing your identity over to them. Only sign fully-detailed statements you agree to.</translation>
+        <source>You can sign messages/agreements with your addresses to prove you can receive GoByte sent to them. Be careful not to sign anything vague or random, as phishing attacks may try to trick you into signing your identity over to them. Only sign fully-detailed statements you agree to.</source>
+        <translation>You can sign messages/agreements with your addresses to prove you can receive GoByte sent to them. Be careful not to sign anything vague or random, as phishing attacks may try to trick you into signing your identity over to them. Only sign fully-detailed statements you agree to.</translation>
     </message>
     <message>
         <location line="+18"/>
-        <source>The Gobyte address to sign the message with</source>
-        <translation>The Gobyte address to sign the message with</translation>
+        <source>The GoByte address to sign the message with</source>
+        <translation>The GoByte address to sign the message with</translation>
     </message>
     <message>
         <location line="+7"/>
@@ -4117,8 +4117,8 @@ https://www.transifex.com/projects/p/gobyte/</translation>
     </message>
     <message>
         <location line="+14"/>
-        <source>Sign the message to prove you own this Gobyte address</source>
-        <translation>Sign the message to prove you own this Gobyte address</translation>
+        <source>Sign the message to prove you own this GoByte address</source>
+        <translation>Sign the message to prove you own this GoByte address</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -4148,13 +4148,13 @@ https://www.transifex.com/projects/p/gobyte/</translation>
     </message>
     <message>
         <location line="+21"/>
-        <source>The Gobyte address the message was signed with</source>
-        <translation>The Gobyte address the message was signed with</translation>
+        <source>The GoByte address the message was signed with</source>
+        <translation>The GoByte address the message was signed with</translation>
     </message>
     <message>
         <location line="+30"/>
-        <source>Verify the message to ensure it was signed with the specified Gobyte address</source>
-        <translation>Verify the message to ensure it was signed with the specified Gobyte address</translation>
+        <source>Verify the message to ensure it was signed with the specified GoByte address</source>
+        <translation>Verify the message to ensure it was signed with the specified GoByte address</translation>
     </message>
     <message>
         <location line="+3"/>
@@ -6441,8 +6441,8 @@ https://www.transifex.com/projects/p/gobyte/</translation>
     </message>
     <message>
         <location line="-533"/>
-        <source>Gobyte Core</source>
-        <translation>Gobyte Core</translation>
+        <source>GoByte Core</source>
+        <translation>GoByte Core</translation>
     </message>
     <message>
         <location line="+1"/>

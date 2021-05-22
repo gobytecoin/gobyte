@@ -70,12 +70,12 @@
         <translation>受取アドレス</translation>
     </message>
     <message>
-        <source>These are your Gobyte addresses for sending payments. Always check the amount and the receiving address before sending coins.</source>
-        <translation>これらは送金するためのあなたの Gobyte アドレスです。送金する前に常に金額と受取アドレスを確認してください。</translation>
+        <source>These are your GoByte addresses for sending payments. Always check the amount and the receiving address before sending coins.</source>
+        <translation>これらは送金するためのあなたの GoByte アドレスです。送金する前に常に金額と受取アドレスを確認してください。</translation>
     </message>
     <message>
-        <source>These are your Gobyte addresses for receiving payments. It is recommended to use a new receiving address for each transaction.</source>
-        <translation>これらは送金を受取用のあなたのGobyteアドレスです。トランザクションごとに新しい受け取り用アドレスの作成を推奨します。</translation>
+        <source>These are your GoByte addresses for receiving payments. It is recommended to use a new receiving address for each transaction.</source>
+        <translation>これらは送金を受取用のあなたのGoByteアドレスです。トランザクションごとに新しい受け取り用アドレスの作成を推奨します。</translation>
     </message>
     <message>
         <source>&amp;Copy Address</source>
@@ -192,7 +192,7 @@
     </message>
     <message>
         <source>Warning: If you encrypt your wallet and lose your passphrase, you will &lt;b&gt;LOSE ALL OF YOUR GBX&lt;/b&gt;!</source>
-        <translation>警告: ウォレットを暗号化しパスフレーズを紛失した場合、あなたは &lt;b&gt;すべてのGobyte&lt;/b&gt;を失います!</translation>
+        <translation>警告: ウォレットを暗号化しパスフレーズを紛失した場合、あなたは &lt;b&gt;すべてのGoByte&lt;/b&gt;を失います!</translation>
     </message>
     <message>
         <source>Are you sure you wish to encrypt your wallet?</source>
@@ -264,12 +264,12 @@
 <context>
     <name>BitcoinGUI</name>
     <message>
-        <source>A fatal error occurred. Gobyte Core can no longer continue safely and will quit.</source>
-        <translation>重大なエラーが発生しました。 Gobyte Coreは安全に続行できなくなり終了します。</translation>
+        <source>A fatal error occurred. GoByte Core can no longer continue safely and will quit.</source>
+        <translation>重大なエラーが発生しました。 GoByte Coreは安全に続行できなくなり終了します。</translation>
     </message>
     <message>
-        <source>Gobyte Core</source>
-        <translation>Gobyte Core</translation>
+        <source>GoByte Core</source>
+        <translation>GoByte Core</translation>
     </message>
     <message>
         <source>Wallet</source>
@@ -292,8 +292,8 @@
         <translation>送金 (&amp;S)</translation>
     </message>
     <message>
-        <source>Send coins to a Gobyte address</source>
-        <translation>Gobyte アドレスに送金</translation>
+        <source>Send coins to a GoByte address</source>
+        <translation>GoByte アドレスに送金</translation>
     </message>
     <message>
         <source>&amp;Receive</source>
@@ -328,8 +328,8 @@
         <translation>アプリケーションを終了</translation>
     </message>
     <message>
-        <source>Show information about Gobyte Core</source>
-        <translation>Gobyte Coreについての情報を表示</translation>
+        <source>Show information about GoByte Core</source>
+        <translation>GoByte Coreについての情報を表示</translation>
     </message>
     <message>
         <source>About &amp;Qt</source>
@@ -400,16 +400,16 @@
         <translation>メッセージの署名… (&amp;M)</translation>
     </message>
     <message>
-        <source>Sign messages with your Gobyte addresses to prove you own them</source>
-        <translation>あなたがGobyte アドレスを所有していることを証明するために、あなたのGobyteアドレスでメッセージに署名してください。</translation>
+        <source>Sign messages with your GoByte addresses to prove you own them</source>
+        <translation>あなたがGoByte アドレスを所有していることを証明するために、あなたのGoByteアドレスでメッセージに署名してください。</translation>
     </message>
     <message>
         <source>&amp;Verify message...</source>
         <translation>メッセージの検証… (&amp;V)</translation>
     </message>
     <message>
-        <source>Verify messages to ensure they were signed with specified Gobyte addresses</source>
-        <translation>指定されたGobyteアドレスで署名されたことを確認するためにメッセージを検証してください。</translation>
+        <source>Verify messages to ensure they were signed with specified GoByte addresses</source>
+        <translation>指定されたGoByteアドレスで署名されたことを確認するためにメッセージを検証してください。</translation>
     </message>
     <message>
         <source>&amp;Information</source>
@@ -496,8 +496,8 @@
         <translation>コマンドラインオプション (&amp;C)</translation>
     </message>
     <message>
-        <source>Show the %1 help message to get a list with possible Gobyte command-line options</source>
-        <translation>有効なGobyteのコマンドラインオプションのリストを見るために %1 のヘルプメッセージを表示</translation>
+        <source>Show the %1 help message to get a list with possible GoByte command-line options</source>
+        <translation>有効なGoByteのコマンドラインオプションのリストを見るために %1 のヘルプメッセージを表示</translation>
     </message>
     <message>
         <source>%1 client</source>
@@ -532,7 +532,7 @@
         <translation>タブツールバー</translation>
     </message>
     <message numerus="yes">
-        <source>%n active connection(s) to Gobyte network</source>
+        <source>%n active connection(s) to GoByte network</source>
         <translation><numerusform>%n アクティブコネクション</numerusform></translation>
     </message>
     <message>
@@ -860,8 +860,8 @@
         <translation>送金アドレスを編集</translation>
     </message>
     <message>
-        <source>The entered address "%1" is not a valid Gobyte address.</source>
-        <translation>入力されたアドレス "%1" は有効なGobyteアドレスではありません。</translation>
+        <source>The entered address "%1" is not a valid GoByte address.</source>
+        <translation>入力されたアドレス "%1" は有効なGoByteアドレスではありません。</translation>
     </message>
     <message>
         <source>The entered address "%1" is already in the address book.</source>
@@ -1002,8 +1002,8 @@
         <translation>おおむね%1GBのデータがこのディレクトリに保存されます。</translation>
     </message>
     <message>
-        <source>%1 will download and store a copy of the Gobyte block chain.</source>
-        <translation>%1はGobyteのブロックチェーンの複製をダウンロードし保存します。</translation>
+        <source>%1 will download and store a copy of the GoByte block chain.</source>
+        <translation>%1はGoByteのブロックチェーンの複製をダウンロードし保存します。</translation>
     </message>
     <message>
         <source>The wallet will also be stored in this directory.</source>
@@ -1128,12 +1128,12 @@
         <translation>フォーム</translation>
     </message>
     <message>
-        <source>Recent transactions may not yet be visible, and therefore your wallet's balance might be incorrect. This information will be correct once your wallet has finished synchronizing with the Gobyte network, as detailed below.</source>
-        <translation>確認できない最新のトランザクションがあるかもしれません。これによりウォレットの残高は不正確なものである可能性があります。この情報はウォレットが一度Gobyteのネットワークへの同期が完了すると正確なものとなります。詳細は下記を参照してください。</translation>
+        <source>Recent transactions may not yet be visible, and therefore your wallet's balance might be incorrect. This information will be correct once your wallet has finished synchronizing with the GoByte network, as detailed below.</source>
+        <translation>確認できない最新のトランザクションがあるかもしれません。これによりウォレットの残高は不正確なものである可能性があります。この情報はウォレットが一度GoByteのネットワークへの同期が完了すると正確なものとなります。詳細は下記を参照してください。</translation>
     </message>
     <message>
-        <source>Attempting to spend Gobyte that are affected by not-yet-displayed transactions will not be accepted by the network.</source>
-        <translation>表示されてないトランザクションに影響を受けたGobyteを使用しようとするとネットワークに承認されません。</translation>
+        <source>Attempting to spend GoByte that are affected by not-yet-displayed transactions will not be accepted by the network.</source>
+        <translation>表示されてないトランザクションに影響を受けたGoByteを使用しようとするとネットワークに承認されません。</translation>
     </message>
     <message>
         <source>Number of blocks left</source>
@@ -1270,12 +1270,12 @@
         <translation>この設定は閾値として機能し、この量に達するとプライベートセンドが無効になります。</translation>
     </message>
     <message>
-        <source>Automatically open the Gobyte Core client port on the router. This only works when your router supports UPnP and it is enabled.</source>
-        <translation>自動的にルーターのGobyte Core クライアントポートを開放します。これはルーターがUPnP機能をサポートしておりUPnP機能が有効な場合にのみ機能します。</translation>
+        <source>Automatically open the GoByte Core client port on the router. This only works when your router supports UPnP and it is enabled.</source>
+        <translation>自動的にルーターのGoByte Core クライアントポートを開放します。これはルーターがUPnP機能をサポートしておりUPnP機能が有効な場合にのみ機能します。</translation>
     </message>
     <message>
-        <source>Connect to the Gobyte network through a SOCKS5 proxy.</source>
-        <translation>SOCKS5プロキシ経由でGobyteネットワークに接続</translation>
+        <source>Connect to the GoByte network through a SOCKS5 proxy.</source>
+        <translation>SOCKS5プロキシ経由でGoByteネットワークに接続</translation>
     </message>
     <message>
         <source>&amp;Connect through SOCKS5 proxy (default proxy):</source>
@@ -1362,8 +1362,8 @@
         <translation>Tor</translation>
     </message>
     <message>
-        <source>Connect to the Gobyte network through a separate SOCKS5 proxy for Tor hidden services.</source>
-        <translation>Tor秘匿サービスを利用するため独立なSOCKS5プロキシ経由でGobyteネットワークに接続</translation>
+        <source>Connect to the GoByte network through a separate SOCKS5 proxy for Tor hidden services.</source>
+        <translation>Tor秘匿サービスを利用するため独立なSOCKS5プロキシ経由でGoByteネットワークに接続</translation>
     </message>
     <message>
         <source>Show only a tray icon after minimizing the window.</source>
@@ -1459,8 +1459,8 @@ https://www.transifex.com/projects/p/gobyte/</translation>
         <translation>フォーム</translation>
     </message>
     <message>
-        <source>The displayed information may be out of date. Your wallet automatically synchronizes with the Gobyte network after a connection is established, but this process has not completed yet.</source>
-        <translation>表示された情報は古いかもしれません。接続が確立されればあなたのウォレットは Gobyteネットワークと自動的に同期しますが、このプロセスはまだ完了していません。</translation>
+        <source>The displayed information may be out of date. Your wallet automatically synchronizes with the GoByte network after a connection is established, but this process has not completed yet.</source>
+        <translation>表示された情報は古いかもしれません。接続が確立されればあなたのウォレットは GoByteネットワークと自動的に同期しますが、このプロセスはまだ完了していません。</translation>
     </message>
     <message>
         <source>Available:</source>
@@ -1671,7 +1671,7 @@ https://www.transifex.com/projects/p/gobyte/</translation>
     </message>
     <message>
         <source>Cannot start gobyte: click-to-pay handler</source>
-        <translation>Gobyte を起動できません: click-to-pay ハンドラー</translation>
+        <translation>GoByte を起動できません: click-to-pay ハンドラー</translation>
     </message>
     <message>
         <source>URI handling</source>
@@ -1686,8 +1686,8 @@ https://www.transifex.com/projects/p/gobyte/</translation>
         <translation>支払いのアドレス　%1　は無効です</translation>
     </message>
     <message>
-        <source>URI cannot be parsed! This can be caused by an invalid Gobyte address or malformed URI parameters.</source>
-        <translation>URI を解析できません! これは無効な Gobyte アドレスあるいは不正な形式の URI パラメーターによって引き起こされた可能性があります。</translation>
+        <source>URI cannot be parsed! This can be caused by an invalid GoByte address or malformed URI parameters.</source>
+        <translation>URI を解析できません! これは無効な GoByte アドレスあるいは不正な形式の URI パラメーターによって引き起こされた可能性があります。</translation>
     </message>
     <message>
         <source>Payment request file handling</source>
@@ -1784,8 +1784,8 @@ https://www.transifex.com/projects/p/gobyte/</translation>
         <translation>総額</translation>
     </message>
     <message>
-        <source>Enter a Gobyte address (e.g. %1)</source>
-        <translation>Gobyteアドレスを入力してください (例 %1)</translation>
+        <source>Enter a GoByte address (e.g. %1)</source>
+        <translation>GoByteアドレスを入力してください (例 %1)</translation>
     </message>
     <message>
         <source>%1 d</source>
@@ -2278,8 +2278,8 @@ https://www.transifex.com/projects/p/gobyte/</translation>
 <context>
     <name>ReceiveCoinsDialog</name>
     <message>
-        <source>An optional message to attach to the payment request, which will be displayed when the request is opened. Note: The message will not be sent with the payment over the Gobyte network.</source>
-        <translation>支払いリクエストが開始された時に表示される、支払いリクエストに添付される任意のメッセージです。注意：このメッセージはGobyteネットワークを通じて支払いと共に送信されるわけではありません。</translation>
+        <source>An optional message to attach to the payment request, which will be displayed when the request is opened. Note: The message will not be sent with the payment over the GoByte network.</source>
+        <translation>支払いリクエストが開始された時に表示される、支払いリクエストに添付される任意のメッセージです。注意：このメッセージはGoByteネットワークを通じて支払いと共に送信されるわけではありません。</translation>
     </message>
     <message>
         <source>&amp;Message:</source>
@@ -2290,8 +2290,8 @@ https://www.transifex.com/projects/p/gobyte/</translation>
         <translation>新しい受け取り用アドレスに紐づく任意のラベル。</translation>
     </message>
     <message>
-        <source>An optional message to attach to the payment request, which will be displayed when the request is opened.&lt;br&gt;Note: The message will not be sent with the payment over the Gobyte network.</source>
-        <translation>支払いリクエストが開始された時に表示される、支払いリクエストに添付される任意のメッセージです。注意：このメッセージはGobyteネットワークを通じて支払いと共に送信されるわけではありません。</translation>
+        <source>An optional message to attach to the payment request, which will be displayed when the request is opened.&lt;br&gt;Note: The message will not be sent with the payment over the GoByte network.</source>
+        <translation>支払いリクエストが開始された時に表示される、支払いリクエストに添付される任意のメッセージです。注意：このメッセージはGoByteネットワークを通じて支払いと共に送信されるわけではありません。</translation>
     </message>
     <message>
         <source>Use this form to request payments. All fields are &lt;b&gt;optional&lt;/b&gt;.</source>
@@ -2524,7 +2524,7 @@ https://www.transifex.com/projects/p/gobyte/</translation>
     </message>
     <message>
         <source>Paying only the minimum fee is just fine as long as there is less transaction volume than space in the blocks.&lt;br /&gt;But be aware that this can end up in a never confirming transaction once there is more demand for gobyte transactions than the network can process.</source>
-        <translation>最低限の手数料しか支払わなくても、トランザクション量以上のスペースが対象ブロックにあれば問題ありません。&lt;br /&gt;しかし、ネットワークが処理できる以上のGobyteのトランザクション需要があれば、処理されないトランザクションになり得ることに注意してください。</translation>
+        <translation>最低限の手数料しか支払わなくても、トランザクション量以上のスペースが対象ブロックにあれば問題ありません。&lt;br /&gt;しかし、ネットワークが処理できる以上のGoByteのトランザクション需要があれば、処理されないトランザクションになり得ることに注意してください。</translation>
     </message>
     <message>
         <source>per kilobyte</source>
@@ -2695,8 +2695,8 @@ https://www.transifex.com/projects/p/gobyte/</translation>
         <translation><numerusform>%n ブロック以内に検証が開始されると予想されます</numerusform></translation>
     </message>
     <message>
-        <source>Warning: Invalid Gobyte address</source>
-        <translation>警告：Gobyteアドレスが無効です</translation>
+        <source>Warning: Invalid GoByte address</source>
+        <translation>警告：GoByteアドレスが無効です</translation>
     </message>
     <message>
         <source>Warning: Unknown change address</source>
@@ -2726,8 +2726,8 @@ https://www.transifex.com/projects/p/gobyte/</translation>
         <translation>送り先: (&amp;T)</translation>
     </message>
     <message>
-        <source>The Gobyte address to send the payment to</source>
-        <translation>送金先Gobyteアドレス</translation>
+        <source>The GoByte address to send the payment to</source>
+        <translation>送金先GoByteアドレス</translation>
     </message>
     <message>
         <source>Choose previously used address</source>
@@ -2762,8 +2762,8 @@ https://www.transifex.com/projects/p/gobyte/</translation>
         <translation>金額： (&amp;M)</translation>
     </message>
     <message>
-        <source>The fee will be deducted from the amount being sent. The recipient will receive a lower amount of Gobyte than you enter in the amount field. If multiple recipients are selected, the fee is split equally.</source>
-        <translation>手数料は総額から差し引かれます。受取人は入力した金額より少ないGobyteを受け取ります。複数の受取人を選択した場合、手数料は等しく分割されます。</translation>
+        <source>The fee will be deducted from the amount being sent. The recipient will receive a lower amount of GoByte than you enter in the amount field. If multiple recipients are selected, the fee is split equally.</source>
+        <translation>手数料は総額から差し引かれます。受取人は入力した金額より少ないGoByteを受け取ります。複数の受取人を選択した場合、手数料は等しく分割されます。</translation>
     </message>
     <message>
         <source>S&amp;ubtract fee from amount</source>
@@ -2774,8 +2774,8 @@ https://www.transifex.com/projects/p/gobyte/</translation>
         <translation>メッセージ：</translation>
     </message>
     <message>
-        <source>A message that was attached to the gobyte: URI which will be stored with the transaction for your reference. Note: This message will not be sent over the Gobyte network.</source>
-        <translation>Gobyte: URIに添付されていたメッセージです。これは参照用としてトランザクションとともに保存されます。注意：このメッセージはGobyteネットワークを経由して送信されるわけではありません。</translation>
+        <source>A message that was attached to the gobyte: URI which will be stored with the transaction for your reference. Note: This message will not be sent over the GoByte network.</source>
+        <translation>GoByte: URIに添付されていたメッセージです。これは参照用としてトランザクションとともに保存されます。注意：このメッセージはGoByteネットワークを経由して送信されるわけではありません。</translation>
     </message>
     <message>
         <source>This is an unauthenticated payment request.</source>
@@ -2827,12 +2827,12 @@ https://www.transifex.com/projects/p/gobyte/</translation>
         <translation>メッセージの署名 (&amp;S)</translation>
     </message>
     <message>
-        <source>You can sign messages/agreements with your addresses to prove you can receive Gobyte sent to them. Be careful not to sign anything vague or random, as phishing attacks may try to trick you into signing your identity over to them. Only sign fully-detailed statements you agree to.</source>
-        <translation>あなたのアドレスを使用してあなたがGobyteを受け取ることができるようにメッセージやアグリーメントに署名できます。充分に詳細が判明していてあなたが確認しているものだけに署名してください。フィッシングによってあなたの署名を読み取られないように注意してください。</translation>
+        <source>You can sign messages/agreements with your addresses to prove you can receive GoByte sent to them. Be careful not to sign anything vague or random, as phishing attacks may try to trick you into signing your identity over to them. Only sign fully-detailed statements you agree to.</source>
+        <translation>あなたのアドレスを使用してあなたがGoByteを受け取ることができるようにメッセージやアグリーメントに署名できます。充分に詳細が判明していてあなたが確認しているものだけに署名してください。フィッシングによってあなたの署名を読み取られないように注意してください。</translation>
     </message>
     <message>
-        <source>The Gobyte address to sign the message with</source>
-        <translation>メッセージを署名する際に使用するGobyteアドレス</translation>
+        <source>The GoByte address to sign the message with</source>
+        <translation>メッセージを署名する際に使用するGoByteアドレス</translation>
     </message>
     <message>
         <source>Choose previously used address</source>
@@ -2863,8 +2863,8 @@ https://www.transifex.com/projects/p/gobyte/</translation>
         <translation>現在の署名をシステムのクリップボードにコピー</translation>
     </message>
     <message>
-        <source>Sign the message to prove you own this Gobyte address</source>
-        <translation>この Gobyte アドレスを所有していることを証明するためにメッセージに署名</translation>
+        <source>Sign the message to prove you own this GoByte address</source>
+        <translation>この GoByte アドレスを所有していることを証明するためにメッセージに署名</translation>
     </message>
     <message>
         <source>Sign &amp;Message</source>
@@ -2887,12 +2887,12 @@ https://www.transifex.com/projects/p/gobyte/</translation>
         <translation>受取人のアドレスとメッセージ（改行やスペース、タブなども完全に一致するよう注意してください）および署名を以下に入力し、メッセージを検証してください。中間者攻撃により騙されるのを防ぐため、署名対象のメッセージに書かれていること以上の意味を署名から読み取ろうとしないよう注意してください。これは署名作成者がこのアドレスで受け取ることを証明するだけであり、トランザクションの送信者を証明するものではないことに注意してください！</translation>
     </message>
     <message>
-        <source>The Gobyte address the message was signed with</source>
-        <translation>メッセージの署名に使用されたGobyteアドレス</translation>
+        <source>The GoByte address the message was signed with</source>
+        <translation>メッセージの署名に使用されたGoByteアドレス</translation>
     </message>
     <message>
-        <source>Verify the message to ensure it was signed with the specified Gobyte address</source>
-        <translation>指定されたGobyteアドレスで署名されたことを確認するためメッセージを検証</translation>
+        <source>Verify the message to ensure it was signed with the specified GoByte address</source>
+        <translation>指定されたGoByteアドレスで署名されたことを確認するためメッセージを検証</translation>
     </message>
     <message>
         <source>Verify &amp;Message</source>
@@ -4460,8 +4460,8 @@ https://www.transifex.com/projects/p/gobyte/</translation>
         <translation>RPCサーバのオプション：</translation>
     </message>
     <message>
-        <source>Gobyte Core</source>
-        <translation>Gobyteコア</translation>
+        <source>GoByte Core</source>
+        <translation>GoByteコア</translation>
     </message>
     <message>
         <source>The %s developers</source>
