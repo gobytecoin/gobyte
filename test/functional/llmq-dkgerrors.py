@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 # Copyright (c) 2015-2020 The Dash Core developers
+# Copyright (c) 2017-2021 The GoByte Core developers
 # Distributed under the MIT software license, see the accompanying
 # file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-from test_framework.test_framework import DashTestFramework
+from test_framework.test_framework import GoByteTestFramework
 from test_framework.util import *
 
 '''
@@ -13,10 +14,10 @@ Simulate and check DKG errors
 
 '''
 
-class LLMQDKGErrors(DashTestFramework):
+class LLMQDKGErrors(GoByteTestFramework):
     def set_test_params(self):
-        self.set_dash_test_params(4, 3, [["-whitelist=127.0.0.1"]] * 4, fast_dip3_enforcement=True)
-        self.set_dash_dip8_activation(10)
+        self.set_gobyte_test_params(4, 3, [["-whitelist=127.0.0.1"]] * 4, fast_dip3_enforcement=True)
+        self.set_gobyte_dip8_activation(10)
 
     def run_test(self):
 

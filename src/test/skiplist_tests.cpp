@@ -4,7 +4,7 @@
 
 #include <chain.h>
 #include <util.h>
-#include <test/test_dash.h>
+#include <test/test_gobyte.h>
 
 #include <vector>
 

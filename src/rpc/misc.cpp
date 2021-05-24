@@ -1,6 +1,7 @@
 // Copyright (c) 2010 Satoshi Nakamoto
 // Copyright (c) 2009-2015 The Bitcoin Core developers
 // Copyright (c) 2014-2020 The Dash Core developers
+// Copyright (c) 2017-2021 The GoByte Core developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -49,7 +50,7 @@ UniValue debug(const JSONRPCRequest& request)
             "libevent logging is configured on startup and cannot be modified by this RPC during runtime.\n"
             "There are also a few meta-categories:\n"
             " - \"all\", \"1\" and \"\" activate all categories at once;\n"
-            " - \"dash\" activates all GoByte-specific categories at once;\n"
+            " - \"gobyte\" activates all GoByte-specific categories at once;\n"
             " - \"none\" (or \"0\") deactivates all categories at once.\n"
             "Note: If specified category doesn't match any of the above, no error is thrown.\n"
             "\nArguments:\n"
@@ -57,8 +58,8 @@ UniValue debug(const JSONRPCRequest& request)
             "\nResult:\n"
             "  result               (string) \"Debug mode: \" followed by the specified category.\n"
             "\nExamples:\n"
-            + HelpExampleCli("debug", "dash")
-            + HelpExampleRpc("debug", "dash+net")
+            + HelpExampleCli("debug", "gobyte")
+            + HelpExampleRpc("debug", "gobyte+net")
         );
 
     std::string strMode = request.params[0].get_str();
@@ -343,7 +344,7 @@ UniValue createmultisig(const JSONRPCRequest& request)
             "It returns a json object with the address and redeemScript.\n"
             "DEPRECATION WARNING: Using addresses with createmultisig is deprecated. Clients must\n"
             "transition to using addmultisigaddress to create multisig addresses with addresses known\n"
-            "to the wallet before upgrading to v0.17. To use the deprecated functionality, start dashd with -deprecatedrpc=createmultisig\n"
+            "to the wallet before upgrading to v0.17. To use the deprecated functionality, start gobyted with -deprecatedrpc=createmultisig\n"
             "\nArguments:\n"
             "1. nrequired                    (numeric, required) The number of required signatures out of the n keys or addresses.\n"
             "2. \"keys\"                       (string, required) A json array of hex-encoded public keys\n"
@@ -384,7 +385,7 @@ UniValue createmultisig(const JSONRPCRequest& request)
 #endif
             throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, strprintf("Invalid public key: %s\nNote that from v0.16, createmultisig no longer accepts addresses."
             " Clients must transition to using addmultisigaddress to create multisig addresses with addresses known to the wallet before upgrading to v0.17."
-            " To use the deprecated functionality, start dashd with -deprecatedrpc=createmultisig", keys[i].get_str()));
+            " To use the deprecated functionality, start gobyted with -deprecatedrpc=createmultisig", keys[i].get_str()));
         }
     }
 
@@ -1115,7 +1116,7 @@ UniValue logging(const JSONRPCRequest& request)
             "The valid logging categories are: " + ListLogCategories() + "\n"
             "In addition, the following are available as category names with special meanings:\n"
             "  - \"all\",  \"1\" : represent all logging categories.\n"
-            "  - \"dash\" activates all GoByte-specific categories at once.\n"
+            "  - \"gobyte\" activates all GoByte-specific categories at once.\n"
             "To deactivate all categories at once you can specify \"all\" in <exclude>.\n"
             "  - \"none\", \"0\" : even if other logging categories are specified, ignore all of them.\n"
             "\nArguments:\n"
@@ -1180,7 +1181,7 @@ UniValue echo(const JSONRPCRequest& request)
             "echo|echojson \"message\" ...\n"
             "\nSimply echo back the input arguments. This command is for testing.\n"
             "\nThe difference between echo and echojson is that echojson has argument conversion enabled in the client-side table in"
-            "dash-cli and the GUI. There is no server-side difference."
+            "gobyte-cli and the GUI. There is no server-side difference."
         );
 
     return request.params;
@@ -1194,7 +1195,7 @@ static UniValue getinfo_deprecated(const JSONRPCRequest& request)
         "- getblockchaininfo: blocks, difficulty, chain\n"
         "- getnetworkinfo: version, protocolversion, timeoffset, connections, proxy, relayfee, warnings\n"
         "- getwalletinfo: balance, privatesend_balance, keypoololdest, keypoolsize, paytxfee, unlocked_until, walletversion\n"
-        "\ndash-cli has the option -getinfo to collect and format these in the old format."
+        "\ngobyte-cli has the option -getinfo to collect and format these in the old format."
     );
 }
 
@@ -1218,8 +1219,8 @@ static const CRPCCommand commands[] =
     { "addressindex",       "getaddressbalance",      &getaddressbalance,      {"addresses"} },
 
     /* GoByte features */
-    { "dash",               "mnsync",                 &mnsync,                 {} },
-    { "dash",               "spork",                  &spork,                  {"arg0","value"} },
+    { "gobyte",               "mnsync",                 &mnsync,                 {} },
+    { "gobyte",               "spork",                  &spork,                  {"arg0","value"} },
 
     /* Not shown in help */
     { "hidden",             "setmocktime",            &setmocktime,            {"timestamp"}},

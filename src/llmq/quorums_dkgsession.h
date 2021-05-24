@@ -1,9 +1,10 @@
 // Copyright (c) 2018-2020 The Dash Core developers
+// Copyright (c) 2017-2021 The GoByte Core developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef DASH_QUORUMS_DKGSESSION_H
-#define DASH_QUORUMS_DKGSESSION_H
+#ifndef GOBYTE_QUORUMS_DKGSESSION_H
+#define GOBYTE_QUORUMS_DKGSESSION_H
 
 #include <consensus/params.h>
 #include <net.h>
@@ -346,4 +347,4 @@ void SetSimulatedDKGErrorRate(const std::string& type, double rate);
 
 } // namespace llmq
 
-#endif //DASH_QUORUMS_DKGSESSION_H
+#endif //GOBYTE_QUORUMS_DKGSESSION_H

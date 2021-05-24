@@ -1,9 +1,10 @@
 // Copyright (c) 2018-2019 The Dash Core developers
+// Copyright (c) 2017-2021 The GoByte Core developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef DASH_QUORUMS_COMMITMENT_H
-#define DASH_QUORUMS_COMMITMENT_H
+#ifndef GOBYTE_QUORUMS_COMMITMENT_H
+#define GOBYTE_QUORUMS_COMMITMENT_H
 
 #include <llmq/quorums_utils.h>
 
@@ -143,4 +144,4 @@ bool CheckLLMQCommitment(const CTransaction& tx, const CBlockIndex* pindexPrev, 
 
 } // namespace llmq
 
-#endif //DASH_QUORUMS_COMMITMENT_H
+#endif //GOBYTE_QUORUMS_COMMITMENT_H

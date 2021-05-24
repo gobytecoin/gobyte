@@ -1,5 +1,6 @@
 // Copyright (c) 2011-2015 The Bitcoin Core developers
 // Copyright (c) 2014-2020 The Dash Core developers
+// Copyright (c) 2017-2021 The GoByte Core developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -54,9 +55,9 @@ const QString BITCOIN_IPC_PREFIX("gobyte:");
 const char* BIP70_MESSAGE_PAYMENTACK = "PaymentACK";
 const char* BIP70_MESSAGE_PAYMENTREQUEST = "PaymentRequest";
 // BIP71 payment protocol media types
-const char* BIP71_MIMETYPE_PAYMENT = "application/dash-payment";
-const char* BIP71_MIMETYPE_PAYMENTACK = "application/dash-paymentack";
-const char* BIP71_MIMETYPE_PAYMENTREQUEST = "application/dash-paymentrequest";
+const char* BIP71_MIMETYPE_PAYMENT = "application/gobyte-payment";
+const char* BIP71_MIMETYPE_PAYMENTACK = "application/gobyte-paymentack";
+const char* BIP71_MIMETYPE_PAYMENTREQUEST = "application/gobyte-paymentrequest";
 
 struct X509StoreDeleter {
       void operator()(X509_STORE* b) {
@@ -561,7 +562,7 @@ bool PaymentServer::processPaymentRequest(const PaymentRequestPlus& request, Sen
             addresses.append(QString::fromStdString(EncodeDestination(dest)));
         }
         else if (!recipient.authenticatedMerchant.isEmpty()) {
-            // Unauthenticated payment requests to custom dash addresses are not supported
+            // Unauthenticated payment requests to custom gobyte addresses are not supported
             // (there is no good way to tell the user where they are paying in a way they'd
             // have a chance of understanding).
             Q_EMIT message(tr("Payment request rejected"),

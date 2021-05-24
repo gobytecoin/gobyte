@@ -6,7 +6,7 @@
 #define BITCOIN_QT_BITCOINGUI_H
 
 #if defined(HAVE_CONFIG_H)
-#include <config/dash-config.h>
+#include <config/gobyte-config.h>
 #endif
 
 #include <amount.h>
@@ -285,7 +285,7 @@ private Q_SLOTS:
     void showPeers();
     void showRepair();
 
-    /** Open external (default) editor with dash.conf */
+    /** Open external (default) editor with gobyte.conf */
     void showConfEditor();
     /** Show folder with wallet backups in default file browser */
     void showBackups();

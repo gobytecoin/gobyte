@@ -1,8 +1,8 @@
-Source: dash
+Source: gobyte
 Section: utils
 Priority: optional
-Maintainer: Holger Schinzel <holger@dash.org>
-Uploaders: Holger Schinzel <holger@dash.org>
+Maintainer: Holger Schinzel <holger@gobyte.network>
+Uploaders: Holger Schinzel <holger@gobyte.network>
 Build-Depends: debhelper,
  devscripts,
  automake,
@@ -26,45 +26,45 @@ Build-Depends: debhelper,
  python,
  libzmq3-dev
 Standards-Version: 3.9.2
-Homepage: https://www.dash.org/
-Vcs-Git: git://github.com/dashpay/dash.git
-Vcs-Browser: https://github.com/dashpay/dash
+Homepage: https://www.gobyte.network/
+Vcs-Git: git://github.com/gobytecoin/gobyte.git
+Vcs-Browser: https://github.com/gobytecoin/gobyte
 
-Package: dashd
+Package: gobyted
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: peer-to-peer network based digital currency - daemon
- Dash is an experimental new digital currency that enables instant, private
- payments to anyone, anywhere in the world. Dash uses peer-to-peer
+ GoByte is an experimental new digital currency that enables instant, private
+ payments to anyone, anywhere in the world. GoByte uses peer-to-peer
  technology to operate with no central authority: managing transactions
- and issuing money are carried out collectively by the network. Dash Core
+ and issuing money are carried out collectively by the network. GoByte Core
  is the name of the open source software which enables the use of this currency.
  .
- This package provides the daemon, dashd, and the CLI tool
- dash-cli to interact with the daemon.
+ This package provides the daemon, gobyted, and the CLI tool
+ gobyte-cli to interact with the daemon.
 
-Package: dash-qt
+Package: gobyte-qt
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: peer-to-peer network based digital currency - Qt GUI
- Dash is an experimental new digital currency that enables instant, private
- payments to anyone, anywhere in the world. Dash uses peer-to-peer
+ GoByte is an experimental new digital currency that enables instant, private
+ payments to anyone, anywhere in the world. GoByte uses peer-to-peer
  technology to operate with no central authority: managing transactions
- and issuing money are carried out collectively by the network. Dash Core
+ and issuing money are carried out collectively by the network. GoByte Core
  is the name of the open source software which enables the use of this currency.
  .
- This package provides Dash-Qt, a GUI for Dash based on Qt.
+ This package provides GoByte-Qt, a GUI for GoByte based on Qt.
 
-Package: dash-tx
+Package: gobyte-tx
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: peer-to-peer digital currency - standalone transaction tool
- Dash is an experimental new digital currency that enables instant, private
- payments to anyone, anywhere in the world. Dash uses peer-to-peer
+ GoByte is an experimental new digital currency that enables instant, private
+ payments to anyone, anywhere in the world. GoByte uses peer-to-peer
  technology to operate with no central authority: managing transactions
- and issuing money are carried out collectively by the network. Dash Core
+ and issuing money are carried out collectively by the network. GoByte Core
  is the name of the open source software which enables the use of this currency.
  .
- This package provides dash-tx, a command-line transaction creation
- tool which can be used without a dash daemon.  Some means of
+ This package provides gobyte-tx, a command-line transaction creation
+ tool which can be used without a gobyte daemon.  Some means of
  exchanging minimal transaction data with peers is still required.

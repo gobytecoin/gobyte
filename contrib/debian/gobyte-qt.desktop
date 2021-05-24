@@ -1,0 +1,14 @@
+[Desktop Entry]
+Version=1.0
+Name=GoByte Core
+Comment=GoByte P2P Cryptocurrency
+Comment[de]=Verbinde mit dem GoByte peer-to-peer Netzwerk
+Comment[fr]=GoByte, monnaie virtuelle cryptographique pair à pair
+Comment[tr]=GoByte, eşten eşe kriptografik sanal para birimi
+Exec=gobyte-qt %u
+Terminal=false
+Type=Application
+Icon=gobyte128
+MimeType=x-scheme-handler/gobyte;
+Categories=Office;Finance;
+StartupWMClass=GoByte-qt

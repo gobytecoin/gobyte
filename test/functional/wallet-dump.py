@@ -127,7 +127,7 @@ class WalletDumpTest(BitcoinTestFramework):
         assert_equal(found_addr, test_addr_count)
         # This is 1, not 2 because we aren't testing for witness scripts
         assert_equal(found_script_addr, 1)
-        # TODO clarify if we want the behavior that is tested below in Dash (only when HD seed was generated and not user-provided)
+        # TODO clarify if we want the behavior that is tested below in GoByte (only when HD seed was generated and not user-provided)
         # assert_equal(found_addr_chg, 180 + 50)  # old reserve keys are marked as change now
         assert_equal(found_addr_rsv, 180)  # keypool size
 

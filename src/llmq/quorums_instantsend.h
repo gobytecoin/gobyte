@@ -1,9 +1,10 @@
 // Copyright (c) 2019-2020 The Dash Core developers
+// Copyright (c) 2017-2021 The GoByte Core developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef DASH_QUORUMS_INSTANTSEND_H
-#define DASH_QUORUMS_INSTANTSEND_H
+#ifndef GOBYTE_QUORUMS_INSTANTSEND_H
+#define GOBYTE_QUORUMS_INSTANTSEND_H
 
 #include <llmq/quorums_signing.h>
 
@@ -177,4 +178,4 @@ bool IsInstantSendEnabled();
 
 } // namespace llmq
 
-#endif//DASH_QUORUMS_INSTANTSEND_H
+#endif//GOBYTE_QUORUMS_INSTANTSEND_H

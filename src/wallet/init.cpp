@@ -51,7 +51,7 @@ public:
     //! Close all wallets.
     void Close() override;
 
-    // Dash Specific Wallet Init
+    // GoByte Specific Wallet Init
     void AutoLockMasternodeCollaterals() override;
     void InitPrivateSendSettings() override;
     void InitKeePass() override;

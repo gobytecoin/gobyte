@@ -1,5 +1,6 @@
 # Copyright (c) 2013-2016 The Bitcoin Core developers
 # Copyright (c) 2014-2018 The Dash Core developers
+# Copyright (c) 2017-2021 The GoByte Core developers
 # Distributed under the MIT software license, see the accompanying
 # file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -89,9 +90,9 @@ BITCOIN_TESTS =\
   test/skiplist_tests.cpp \
   test/streams_tests.cpp \
   test/subsidy_tests.cpp \
-  test/test_dash.cpp \
-  test/test_dash.h \
-  test/test_dash_main.cpp \
+  test/test_gobyte.cpp \
+  test/test_gobyte.h \
+  test/test_gobyte_main.cpp \
   test/timedata_tests.cpp \
   test/torcontrol_tests.cpp \
   test/transaction_tests.cpp \
@@ -130,7 +131,7 @@ endif
 #
 
 # test_gobyte_fuzzy binary #
-test_test_gobyte_fuzzy_SOURCES = test/test_dash_fuzzy.cpp
+test_test_gobyte_fuzzy_SOURCES = test/test_gobyte_fuzzy.cpp
 test_test_gobyte_fuzzy_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES)
 test_test_gobyte_fuzzy_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
 test_test_gobyte_fuzzy_LDFLAGS = $(LDFLAGS_WRAP_EXCEPTIONS) $(RELDFLAGS) $(AM_LDFLAGS) $(LIBTOOL_APP_LDFLAGS)

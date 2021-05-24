@@ -24,7 +24,7 @@ import time
 from test_framework.siphash import siphash256
 from test_framework.util import hex_str_to_bytes, bytes_to_hex_str, wait_until
 
-import dash_hash
+import gobyte_hash
 
 MIN_VERSION_SUPPORTED = 60001
 MY_VERSION = 70214  # MIN_PEER_PROTO_VERSION
@@ -50,8 +50,8 @@ def sha256(s):
 def hash256(s):
     return sha256(sha256(s))
 
-def dashhash(s):
-    return dash_hash.getPoWHash(s)
+def gobytehash(s):
+    return gobyte_hash.getPoWHash(s)
 
 def ser_compact_size(l):
     r = b""
@@ -197,7 +197,7 @@ def FromHex(obj, hex_string):
 def ToHex(obj):
     return bytes_to_hex_str(obj.serialize())
 
-# Objects that map to dashd objects, which can be serialized/deserialized
+# Objects that map to gobyted objects, which can be serialized/deserialized
 
 class CService():
     def __init__(self):
@@ -483,8 +483,8 @@ class CBlockHeader():
             r += struct.pack("<I", self.nTime)
             r += struct.pack("<I", self.nBits)
             r += struct.pack("<I", self.nNonce)
-            self.sha256 = uint256_from_str(dashhash(r))
-            self.hash = encode(dashhash(r)[::-1], 'hex_codec').decode('ascii')
+            self.sha256 = uint256_from_str(gobytehash(r))
+            self.hash = encode(gobytehash(r)[::-1], 'hex_codec').decode('ascii')
 
     def rehash(self):
         self.sha256 = None
@@ -1200,7 +1200,7 @@ class msg_headers():
         self.headers = headers if headers is not None else []
 
     def deserialize(self, f):
-        # comment in dashd indicates these should be deserialized as blocks
+        # comment in gobyted indicates these should be deserialized as blocks
         blocks = deser_vector(f, CBlock)
         for x in blocks:
             self.headers.append(CBlockHeader(x))

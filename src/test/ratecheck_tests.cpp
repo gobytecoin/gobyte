@@ -1,8 +1,9 @@
 // Copyright (c) 2014-2019 The Dash Core developers
+// Copyright (c) 2017-2021 The GoByte Core developers
 
 #include <governance/governance.h>
 
-#include <test/test_dash.h>
+#include <test/test_gobyte.h>
 
 #include <boost/test/unit_test.hpp>
 

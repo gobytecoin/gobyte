@@ -1,5 +1,6 @@
 /**
 Copyright (c) 2020 The Dash Core developers
+Copyright (c) 2021 The GoByte Core developers
 Distributed under the MIT/X11 software license, see the accompanying
 file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -897,7 +898,7 @@ QToolBar > QToolButton:disabled {
 
 QToolBar QLabel#lblToolbarLogo {
     padding: 12px;
-    image: url(':/images/dash_logo_toolbar');
+    image: url(':/images/gobyte_logo_toolbar');
     height: 2.5em;
 }
 
@@ -986,11 +987,11 @@ AboutDialog
 
 QDialog#AboutDialog QLabel#label,
 QDialog#AboutDialog QLabel#copyrightLabel,
-QDialog#AboutDialog QLabel#label_2 { /* About Dash Contents */
+QDialog#AboutDialog QLabel#label_2 { /* About GoByte Contents */
     margin-left: 10px;
 }
 
-QDialog#AboutDialog QLabel#label_2 { /* Margin for About Dash text */
+QDialog#AboutDialog QLabel#label_2 { /* Margin for About GoByte text */
     margin-right: 10px;
 }
 

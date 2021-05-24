@@ -353,7 +353,7 @@
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="../dash.qrc"/>
+  <include location="../gobyte.qrc"/>
  </resources>
  <connections/>
 </ui>

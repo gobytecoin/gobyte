@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # Copyright (c) 2015-2020 The Dash Core developers
+# Copyright (c) 2017-2021 The GoByte Core developers
 # Distributed under the MIT software license, see the accompanying
 # file COPYING or http://www.opensource.org/licenses/mit-license.php.
 import time
@@ -8,7 +9,7 @@ from decimal import Decimal
 from test_framework import mininode
 from test_framework.blocktools import get_masternode_payment, create_coinbase, create_block
 from test_framework.mininode import *
-from test_framework.test_framework import DashTestFramework
+from test_framework.test_framework import GoByteTestFramework
 from test_framework.util import sync_blocks, sync_mempools, p2p_port, assert_raises_rpc_error, get_bip9_status
 
 '''
@@ -46,10 +47,10 @@ class TestNode(P2PInterface):
                 self.send_message(self.islocks[inv.hash])
 
 
-class LLMQ_IS_CL_Conflicts(DashTestFramework):
+class LLMQ_IS_CL_Conflicts(GoByteTestFramework):
     def set_test_params(self):
-        self.set_dash_test_params(4, 3, fast_dip3_enforcement=True)
-        self.set_dash_dip8_activation(10)
+        self.set_gobyte_test_params(4, 3, fast_dip3_enforcement=True)
+        self.set_gobyte_dip8_activation(10)
         #disable_mocktime()
 
     def run_test(self):

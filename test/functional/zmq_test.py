@@ -9,15 +9,15 @@ import struct
 
 from codecs import encode
 
-from test_framework.mininode import dashhash
+from test_framework.mininode import gobytehash
 from test_framework.test_framework import BitcoinTestFramework, SkipTest
 from test_framework.util import (assert_equal,
                                  bytes_to_hex_str,
                                  hash256,
                                 )
 
-def dashhash_helper(b):
-    return encode(dashhash(b)[::-1], 'hex_codec').decode('ascii')
+def gobytehash_helper(b):
+    return encode(gobytehash(b)[::-1], 'hex_codec').decode('ascii')
 
 class ZMQSubscriber:
     def __init__(self, socket, topic):
@@ -49,14 +49,14 @@ class ZMQTest (BitcoinTestFramework):
         except ImportError:
             raise SkipTest("python3-zmq module not available.")
 
-        # Check that dash has been built with ZMQ enabled.
+        # Check that gobyte has been built with ZMQ enabled.
         config = configparser.ConfigParser()
         if not self.options.configfile:
             self.options.configfile = os.path.abspath(os.path.join(os.path.dirname(__file__), "../config.ini"))
         config.read_file(open(self.options.configfile))
 
         if not config["components"].getboolean("ENABLE_ZMQ"):
-            raise SkipTest("dashd has not been built with zmq enabled.")
+            raise SkipTest("gobyted has not been built with zmq enabled.")
 
         # Initialize ZMQ context and socket.
         # All messages are received in the same socket which means
@@ -109,7 +109,7 @@ class ZMQTest (BitcoinTestFramework):
 
             # Should receive the generated raw block.
             block = self.rawblock.receive()
-            assert_equal(genhashes[x], dashhash_helper(block[:80]))
+            assert_equal(genhashes[x], gobytehash_helper(block[:80]))
 
         self.log.info("Wait for tx from second node")
         payment_txid = self.nodes[1].sendtoaddress(self.nodes[0].getnewaddress(), 1.0)

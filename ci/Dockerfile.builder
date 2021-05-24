@@ -16,9 +16,9 @@ RUN apt-get update && apt-get install $APT_ARGS python3-pip python3-setuptools &
 RUN pip3 install pyzmq # really needed?
 RUN pip3 install jinja2
 
-# dash_hash
-RUN git clone https://github.com/dashpay/dash_hash
-RUN cd dash_hash && python3 setup.py install
+# gobyte_hash
+RUN git clone https://github.com/gobytecoin/gobyte_hash
+RUN cd gobyte_hash && python3 setup.py install
 
 ARG USER_ID=1000
 ARG GROUP_ID=1000
@@ -26,8 +26,8 @@ ARG GROUP_ID=1000
 # add user with specified (or default) user/group ids
 ENV USER_ID ${USER_ID}
 ENV GROUP_ID ${GROUP_ID}
-RUN groupadd -g ${GROUP_ID} dash
-RUN useradd -u ${USER_ID} -g dash -s /bin/bash -m -d /dash dash
+RUN groupadd -g ${GROUP_ID} gobyte
+RUN useradd -u ${USER_ID} -g gobyte -s /bin/bash -m -d /gobyte gobyte
 
 # Packages needed for all target builds
 RUN dpkg --add-architecture i386
@@ -53,13 +53,13 @@ RUN \
   update-alternatives --set x86_64-w64-mingw32-g++  /usr/bin/x86_64-w64-mingw32-g++-posix; \
   exit 0
 
-RUN mkdir /dash-src && \
+RUN mkdir /gobyte-src && \
   mkdir -p /cache/ccache && \
   mkdir /cache/depends && \
   mkdir /cache/sdk-sources && \
-  chown $USER_ID:$GROUP_ID /dash-src && \
+  chown $USER_ID:$GROUP_ID /gobyte-src && \
   chown $USER_ID:$GROUP_ID /cache && \
   chown $USER_ID:$GROUP_ID /cache -R
-WORKDIR /dash-src
+WORKDIR /gobyte-src
 
-USER dash
+USER gobyte

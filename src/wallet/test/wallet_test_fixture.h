@@ -5,7 +5,7 @@
 #ifndef BITCOIN_WALLET_TEST_FIXTURE_H
 #define BITCOIN_WALLET_TEST_FIXTURE_H
 
-#include <test/test_dash.h>
+#include <test/test_gobyte.h>
 
 #include <wallet/wallet.h>
 

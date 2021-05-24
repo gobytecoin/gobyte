@@ -1,9 +1,10 @@
 // Copyright (c) 2018 The Dash Core developers
+// Copyright (c) 2021 The GoByte Core developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef DASH_CRYPTO_BLS_IES_H
-#define DASH_CRYPTO_BLS_IES_H
+#ifndef GOBYTE_CRYPTO_BLS_IES_H
+#define GOBYTE_CRYPTO_BLS_IES_H
 
 #include <bls/bls.h>
 #include <streams.h>
@@ -161,4 +162,4 @@ public:
     }
 };
 
-#endif // DASH_CRYPTO_BLS_IES_H
+#endif // GOBYTE_CRYPTO_BLS_IES_H

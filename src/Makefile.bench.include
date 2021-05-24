@@ -1,5 +1,6 @@
 # Copyright (c) 2015-2016 The Bitcoin Core developers
 # Copyright (c) 2014-2018 The Dash Core developers
+# Copyright (c) 2017-2021 The GoByte Core developers
 # Distributed under the MIT software license, see the accompanying
 # file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -13,7 +14,7 @@ GENERATED_BENCH_FILES = $(RAW_BENCH_FILES:.raw=.raw.h)
 
 bench_bench_gobyte_SOURCES = \
   $(RAW_BENCH_FILES) \
-  bench/bench_dash.cpp \
+  bench/bench_gobyte.cpp \
   bench/bench.cpp \
   bench/bench.h \
   bench/bls.cpp \
