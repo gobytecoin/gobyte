@@ -226,15 +226,15 @@ public:
     CTestNetParams() {
         strNetworkID = "test";
         consensus.nSubsidyHalvingInterval = 210240;
-        consensus.nMasternodePaymentsStartBlock = 1024; // not true, but it's ok as long as it's less then nMasternodePaymentsIncreaseBlock
-        consensus.nMasternodePaymentsIncreaseBlock = 21100;
-        consensus.nMasternodePaymentsIncreasePeriod = 100;
+        consensus.nMasternodePaymentsStartBlock = 4010; // not true, but it's ok as long as it's less then nMasternodePaymentsIncreaseBlock
+        consensus.nMasternodePaymentsIncreaseBlock = 4030;
+        consensus.nMasternodePaymentsIncreasePeriod = 10;
         consensus.nInstantSendKeepLock = 6;
-        consensus.nBudgetPaymentsStartBlock = 15500;
+        consensus.nBudgetPaymentsStartBlock = 4100;
         consensus.nBudgetPaymentsCycleBlocks = 50; // ~(60*24*30)/2.5
         consensus.nBudgetPaymentsWindowBlocks = 10;
         consensus.nBudgetProposalEstablishingTime = 60*20;
-        consensus.nSuperblockStartBlock = 15600; // NOTE: Should satisfy nSuperblockStartBlock > nBudgetPeymentsStartBlock
+        consensus.nSuperblockStartBlock = 4200; // NOTE: Should satisfy nSuperblockStartBlock > nBudgetPeymentsStartBlock
         consensus.nSuperblockCycle = 24; // Superblocks can be issued hourly on testnet
         consensus.nGovernanceMinQuorum = 1;
         consensus.nGovernanceFilterElements = 500;
@@ -242,8 +242,8 @@ public:
         consensus.nMajorityEnforceBlockUpgrade = 51;
         consensus.nMajorityRejectBlockOutdated = 75;
         consensus.nMajorityWindow = 100;
-        consensus.BIP34Height = 1;
-        consensus.BIP34Hash = uint256S("0x0000064a72bc327f2c93169784623348d8ad8975873563a2c3e0e1deb6bcc9f7");
+        consensus.BIP34Height = 50;
+        consensus.BIP34Hash = uint256S("0x0000039db8b789064e2370998cdd0a914cf516869796fe5da5ae095a94eaa812");
         consensus.powLimit = uint256S("00000fffff000000000000000000000000000000000000000000000000000000");
         consensus.nPowTargetTimespan = 60 * 60; // GoByte: 1 hour, 24 blocks
         consensus.nPowTargetSpacing = 2.5 * 60; // GoByte: 150 seconds
@@ -253,26 +253,26 @@ public:
         consensus.nRuleChangeActivationThreshold = 1512; // 75% for testchains
         consensus.nMinerConfirmationWindow = 2016; // nPowTargetTimespan / nPowTargetSpacing
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].bit = 28;
-        consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].nStartTime = 1199145601; // January 1, 2008
-        consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].nTimeout = 1230767999; // December 31, 2008
+        consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].nStartTime = 1622288970; // May 29, 2021
+        consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].nTimeout = 1653824970; // May 29, 2022
 
         // Deployment of BIP68, BIP112, and BIP113.
         consensus.vDeployments[Consensus::DEPLOYMENT_CSV].bit = 0;
-        consensus.vDeployments[Consensus::DEPLOYMENT_CSV].nStartTime = 1506556800; // September 28th, 2017
-        consensus.vDeployments[Consensus::DEPLOYMENT_CSV].nTimeout = 1538092800; // September 28th, 2018
+        consensus.vDeployments[Consensus::DEPLOYMENT_CSV].nStartTime = 1622288970; // May 29, 2021
+        consensus.vDeployments[Consensus::DEPLOYMENT_CSV].nTimeout = 1653824970; // May 29, 2022
 
         // Deployment of DIP0001
         consensus.vDeployments[Consensus::DEPLOYMENT_DIP0001].bit = 1;
-        consensus.vDeployments[Consensus::DEPLOYMENT_DIP0001].nStartTime = 1522857600; // April 4th, 2018
-        consensus.vDeployments[Consensus::DEPLOYMENT_DIP0001].nTimeout = 1554393600; // April 4th, 2019
+        consensus.vDeployments[Consensus::DEPLOYMENT_DIP0001].nStartTime = 1622288970; // May 29, 2021
+        consensus.vDeployments[Consensus::DEPLOYMENT_DIP0001].nTimeout = 1653824970; // May 29, 2022
         consensus.vDeployments[Consensus::DEPLOYMENT_DIP0001].nWindowSize = 100;
         consensus.vDeployments[Consensus::DEPLOYMENT_DIP0001].nThreshold = 50; // 50% of 100
 
         // The best chain should have at least this much work.
-        consensus.nMinimumChainWork = uint256S("0x000000000000000000000000000000000000000000000000000006a96dd9119d"); // 14500
+        consensus.nMinimumChainWork = uint256S("0x000000000000000000000000000000000000000000000000000000009e3e9dbc"); // 1359 getblockheader
 
         // By default assume that the signatures in ancestors of this block are valid.
-        consensus.defaultAssumeValid = uint256S("0x0000000c94299ee914c5f7d6322c4f51759ddaa848ea881b0280bb00591bb7f1"); // 14500
+        consensus.defaultAssumeValid = uint256S("0x000004cc71734bb41970f884c9c5a6bcced9dba542b900c818d9be964c3b4a0f"); // 1359 getblockhash
 
         pchMessageStart[0] = 0xd1;
         pchMessageStart[1] = 0x2b;
@@ -284,9 +284,9 @@ public:
         nDelayGetHeadersTime = 24 * 60 * 60;
         nPruneAfterHeight = 1000;
 
-        genesis = CreateGenesisBlock(1510727200, 2998459, 0x1e0ffff0, 1, 50 * COIN);
+        genesis = CreateGenesisBlock(1621860500, 1181433, 0x1e0ffff0, 1, 50 * COIN);
         consensus.hashGenesisBlock = genesis.GetHash();
-        assert(consensus.hashGenesisBlock == uint256S("0x00000c958ba1a0fe2174effe57a7f39c4c32b8341f1efa20be78b48b6b6bb353"));
+        assert(consensus.hashGenesisBlock == uint256S("0x00000a63181b01cd202a3e28380b334d107f01cbc0a831c2ab0751bb3370fe7a"));
         assert(genesis.hashMerkleRoot == uint256S("0xdc9a719dc1bcda39107ea55424f00cab512170a1cb69efa08531f483f2399f21"));
 
         vFixedSeeds.clear();
@@ -322,14 +322,13 @@ public:
 
         checkpointData = (CCheckpointData) {
             boost::assign::map_list_of
-            (   500, uint256S("0x0000000a074e448fcae79552631e7e90047f55e272e85f3db93df86c4bcd4fc1"))
-            (  1000, uint256S("0x0000000302c5f739c94680415cfed780e5f90f6ab6b62e39c8cac9dc267acffd"))
-            (  5000, uint256S("0x000000023af784ca843c9bf0003cb3586e626936346456f6948586b71851f7a8"))
-            ( 10000, uint256S("0x000000041bcae477bee46f37d851a185c26b2fa5558fab12c72f43cd70bfe1fc")),
-            1524132951, // * UNIX timestamp of last checkpoint block
-            10485,       // * total number of transactions between genesis and last checkpoint
+            (  250, uint256S("0x000002b73b3acc90c891363127fc666b0d19e899a19d4d17d674d9358ba3f604"))
+            (  999, uint256S("0x000000463cc00b83ca1c6448e1659b588a454c34f3334c5f50c94b16c4257239"))
+            (  1299, uint256S("0x00000591a751dab5204cfb18fcba053a8307159f4d0bad035c0a11e1bcb65749")),
+            1622290075, // * UNIX timestamp of last checkpoint block
+            1367,       // * total number of transactions between genesis and last checkpoint
                         //   (the tx=... number in the SetBestChain debug.log lines)
-            500         // * estimated number of transactions per day after checkpoint
+            100         // * estimated number of transactions per day after checkpoint
         };
 
     }
