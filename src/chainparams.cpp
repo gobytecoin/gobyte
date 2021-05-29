@@ -15,6 +15,7 @@
 #include <arith_uint256.h>
 
 #include <assert.h>
+#include <limits>
 #include <memory>
 
 #include <chainparamsseeds.h>
@@ -507,9 +508,9 @@ public:
         consensus.BIP34Hash = uint256S("0x0000039db8b789064e2370998cdd0a914cf516869796fe5da5ae095a94eaa812");
         consensus.BIP65Height = 500;
         consensus.BIP66Height = 800;
-        consensus.DIP0001Height = 1000;
-        consensus.DIP0003Height = 1200;
-        consensus.DIP0003EnforcementHeight = 1300;
+        consensus.DIP0001Height = std::numeric_limits<int>::max();
+        consensus.DIP0003Height = std::numeric_limits<int>::max();
+        consensus.DIP0003EnforcementHeight = std::numeric_limits<int>::max();
         consensus.DIP0003EnforcementHash = uint256S("0000003b02cc5204685e2a5ea63260633ebc951b2781a1a5c95f479b0e4a3f2f");
         consensus.powLimit = uint256S("00000fffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"); // ~uint256(0) >> 20
         consensus.nPowTargetTimespan = 60 * 60; // GoByte: 1 hour, 24 blocks
