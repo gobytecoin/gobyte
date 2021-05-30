@@ -360,10 +360,10 @@ public:
         consensus.vDeployments[Consensus::DEPLOYMENT_REALLOC].nFalloffCoeff = 5; // this corresponds to 10 periods
 
         // The best chain should have at least this much work.
-        consensus.nMinimumChainWork = uint256S("0x00000000000000000000000000000000000000000000000004ce57668f63f9b4"); // 85000
+        consensus.nMinimumChainWork = uint256S("0x00000000000000000000000000000000000000000000000008717841844189b3"); // 705000
 
         // By default assume that the signatures in ancestors of this block are valid.
-        consensus.defaultAssumeValid = uint256S("0x0000000000465ca188f7524071debf90b7fa9716736673a8641a82805119b2f0"); // 85000
+        consensus.defaultAssumeValid = uint256S("0x00000000035d65fc15857e19d63a0b7c09b96bdc58c9e9a0122fddd24306de68"); // 705000
 
         /**
          * The message start string is designed to be unlikely to occur in normal data.
@@ -470,14 +470,15 @@ public:
                 {556750, uint256S("0x0000000003174913922493cb828474c666b634bd169a7221c9387528a69ec957")},
                 {600000, uint256S("0x0000000008add114d54f804571489e7786f4d23a031310650cd6fdd6a74a8fe5")},
                 {650000, uint256S("0x000000000f301e4ca7b252764aef8e28aace74fdd31176edab0ba40abd47e734")},
+                {705200, uint256S("0x00000000084105e202d7f10b468f9e704ecc9287cd5e4263a32b3de92552c8c0")},                
             }
         };
 
         chainTxData = ChainTxData{
-            1598853165, // * UNIX timestamp of last known number of transactions (Block 1344000)
-            970293,   // * total number of transactions between genesis and that timestamp
-                        //   (the tx=... number in the SetBestChain debug.log lines)
-            2800         // * estimated number of transactions per second after that timestamp
+            1622353997, // * UNIX timestamp of last known number of transactions (Block 705200)
+            1178150,   // * total number of transactions between genesis and that timestamp
+                       //   (the tx=... number in the SetBestChain debug.log lines)
+            0.2    // * estimated number of transactions per second after that timestamp
         };
     }
 };
@@ -741,7 +742,7 @@ public:
         pchMessageStart[1] = 0xca;
         pchMessageStart[2] = 0xff;
         pchMessageStart[3] = 0xce;
-        nDefaultPort = 13455;
+        nDefaultPort = 13475;
         nPruneAfterHeight = 1000;
 
         genesis = CreateGenesisBlock(1564741609, 1096447, 0x207fffff, 1, 50 * COIN);
