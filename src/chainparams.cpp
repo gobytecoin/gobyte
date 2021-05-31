@@ -211,20 +211,20 @@ static Consensus::LLMQParams llmq_devnet = {
 static Consensus::LLMQParams llmq5_60 = {
         .type = Consensus::LLMQ_5_60,
         .name = "llmq_5_60",
-        .size = 50,
-        .minSize = 5,
-        .threshold = 5,
+        .size = 5,
+        .minSize = 3,
+        .threshold = 3,
 
         .dkgInterval = 24, // one DKG per hour
         .dkgPhaseBlocks = 2,
         .dkgMiningWindowStart = 10, // dkgPhaseBlocks * 5 = after finalization
         .dkgMiningWindowEnd = 18,
-        .dkgBadVotesThreshold = 40,
+        .dkgBadVotesThreshold = 3,
 
-        .signingActiveQuorumCount = 24, // a full day worth of LLMQs
+        .signingActiveQuorumCount = 3, // just a few ones to allow easier testing
 
-        .keepOldConnections = 25,
-        .recoveryMembers = 25,
+        .keepOldConnections = 5,
+        .recoveryMembers = 5,
 };
 
 static Consensus::LLMQParams llmq50_60 = {
