@@ -6,15 +6,15 @@ reset-files.bash
 *.tar.gz
 
 *.exe
-src/dash
-src/dashd
-src/dash-cli
-src/dash-tx
-src/test/test_dash
-src/test/test_dash_fuzzy
-src/qt/test/test_dash-qt
+src/gobyte
+src/gobyted
+src/gobyte-cli
+src/gobyte-tx
+src/test/test_gobyte
+src/test/test_gobyte_fuzzy
+src/qt/test/test_gobyte-qt
 src/qt/res/css/colors/*
-src/bench/bench_dash
+src/bench/bench_gobyte
 
 # autoreconf
 Makefile.in
@@ -37,8 +37,8 @@ config.log
 config.status
 configure
 libtool
-src/config/dash-config.h
-src/config/dash-config.h.in
+src/config/gobyte-config.h
+src/config/gobyte-config.h.in
 src/config/stamp-h1
 share/setup.nsi
 share/qt/Info.plist
@@ -83,14 +83,14 @@ libconftest.dylib*
 # Compilation and Qt preprocessor part
 *.qm
 Makefile
-dash-qt
-Dash-Qt.app
+gobyte-qt
+GoByte-Qt.app
 background.tiff*
 !/depends/Makefile
 
 # Unit-tests
 Makefile.test
-dash-qt_test
+gobyte-qt_test
 
 # Resources cpp
 qrc_*.cpp
@@ -103,7 +103,7 @@ build
 *.gcno
 *.gcda
 /*.info
-test_dash.coverage/
+test_gobyte.coverage/
 total.coverage/
 coverage_percent.txt
 
@@ -121,15 +121,15 @@ test/cache/*
 .autotools
 /doc/doxygen/
 
-libdashconsensus.pc
+libgobyteconsensus.pc
 contrib/devtools/split-debug.sh
-src/qt/dash-qt.bash
+src/qt/gobyte-qt.bash
 qa/pull-tester/tests-config.sh
 
 #development symlinks
-dash-cli
-dashd
-dash-qt
+gobyte-cli
+gobyted
+gobyte-qt
 make
 
 /docker/bin
