@@ -105,11 +105,15 @@ unsigned int GetNextWorkRequiredBTC(const CBlockIndex* pindexLast, const CBlockH
 
 unsigned int GetNextWorkRequired(const CBlockIndex* pindexLast, const CBlockHeader *pblock, const Consensus::Params& params)
 {
+    // Special rules for testnet
+    if ((Params().NetworkIDString() == CBaseChainParams::TESTNET) && pindexLast->nHeight >= 2900) {
+        return UintToArith256(params.powLimit).GetCompact();
+    }
+
     // Most recent algo first
     if (pindexLast->nHeight + 1 >= params.nPowDGWHeight) {
         return DarkGravityWave(pindexLast, params);
-    }
-    else {
+    } else {
         return GetNextWorkRequiredBTC(pindexLast, pblock, params);
     }
 }

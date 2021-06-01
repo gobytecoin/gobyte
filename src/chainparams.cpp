@@ -529,9 +529,9 @@ public:
         consensus.BIP34Hash = uint256S("0x0000039db8b789064e2370998cdd0a914cf516869796fe5da5ae095a94eaa812");
         consensus.BIP65Height = 500;
         consensus.BIP66Height = 800;
-        consensus.DIP0001Height = std::numeric_limits<int>::max();
-        consensus.DIP0003Height = std::numeric_limits<int>::max();
-        consensus.DIP0003EnforcementHeight = std::numeric_limits<int>::max();
+        consensus.DIP0001Height = 2950;
+        consensus.DIP0003Height = 3000;
+        consensus.DIP0003EnforcementHeight = 3500;
         consensus.DIP0003EnforcementHash = uint256();
         consensus.powLimit = uint256S("00000fffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"); // ~uint256(0) >> 20
         consensus.nPowTargetTimespan = 60 * 60; // GoByte: 1 hour, 24 blocks
