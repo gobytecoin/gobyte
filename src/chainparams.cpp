@@ -351,29 +351,29 @@ public:
 
         // Deployment of BIP147
         consensus.vDeployments[Consensus::DEPLOYMENT_BIP147].bit = 2;
-        consensus.vDeployments[Consensus::DEPLOYMENT_BIP147].nStartTime = 1622288970; // May 29th, 2021
-        consensus.vDeployments[Consensus::DEPLOYMENT_BIP147].nTimeout = 1672444800; // Dec 31st, 2022
+        consensus.vDeployments[Consensus::DEPLOYMENT_BIP147].nStartTime = 1621900800; // May 25th, 2021
+        consensus.vDeployments[Consensus::DEPLOYMENT_BIP147].nTimeout = 1653436800; // May 25th, 2022
         consensus.vDeployments[Consensus::DEPLOYMENT_BIP147].nWindowSize = 4032;
         consensus.vDeployments[Consensus::DEPLOYMENT_BIP147].nThresholdStart = 3226; // 80% of 4032
 
         // Deployment of DIP0003
         consensus.vDeployments[Consensus::DEPLOYMENT_DIP0003].bit = 3;
         consensus.vDeployments[Consensus::DEPLOYMENT_DIP0003].nStartTime = 1622288970; // May 29th, 2021
-        consensus.vDeployments[Consensus::DEPLOYMENT_DIP0003].nTimeout = 1672444800; // Dec 31st, 2022
+        consensus.vDeployments[Consensus::DEPLOYMENT_DIP0003].nTimeout = 1653782400; // May 29th, 2022
         consensus.vDeployments[Consensus::DEPLOYMENT_DIP0003].nWindowSize = 4032;
         consensus.vDeployments[Consensus::DEPLOYMENT_DIP0003].nThresholdStart = 3226; // 80% of 4032
 
         // Deployment of DIP0008
         consensus.vDeployments[Consensus::DEPLOYMENT_DIP0008].bit = 4;
-        consensus.vDeployments[Consensus::DEPLOYMENT_DIP0008].nStartTime = 1622288970; // May 29th, 2021
-        consensus.vDeployments[Consensus::DEPLOYMENT_DIP0008].nTimeout = 1672444800; // Dec 31st, 2022
+        consensus.vDeployments[Consensus::DEPLOYMENT_DIP0008].nStartTime = 1622505600; // June 1st, 2021
+        consensus.vDeployments[Consensus::DEPLOYMENT_DIP0008].nTimeout = 1654041600; // June 1st, 2022
         consensus.vDeployments[Consensus::DEPLOYMENT_DIP0008].nWindowSize = 4032;
         consensus.vDeployments[Consensus::DEPLOYMENT_DIP0008].nThresholdStart = 3226; // 80% of 4032
 
         // Deployment of Block Reward Reallocation
         consensus.vDeployments[Consensus::DEPLOYMENT_REALLOC].bit = 5;
-        consensus.vDeployments[Consensus::DEPLOYMENT_REALLOC].nStartTime = 1622288970; // May 29th, 2021
-        consensus.vDeployments[Consensus::DEPLOYMENT_REALLOC].nTimeout = 1672444800; // Dec 31st, 2022
+        consensus.vDeployments[Consensus::DEPLOYMENT_REALLOC].nStartTime = 1622937600; // June 6th, 2021
+        consensus.vDeployments[Consensus::DEPLOYMENT_REALLOC].nTimeout = 1654473600; // June 6th, 2022
         consensus.vDeployments[Consensus::DEPLOYMENT_REALLOC].nWindowSize = 4032;
         consensus.vDeployments[Consensus::DEPLOYMENT_REALLOC].nThresholdStart = 3226; // 80% of 4032
         consensus.vDeployments[Consensus::DEPLOYMENT_REALLOC].nThresholdMin = 2420; // 60% of 4032
