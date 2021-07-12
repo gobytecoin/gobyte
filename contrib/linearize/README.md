@@ -42,13 +42,13 @@ will be printed.
 * `file_timestamp`: Set each file's last-accessed and last-modified times,
 respectively, to the current time and to the timestamp of the most recent block
 written to the script's blockchain.
-* `genesis`: The hash of the genesis block in the blockchain. (default is '00000ffd590b1485b3caadc19b22e6379c733355108f107a430458cdf3407ab6', mainnet)
+* `genesis`: The hash of the genesis block in the blockchain. (default is '0000033b01055cf8df90b01a14734cae92f7039b9b0e48887b4e33a469d7bc07', mainnet)
 * `input`: gobyted blocks/ directory containing blkNNNNN.dat
 * `hashlist`: text file containing list of block hashes created by
 linearize-hashes.py.
 * `max_out_sz`: Maximum size for files created by the `output_file` option.
 (Default: `1000*1000*1000 bytes`)
-* `netmagic`: Network magic number. (default is 'bf0c6bbd', mainnet)
+* `netmagic`: Network magic number. (default is '1ab2c3d4', mainnet)
 * `out_of_order_cache_sz`: If out-of-order blocks are being read, the block can
 be written to a cache so that the blockchain doesn't have to be sought again.
 This option specifies the cache size. (Default: `100*1000*1000 bytes`)

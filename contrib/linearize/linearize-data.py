@@ -14,7 +14,7 @@ import os
 import os.path
 import sys
 import hashlib
-import gobyte_hash
+import neoscrypt
 import datetime
 import time
 from collections import namedtuple
@@ -59,8 +59,8 @@ def calc_hdr_hash(blk_hdr):
 	#hash2_o = hash2.digest()
 
 	#return hash2_o
-        pow_hash = gobyte_hash.getPoWHash(blk_hdr)
-        return pow_hash
+    pow_hash = neoscrypt.getPoWHash(blk_hdr)
+    return pow_hash
 
 def calc_hash_str(blk_hdr):
 	hash = calc_hdr_hash(blk_hdr)
@@ -174,7 +174,7 @@ class BlockDataCopier:
 			self.highTS = blkTS
 
 		if (self.blkCountOut % 1000) == 0:
-			print('%i blocks scanned, %i blocks written (of %i, %.1f%% complete)' % 
+			print('%i blocks scanned, %i blocks written (of %i, %.1f%% complete)' %
 					(self.blkCountIn, self.blkCountOut, len(self.blkindex), 100.0 * self.blkCountOut / len(self.blkindex)))
 
 	def inFileName(self, fn):
@@ -286,9 +286,9 @@ if __name__ == '__main__':
 	settings['rev_hash_bytes'] = settings['rev_hash_bytes'].lower()
 
 	if 'netmagic' not in settings:
-		settings['netmagic'] = 'bf0c6bbd'
+		settings['netmagic'] = '1ab2c3d4'
 	if 'genesis' not in settings:
-		settings['genesis'] = '00000ffd590b1485b3caadc19b22e6379c733355108f107a430458cdf3407ab6'
+		settings['genesis'] = '0000033b01055cf8df90b01a14734cae92f7039b9b0e48887b4e33a469d7bc07'
 	if 'input' not in settings:
 		settings['input'] = 'input'
 	if 'hashlist' not in settings:
