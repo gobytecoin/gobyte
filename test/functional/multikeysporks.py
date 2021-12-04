@@ -13,8 +13,8 @@ multikeysporks.py
 
 Test logic for several signer keys usage for spork broadcast.
 
-We set 5 possible keys for sporks signing and set minimum 
-required signers to 3. We check 1 and 2 signers can't set the spork 
+We set 5 possible keys for sporks signing and set minimum
+required signers to 3. We check 1 and 2 signers can't set the spork
 value, any 3 signers can change spork value and other 3 signers
 can change it again.
 '''
@@ -27,62 +27,62 @@ class MultiKeySporkTest(BitcoinTestFramework):
         self.is_network_split = False
 
     def setup_network(self):
-        # secret(base58): 931wyuRNVYvhg18Uu9bky5Qg1z4QbxaJ7fefNBzjBPiLRqcd33F
+        # secret(base58): 942MmdVMK95TdFdCYK3mkkC6MPx9GxNuMjy7qGmwN9cfDZ6JvfF
         # keyid(hex): 60f0f57f71f0081f1aacdd8432340a33a526f91b
-        # address(base58): yNsMZhEhYqv14TgdYb1NS2UmNZjE8FSJxa
+        # address(base58): nNFe5kSc6KcuezjZavqizjfuqY9rj5JTxh
 
-        # secret(base58): 91vbXGMSWKGHom62986XtL1q2mQDA12ngcuUNNe5NfMSj44j7g3
+        # secret(base58): 94YkGAQ4igCsyH98hwg3UMfH5f4uSZCDmU5FGLgGXwu8umRG1Hx
         # keyid(hex): 43dff2b09de2f904f688ec14ee6899087b889ad0
-        # address(base58): yfLSXFfipnkgYioD6L8aUNyfRgEBuJv48h
+        # address(base58): n8hdGQt6N9BgCnTmqwrEHzsTGLm7MwbNst
 
-        # secret(base58): 92bxUjPT5AhgXuXJwfGGXqhomY2SdQ55MYjXyx9DZNxCABCSsRH
+        # secret(base58): 93fRQ7X4g4XFQDAXhdT9o7rJKeXcuoeCe6rkCcRQGDzhMEK4j5d
         # keyid(hex): d9aa5fa00cce99101a4044e65dc544d1579890de
-        # address(base58): ygcG5S2pQz2U1UAaHvU6EznKZW7yapKMA7
+        # address(base58): nPCNoPqJ57ENu6uZfnimi267vLgsuT6HFv
 
-        # secret(base58): 934yPXiVGf4RCY2qTs2Bt5k3TEtAiAg12sMxCt8yVWbSU7p3fuD
+        # secret(base58): 957eM6g5YUhPCxPm5SLPgFXuWYAQ3ixELcNzFfpqGzjCGrUUP67
         # keyid(hex): 0b23935ce0bea3b997a334f6fa276c9fa17687b2
-        # address(base58): ycbRQWbovrhQMTuxg9p4LAuW5SCMAKqPrn
+        # address(base58): n7LfDRBkE65bhpwqT4MzJRB6QxKsATWUdA
 
-        # secret(base58): 92Cxwia363Wg2qGF1fE5z4GKi8u7r1nrWQXdtsj2ACZqaDPSihD
+        # secret(base58): 94N31JxLB5dV1cPruNtZAuonE4ttxyBQ36bPc3omD3MCYiWjPNt
         # keyid(hex): 1d1098b2b1f759b678a0a7a098637a9b898adcac
-        # address(base58): yc5TGfcHYoLCrcbVy4umsiDjsYUn39vLui
+        # address(base58): nJSbynYfQVWBnC5SdDTTzDD8bpvJ4ftD6t
 
         self.add_nodes(5)
 
-        self.start_node(0, ["-sporkkey=931wyuRNVYvhg18Uu9bky5Qg1z4QbxaJ7fefNBzjBPiLRqcd33F",
-                            "-sporkaddr=ygcG5S2pQz2U1UAaHvU6EznKZW7yapKMA7",
-                            "-sporkaddr=yfLSXFfipnkgYioD6L8aUNyfRgEBuJv48h",
-                            "-sporkaddr=yNsMZhEhYqv14TgdYb1NS2UmNZjE8FSJxa",
-                            "-sporkaddr=ycbRQWbovrhQMTuxg9p4LAuW5SCMAKqPrn",
-                            "-sporkaddr=yc5TGfcHYoLCrcbVy4umsiDjsYUn39vLui",
+        self.start_node(0, ["-sporkkey=942MmdVMK95TdFdCYK3mkkC6MPx9GxNuMjy7qGmwN9cfDZ6JvfF",
+                            "-sporkaddr=nPCNoPqJ57ENu6uZfnimi267vLgsuT6HFv",
+                            "-sporkaddr=n8hdGQt6N9BgCnTmqwrEHzsTGLm7MwbNst",
+                            "-sporkaddr=nNFe5kSc6KcuezjZavqizjfuqY9rj5JTxh",
+                            "-sporkaddr=n7LfDRBkE65bhpwqT4MzJRB6QxKsATWUdA",
+                            "-sporkaddr=nJSbynYfQVWBnC5SdDTTzDD8bpvJ4ftD6t",
                             "-minsporkkeys=3"])
-        self.start_node(1, ["-sporkkey=91vbXGMSWKGHom62986XtL1q2mQDA12ngcuUNNe5NfMSj44j7g3",
-                            "-sporkaddr=ygcG5S2pQz2U1UAaHvU6EznKZW7yapKMA7",
-                            "-sporkaddr=yfLSXFfipnkgYioD6L8aUNyfRgEBuJv48h",
-                            "-sporkaddr=yNsMZhEhYqv14TgdYb1NS2UmNZjE8FSJxa",
-                            "-sporkaddr=ycbRQWbovrhQMTuxg9p4LAuW5SCMAKqPrn",
-                            "-sporkaddr=yc5TGfcHYoLCrcbVy4umsiDjsYUn39vLui",
+        self.start_node(1, ["-sporkkey=94YkGAQ4igCsyH98hwg3UMfH5f4uSZCDmU5FGLgGXwu8umRG1Hx",
+                            "-sporkaddr=nPCNoPqJ57ENu6uZfnimi267vLgsuT6HFv",
+                            "-sporkaddr=n8hdGQt6N9BgCnTmqwrEHzsTGLm7MwbNst",
+                            "-sporkaddr=nNFe5kSc6KcuezjZavqizjfuqY9rj5JTxh",
+                            "-sporkaddr=n7LfDRBkE65bhpwqT4MzJRB6QxKsATWUdA",
+                            "-sporkaddr=nJSbynYfQVWBnC5SdDTTzDD8bpvJ4ftD6t",
                             "-minsporkkeys=3"])
-        self.start_node(2, ["-sporkkey=92bxUjPT5AhgXuXJwfGGXqhomY2SdQ55MYjXyx9DZNxCABCSsRH",
-                            "-sporkaddr=ygcG5S2pQz2U1UAaHvU6EznKZW7yapKMA7",
-                            "-sporkaddr=yfLSXFfipnkgYioD6L8aUNyfRgEBuJv48h",
-                            "-sporkaddr=yNsMZhEhYqv14TgdYb1NS2UmNZjE8FSJxa",
-                            "-sporkaddr=ycbRQWbovrhQMTuxg9p4LAuW5SCMAKqPrn",
-                            "-sporkaddr=yc5TGfcHYoLCrcbVy4umsiDjsYUn39vLui",
+        self.start_node(2, ["-sporkkey=93fRQ7X4g4XFQDAXhdT9o7rJKeXcuoeCe6rkCcRQGDzhMEK4j5d",
+                            "-sporkaddr=nPCNoPqJ57ENu6uZfnimi267vLgsuT6HFv",
+                            "-sporkaddr=n8hdGQt6N9BgCnTmqwrEHzsTGLm7MwbNst",
+                            "-sporkaddr=nNFe5kSc6KcuezjZavqizjfuqY9rj5JTxh",
+                            "-sporkaddr=n7LfDRBkE65bhpwqT4MzJRB6QxKsATWUdA",
+                            "-sporkaddr=nJSbynYfQVWBnC5SdDTTzDD8bpvJ4ftD6t",
                             "-minsporkkeys=3"])
-        self.start_node(3, ["-sporkkey=934yPXiVGf4RCY2qTs2Bt5k3TEtAiAg12sMxCt8yVWbSU7p3fuD",
-                            "-sporkaddr=ygcG5S2pQz2U1UAaHvU6EznKZW7yapKMA7",
-                            "-sporkaddr=yfLSXFfipnkgYioD6L8aUNyfRgEBuJv48h",
-                            "-sporkaddr=yNsMZhEhYqv14TgdYb1NS2UmNZjE8FSJxa",
-                            "-sporkaddr=ycbRQWbovrhQMTuxg9p4LAuW5SCMAKqPrn",
-                            "-sporkaddr=yc5TGfcHYoLCrcbVy4umsiDjsYUn39vLui",
+        self.start_node(3, ["-sporkkey=957eM6g5YUhPCxPm5SLPgFXuWYAQ3ixELcNzFfpqGzjCGrUUP67",
+                            "-sporkaddr=nPCNoPqJ57ENu6uZfnimi267vLgsuT6HFv",
+                            "-sporkaddr=n8hdGQt6N9BgCnTmqwrEHzsTGLm7MwbNst",
+                            "-sporkaddr=nNFe5kSc6KcuezjZavqizjfuqY9rj5JTxh",
+                            "-sporkaddr=n7LfDRBkE65bhpwqT4MzJRB6QxKsATWUdA",
+                            "-sporkaddr=nJSbynYfQVWBnC5SdDTTzDD8bpvJ4ftD6t",
                             "-minsporkkeys=3"])
-        self.start_node(4, ["-sporkkey=92Cxwia363Wg2qGF1fE5z4GKi8u7r1nrWQXdtsj2ACZqaDPSihD",
-                            "-sporkaddr=ygcG5S2pQz2U1UAaHvU6EznKZW7yapKMA7",
-                            "-sporkaddr=yfLSXFfipnkgYioD6L8aUNyfRgEBuJv48h",
-                            "-sporkaddr=yNsMZhEhYqv14TgdYb1NS2UmNZjE8FSJxa",
-                            "-sporkaddr=ycbRQWbovrhQMTuxg9p4LAuW5SCMAKqPrn",
-                            "-sporkaddr=yc5TGfcHYoLCrcbVy4umsiDjsYUn39vLui",
+        self.start_node(4, ["-sporkkey=94N31JxLB5dV1cPruNtZAuonE4ttxyBQ36bPc3omD3MCYiWjPNt",
+                            "-sporkaddr=nPCNoPqJ57ENu6uZfnimi267vLgsuT6HFv",
+                            "-sporkaddr=n8hdGQt6N9BgCnTmqwrEHzsTGLm7MwbNst",
+                            "-sporkaddr=nNFe5kSc6KcuezjZavqizjfuqY9rj5JTxh",
+                            "-sporkaddr=n7LfDRBkE65bhpwqT4MzJRB6QxKsATWUdA",
+                            "-sporkaddr=nJSbynYfQVWBnC5SdDTTzDD8bpvJ4ftD6t",
                             "-minsporkkeys=3"])
         # connect nodes at start
         for i in range(0, 5):

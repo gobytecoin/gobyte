@@ -57,9 +57,9 @@ class SpentIndexTest(BitcoinTestFramework):
         # Check that
         self.log.info("Testing spent index...")
 
-        privkey = "cU4zhap7nPJAWeMFu4j6jLrfPmqakDAzy8zn8Fhb3oEevdm4e5Lc"
-        address = "yeMpGzMj3rhtnz48XsfpB8itPHhHtgxLc3"
-        addressHash = binascii.unhexlify("C5E4FB9171C22409809A3E8047A29C83886E325D")
+        privkey = "cYMtSnGZZKXEstrG9jqUw8TuKLPvK8ppMqfhw87ZPQzHGoMwnjuk"
+        address = "nGJ8GucyGXWzCFiapA1pdc8xvrWppoVFMN"
+        addressHash = binascii.unhexlify("7D7F5375C03671062A29B090B476B8E3D5CBABE2")
         scriptPubKey = CScript([OP_DUP, OP_HASH160, addressHash, OP_EQUALVERIFY, OP_CHECKSIG])
         unspent = self.nodes[0].listunspent()
         tx = CTransaction()
@@ -97,9 +97,9 @@ class SpentIndexTest(BitcoinTestFramework):
         assert_equal(txVerbose2["vin"][0]["valueSat"] - tx_fee_sat, amount)
 
         # Check that verbose raw transaction includes address values and input values
-        privkey2 = "cU4zhap7nPJAWeMFu4j6jLrfPmqakDAzy8zn8Fhb3oEevdm4e5Lc"
-        address2 = "yeMpGzMj3rhtnz48XsfpB8itPHhHtgxLc3"
-        addressHash2 = binascii.unhexlify("C5E4FB9171C22409809A3E8047A29C83886E325D")
+        privkey2 = "cYMtSnGZZKXEstrG9jqUw8TuKLPvK8ppMqfhw87ZPQzHGoMwnjuk"
+        address2 = "nGJ8GucyGXWzCFiapA1pdc8xvrWppoVFMN"
+        addressHash2 = binascii.unhexlify("7D7F5375C03671062A29B090B476B8E3D5CBABE2")
         scriptPubKey2 = CScript([OP_DUP, OP_HASH160, addressHash2, OP_EQUALVERIFY, OP_CHECKSIG])
         tx2 = CTransaction()
         tx2.vin = [CTxIn(COutPoint(int(txid, 16), 0))]

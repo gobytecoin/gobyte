@@ -247,7 +247,7 @@ BOOST_FIXTURE_TEST_CASE(dip3_activation, TestChainDIP3BeforeActivationSetup)
     auto utxos = BuildSimpleUtxoMap(coinbaseTxns);
     CKey ownerKey;
     CBLSSecretKey operatorKey;
-    CTxDestination payoutDest = DecodeDestination("yRq1Ky1AfFmf597rnotj7QRxsDUKePVWNF");
+    CTxDestination payoutDest = DecodeDestination("nJJpG743J1t47K3gxQ8MzSYvN7ATgYwgd5");
     auto tx = CreateProRegTx(utxos, 1, GetScriptForDestination(payoutDest), coinbaseKey, ownerKey, operatorKey);
     std::vector<CMutableTransaction> txns = {tx};
 

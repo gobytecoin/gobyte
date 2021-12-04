@@ -51,7 +51,7 @@ TEST_EXIT_PASSED = 0
 TEST_EXIT_FAILED = 1
 TEST_EXIT_SKIPPED = 77
 
-GENESISTIME = 1417713337
+GENESISTIME = 1510727100
 
 class BitcoinTestFramework():
     """Base class for a bitcoin test script.
@@ -531,7 +531,7 @@ class GoByteTestFramework(BitcoinTestFramework):
             extra_args = [[]] * num_nodes
         assert_equal(len(extra_args), num_nodes)
         self.extra_args = [copy.deepcopy(a) for a in extra_args]
-        self.extra_args[0] += ["-sporkkey=cP4EKFyJsHT39LDqgdcB43Y3YXjNyjb5Fuas1GQSeAtjnZWmZEQK"]
+        self.extra_args[0] += ["-sporkkey=cYMtSnGZZKXEstrG9jqUw8TuKLPvK8ppMqfhw87ZPQzHGoMwnjuk"]
         self.fast_dip3_enforcement = fast_dip3_enforcement
         if fast_dip3_enforcement:
             for i in range(0, num_nodes):
