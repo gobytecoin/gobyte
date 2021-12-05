@@ -339,7 +339,7 @@ void protx_register_fund_help(CWallet* const pwallet)
             "\nResult:\n"
             "\"txid\"                        (string) The transaction id.\n"
             "\nExamples:\n"
-            + HelpExampleCli("protx", "register_fund \"XrVhS9LogauRJGJu2sHuryjhpuex4RNPSb\" \"1.2.3.4:1234\" \"Xt9AMWaYSz7tR7Uo7gzXA3m4QmeWgrR3rr\" \"93746e8731c57f87f79b3620a7982924e2931717d49540a85864bd543de11c43fb868fd63e501a1db37e19ed59ae6db4\" \"Xt9AMWaYSz7tR7Uo7gzXA3m4QmeWgrR3rr\" 0 \"XrVhS9LogauRJGJu2sHuryjhpuex4RNPSb\"")
+            + HelpExampleCli("protx", "register_fund \"GYQB3b2EhTHQcPT4SmnFmE8Jmc1a7uTNg1\" \"1.2.3.4:1234\" \"GYZRiAQRyXnwzgmvv5ma6cisByNhaRc8AU\" \"93746e8731c57f87f79b3620a7982924e2931717d49540a85864bd543de11c43fb868fd63e501a1db37e19ed59ae6db4\" \"GYZRiAQRyXnwzgmvv5ma6cisByNhaRc8AU\" 0 \"GYQB3b2EhTHQcPT4SmnFmE8Jmc1a7uTNg1\"")
     );
 }
 
@@ -364,7 +364,7 @@ void protx_register_help(CWallet* const pwallet)
             "\nResult:\n"
             "\"txid\"                        (string) The transaction id.\n"
             "\nExamples:\n"
-            + HelpExampleCli("protx", "register \"0123456701234567012345670123456701234567012345670123456701234567\" 0 \"1.2.3.4:1234\" \"Xt9AMWaYSz7tR7Uo7gzXA3m4QmeWgrR3rr\" \"93746e8731c57f87f79b3620a7982924e2931717d49540a85864bd543de11c43fb868fd63e501a1db37e19ed59ae6db4\" \"Xt9AMWaYSz7tR7Uo7gzXA3m4QmeWgrR3rr\" 0 \"XrVhS9LogauRJGJu2sHuryjhpuex4RNPSb\"")
+            + HelpExampleCli("protx", "register \"0123456701234567012345670123456701234567012345670123456701234567\" 0 \"1.2.3.4:1234\" \"GYZRiAQRyXnwzgmvv5ma6cisByNhaRc8AU\" \"93746e8731c57f87f79b3620a7982924e2931717d49540a85864bd543de11c43fb868fd63e501a1db37e19ed59ae6db4\" \"GYZRiAQRyXnwzgmvv5ma6cisByNhaRc8AU\" 0 \"GYQB3b2EhTHQcPT4SmnFmE8Jmc1a7uTNg1\"")
     );
 }
 
@@ -393,7 +393,7 @@ void protx_register_prepare_help()
             "                              the collateral key.\n"
             "}\n"
             "\nExamples:\n"
-            + HelpExampleCli("protx", "register_prepare \"0123456701234567012345670123456701234567012345670123456701234567\" 0 \"1.2.3.4:1234\" \"Xt9AMWaYSz7tR7Uo7gzXA3m4QmeWgrR3rr\" \"93746e8731c57f87f79b3620a7982924e2931717d49540a85864bd543de11c43fb868fd63e501a1db37e19ed59ae6db4\" \"Xt9AMWaYSz7tR7Uo7gzXA3m4QmeWgrR3rr\" 0 \"XrVhS9LogauRJGJu2sHuryjhpuex4RNPSb\"")
+            + HelpExampleCli("protx", "register_prepare \"0123456701234567012345670123456701234567012345670123456701234567\" 0 \"1.2.3.4:1234\" \"GYZRiAQRyXnwzgmvv5ma6cisByNhaRc8AU\" \"93746e8731c57f87f79b3620a7982924e2931717d49540a85864bd543de11c43fb868fd63e501a1db37e19ed59ae6db4\" \"GYZRiAQRyXnwzgmvv5ma6cisByNhaRc8AU\" 0 \"GYQB3b2EhTHQcPT4SmnFmE8Jmc1a7uTNg1\"")
     );
 }
 
@@ -722,7 +722,7 @@ void protx_update_registrar_help(CWallet* const pwallet)
             "\nResult:\n"
             "\"txid\"                        (string) The transaction id.\n"
             "\nExamples:\n"
-            + HelpExampleCli("protx", "update_registrar \"0123456701234567012345670123456701234567012345670123456701234567\" \"982eb34b7c7f614f29e5c665bc3605f1beeef85e3395ca12d3be49d2868ecfea5566f11cedfad30c51b2403f2ad95b67\" \"XwnLY9Tf7Zsef8gMGL2fhWA9ZmMjt4KPwG\"")
+            + HelpExampleCli("protx", "update_registrar \"0123456701234567012345670123456701234567012345670123456701234567\" \"982eb34b7c7f614f29e5c665bc3605f1beeef85e3395ca12d3be49d2868ecfea5566f11cedfad30c51b2403f2ad95b67\" \"GRDScwm14buqH1Wv1K6SMwNKGUHa4Jt2nb\"")
     );
 }
 

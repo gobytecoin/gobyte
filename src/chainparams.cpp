@@ -324,7 +324,7 @@ public:
         consensus.DIP0001Height = 124992;
         consensus.DIP0003Height = 790000;
         consensus.DIP0003EnforcementHeight = 795000;
-        consensus.DIP0003EnforcementHash = uint256();
+        consensus.DIP0003EnforcementHash = uint256S("00000000075594bad1f166d92727dc9afc4bfacd352d98c7a6e9f91c5b948ad1");
         consensus.powLimit = uint256S("00000fffff000000000000000000000000000000000000000000000000000000");
         consensus.nPowTargetTimespan = 60 * 60; // GoByte: 1 hour, 24 blocks
         consensus.nPowTargetSpacing = 2.5 * 60; // GoByte: 2.5 minutes
@@ -380,10 +380,10 @@ public:
         consensus.vDeployments[Consensus::DEPLOYMENT_REALLOC].nFalloffCoeff = 5; // this corresponds to 10 periods
 
         // The best chain should have at least this much work.
-        consensus.nMinimumChainWork = uint256S("0x000000000000000000000000000000000000000000000000087f3c61c6af5e6a"); // 772700
+        consensus.nMinimumChainWork = uint256S("0x0000000000000000000000000000000000000000000000000882ead24461b2ab"); // 800000
 
         // By default assume that the signatures in ancestors of this block are valid.
-        consensus.defaultAssumeValid = uint256S("0x0000000008941cc91fc012831c9db33b757b95db2c49ebb15e6777a2b2af508d"); // 772700
+        consensus.defaultAssumeValid = uint256S("0x00000000bfae74de004393d77f6f9ed116465984465b0e9a761987d1e5182cfe"); // 800000
 
         /**
          * The message start string is designed to be unlikely to occur in normal data.
@@ -492,12 +492,13 @@ public:
                 {650000, uint256S("0x000000000f301e4ca7b252764aef8e28aace74fdd31176edab0ba40abd47e734")},
                 {705900, uint256S("0x0000000001a58009d78d5919f0922875a1f9041c1b02c800214963c7a46b6871")},
                 {772700, uint256S("0x0000000008941cc91fc012831c9db33b757b95db2c49ebb15e6777a2b2af508d")},
+                {800000, uint256S("0x00000000bfae74de004393d77f6f9ed116465984465b0e9a761987d1e5182cfe")},
             }
         };
 
         chainTxData = ChainTxData{
-            1633011921, // * UNIX timestamp of last known number of transactions (Block 772700)
-            1268540,   // * total number of transactions between genesis and that timestamp
+            1637363393, // * UNIX timestamp of last known number of transactions (Block 800000)
+            1309267,   // * total number of transactions between genesis and that timestamp
                        //   (the tx=... number in the SetBestChain debug.log lines)
             0.01    // * estimated number of transactions per second after that timestamp
         };
@@ -533,7 +534,7 @@ public:
         consensus.DIP0001Height = 2950;
         consensus.DIP0003Height = 3000;
         consensus.DIP0003EnforcementHeight = 3500;
-        consensus.DIP0003EnforcementHash = uint256();
+        consensus.DIP0003EnforcementHash = uint256S("00000daf50c206bbd55d1c0eef1a0bf11a2169768e431da760e37aafaa43fccf");
         consensus.powLimit = uint256S("00000fffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"); // ~uint256(0) >> 20
         consensus.nPowTargetTimespan = 60 * 60; // GoByte: 1 hour, 24 blocks
         consensus.nPowTargetSpacing = 2.5 * 60; // GoByte: 150 seconds
@@ -589,10 +590,10 @@ public:
         consensus.vDeployments[Consensus::DEPLOYMENT_REALLOC].nFalloffCoeff = 5; // this corresponds to 10 periods
 
         // The best chain should have at least this much work.
-        consensus.nMinimumChainWork = uint256S("0x000000000000000000000000000000000000000000000000000000012dcc19a7"); // 2349 getblockheader
+        consensus.nMinimumChainWork = uint256S("0x000000000000000000000000000000000000000000000000000000148ae6172d"); // 80500 getblockheader
 
         // By default assume that the signatures in ancestors of this block are valid.
-        consensus.defaultAssumeValid = uint256S("0x0x00000091281586ffa24362e2adce9af51b9a899e9e09f88d389c33ef14855c45"); // 2349 getblockhash
+        consensus.defaultAssumeValid = uint256S("0x000008f3916001ce53e31c7b55bddad4cfdc6dc2ca878fc15ab503e79b73626b"); // 80500 getblockhash
 
         pchMessageStart[0] = 0xd1;
         pchMessageStart[1] = 0x2b;
@@ -658,14 +659,15 @@ public:
                 {999, uint256S("0x000000463cc00b83ca1c6448e1659b588a454c34f3334c5f50c94b16c4257239")},
                 {1299, uint256S("0x00000591a751dab5204cfb18fcba053a8307159f4d0bad035c0a11e1bcb65749")},
                 {2349, uint256S("0x00000091281586ffa24362e2adce9af51b9a899e9e09f88d389c33ef14855c45")},
+                {80500, uint256S("0x000008f3916001ce53e31c7b55bddad4cfdc6dc2ca878fc15ab503e79b73626b")},
             }
         };
 
         chainTxData = ChainTxData{
-            1622470372, // * UNIX timestamp of last known number of transactions (Block 1364)
-            2353,    // * total number of transactions between genesis and that timestamp
+            1637424520, // * UNIX timestamp of last known number of transactions (Block 1364)
+            98944,    // * total number of transactions between genesis and that timestamp
                         //   (the tx=... number in the SetBestChain debug.log lines)
-            0.004      // * estimated number of transactions per second after that timestamp
+            0.001      // * estimated number of transactions per second after that timestamp
         };
 
     }

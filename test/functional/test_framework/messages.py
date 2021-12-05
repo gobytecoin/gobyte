@@ -27,7 +27,7 @@ from test_framework.util import hex_str_to_bytes, bytes_to_hex_str, wait_until
 import neoscrypt
 
 MIN_VERSION_SUPPORTED = 60001
-MY_VERSION = 70214  # MIN_PEER_PROTO_VERSION
+MY_VERSION = 70210  # MIN_PEER_PROTO_VERSION
 MY_SUBVERSION = b"/python-mininode-tester:0.0.3/"
 MY_SUBVERSION_DEVNET = b"/python-mininode-tester:0.0.3,devnet=devnet-%s/"
 MY_RELAY = 1 # from version 70001 onwards, fRelay should be appended to version messages (BIP37)

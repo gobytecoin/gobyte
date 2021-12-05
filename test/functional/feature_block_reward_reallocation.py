@@ -151,11 +151,11 @@ class BlockRewardReallocationTest(GoByteTestFramework):
         # This applies even if reallocation was activated right at superblock height like it does here
         bt = self.nodes[0].getblocktemplate()
         assert_equal(bt['height'], 2500)
-        assert_equal(bt['masternode'][0]['amount'], get_masternode_payment(bt['height'], bt['coinbasevalue'], 2500))
+        assert_equal(bt['masternode'][0]['amount'], get_masternode_payment(bt['height'], bt['coinbasevalue']))
         self.nodes[0].generate(9)
         self.sync_blocks()
         bt = self.nodes[0].getblocktemplate()
-        assert_equal(bt['masternode'][0]['amount'], get_masternode_payment(bt['height'], bt['coinbasevalue'], 2500))
+        assert_equal(bt['masternode'][0]['amount'], get_masternode_payment(bt['height'], bt['coinbasevalue']))
         assert_equal(bt['coinbasevalue'], 13748571607)
         assert_equal(bt['masternode'][0]['amount'], 6874285801) # 0.4999999998
 
@@ -166,7 +166,7 @@ class BlockRewardReallocationTest(GoByteTestFramework):
                 self.nodes[0].generate(10)
                 self.sync_blocks()
                 bt = self.nodes[0].getblocktemplate()
-                assert_equal(bt['masternode'][0]['amount'], get_masternode_payment(bt['height'], bt['coinbasevalue'], 2500))
+                assert_equal(bt['masternode'][0]['amount'], get_masternode_payment(bt['height'], bt['coinbasevalue']))
 
         self.log.info("Reward split should reach ~60/40 after reallocation is done")
         assert_equal(bt['coinbasevalue'], 10221599170)
@@ -178,7 +178,7 @@ class BlockRewardReallocationTest(GoByteTestFramework):
             self.nodes[0].generate(10)
             self.sync_blocks()
             bt = self.nodes[0].getblocktemplate()
-            assert_equal(bt['masternode'][0]['amount'], get_masternode_payment(bt['height'], bt['coinbasevalue'], 2500))
+            assert_equal(bt['masternode'][0]['amount'], get_masternode_payment(bt['height'], bt['coinbasevalue']))
         assert_equal(bt['coinbasevalue'], 9491484944)
         assert_equal(bt['masternode'][0]['amount'], 5694890966) # 0.6
 

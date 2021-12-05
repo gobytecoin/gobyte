@@ -24,7 +24,7 @@ class DIP3Test(BitcoinTestFramework):
         self.setup_clean_chain = True
 
         self.extra_args = ["-budgetparams=10:10:10"]
-        self.extra_args += ["-sporkkey=cP4EKFyJsHT39LDqgdcB43Y3YXjNyjb5Fuas1GQSeAtjnZWmZEQK"]
+        self.extra_args += ["-sporkkey=cYMtSnGZZKXEstrG9jqUw8TuKLPvK8ppMqfhw87ZPQzHGoMwnjuk"]
         self.extra_args += ["-dip3params=135:150"]
 
 
@@ -397,7 +397,7 @@ class DIP3Test(BitcoinTestFramework):
             realloc_height = 99999999
             if realloc_info['status'] == 'active':
                 realloc_height = realloc_info['since']
-            mn_amount = get_masternode_payment(height, coinbasevalue, realloc_height)
+            mn_amount = get_masternode_payment(height, coinbasevalue)
         miner_amount = coinbasevalue - mn_amount
 
         outputs = {miner_address: str(Decimal(miner_amount) / COIN)}
