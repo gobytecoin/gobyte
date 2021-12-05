@@ -2184,6 +2184,14 @@ bool static ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStr
         }
         pfrom->nStartingHeight = nStartingHeight;
 
+        // disconnect nodes that arent at least 16.x series
+        if (pfrom->cleanSubVer.find("0.16") == std::string::npos) {
+            LogPrintf("connected to legacy version (%s), disconnecting from node %s\n", pfrom->cleanSubVer, pfrom->GetId());
+            Misbehaving(pfrom->GetId(), 0);
+            pfrom->fDisconnect = true;
+            return true;
+        }
+
         // set nodes not relaying blocks and tx and not serving (parts) of the historical blockchain as "clients"
         pfrom->fClient = (!(nServices & NODE_NETWORK) && !(nServices & NODE_NETWORK_LIMITED));
 
