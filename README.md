@@ -1,7 +1,7 @@
 ![GitHub Logo](https://raw.githubusercontent.com/gobytecoin/gobyte/master/share/pixmaps/gobyte128.png "GoByte")
 
-GoByte Core v0.16.1 (GBX)
-=========================
+GoByte Core v0.16.2.2 (GBX)
+==========================
 
 https://www.gobyte.network
 
