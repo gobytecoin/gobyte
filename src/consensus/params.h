@@ -67,6 +67,9 @@ enum LLMQType : uint8_t
     LLMQ_TEST = 100, // 3 members, 2 (66%) threshold, one per hour. Params might differ when -llmqtestparams is used
     LLMQ_5_60 = 100, // 5 members, 3 (60%) threshold, one per hour
 
+    // for mainnet only
+    LLMQ_20_60 = 200, // 20 members, 3 (15%) threhold, one per hour
+
     // for devnets only
     LLMQ_DEVNET = 101, // 10 members, 6 (60%) threshold, one per hour. Params might differ when -llmqdevnetparams is used
 };

@@ -246,6 +246,24 @@ static Consensus::LLMQParams llmq50_60 = {
         .recoveryMembers = 25,
 };
 
+static Consensus::LLMQParams llmq20_60 = {
+        .type = Consensus::LLMQ_20_60,
+        .name = "llmq_20_60",
+        .size = 20,
+        .minSize = 5,
+        .threshold = 3,
+
+        .dkgInterval = 24, // one DKG per hour
+        .dkgPhaseBlocks = 2,
+        .dkgMiningWindowStart = 10, // dkgPhaseBlocks * 5 = after finalization
+        .dkgMiningWindowEnd = 18,
+        .dkgBadVotesThreshold = 5,
+
+        .signingActiveQuorumCount = 2, // just a few ones to allow easier testing
+
+        .keepOldConnections = 3,
+};
+
 static Consensus::LLMQParams llmq400_60 = {
         .type = Consensus::LLMQ_400_60,
         .name = "llmq_400_60",
@@ -435,11 +453,12 @@ public:
         vFixedSeeds = std::vector<SeedSpec6>(pnSeed6_main, pnSeed6_main + ARRAYLEN(pnSeed6_main));
 
         // long living quorum params
+        consensus.llmqs[Consensus::LLMQ_20_60] = llmq20_60;
         consensus.llmqs[Consensus::LLMQ_50_60] = llmq50_60;
         consensus.llmqs[Consensus::LLMQ_400_60] = llmq400_60;
         consensus.llmqs[Consensus::LLMQ_400_85] = llmq400_85;
-        consensus.llmqTypeChainLocks = Consensus::LLMQ_400_60;
-        consensus.llmqTypeInstantSend = Consensus::LLMQ_50_60;
+        consensus.llmqChainLocks = Consensus::LLMQ_20_60;
+        consensus.llmqForInstantSend = Consensus::LLMQ_20_60;
 
         fDefaultConsistencyChecks = false;
         fRequireStandard = true;
