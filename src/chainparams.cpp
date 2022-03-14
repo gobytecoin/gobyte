@@ -341,8 +341,8 @@ public:
         consensus.BIP66Height = 245817; // 00000000000b1fa2dfa312863570e13fae9ca7b5566cb27e55422620b469aefa
         consensus.DIP0001Height = 124992;
         consensus.DIP0003Height = 790000;
-        consensus.DIP0003EnforcementHeight = 795000;
-        consensus.DIP0003EnforcementHash = uint256S("00000000075594bad1f166d92727dc9afc4bfacd352d98c7a6e9f91c5b948ad1");
+        consensus.DIP0003EnforcementHeight = 7950000; // todo
+        consensus.DIP0003EnforcementHash = uint256(); // todo
         consensus.powLimit = uint256S("00000fffff000000000000000000000000000000000000000000000000000000");
         consensus.nPowTargetTimespan = 60 * 60; // GoByte: 1 hour, 24 blocks
         consensus.nPowTargetSpacing = 2.5 * 60; // GoByte: 2.5 minutes
