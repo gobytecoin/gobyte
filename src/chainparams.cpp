@@ -457,8 +457,8 @@ public:
         consensus.llmqs[Consensus::LLMQ_50_60] = llmq50_60;
         consensus.llmqs[Consensus::LLMQ_400_60] = llmq400_60;
         consensus.llmqs[Consensus::LLMQ_400_85] = llmq400_85;
-        consensus.llmqChainLocks = Consensus::LLMQ_20_60;
-        consensus.llmqForInstantSend = Consensus::LLMQ_20_60;
+        consensus.llmqTypeChainLocks = Consensus::LLMQ_20_60;
+        consensus.llmqTypeInstantSend = Consensus::LLMQ_20_60;
 
         fDefaultConsistencyChecks = false;
         fRequireStandard = true;
