@@ -127,6 +127,8 @@ bool CQuorumBlockProcessor::ProcessBlock(const CBlock& block, const CBlockIndex*
         return true;
     }
 
+    bool fDIP0003FullActive = pindex->nHeight >= Params().GetConsensus().DIP0003EnforcementNoBypassHeight;
+
     std::map<Consensus::LLMQType, CFinalCommitment> qcs;
     if (!GetCommitmentsFromBlock(block, pindex, qcs, state)) {
         return false;
@@ -152,7 +154,7 @@ bool CQuorumBlockProcessor::ProcessBlock(const CBlock& block, const CBlockIndex*
             return state.DoS(100, false, REJECT_INVALID, "bad-qc-not-allowed");
         }
 
-        if (!hasCommitmentInNewBlock && isCommitmentRequired) {
+        if (!hasCommitmentInNewBlock && isCommitmentRequired && fDIP0003FullActive) {
             // If no non-null commitment was mined for the mining phase yet and the new block does not include
             // a (possibly null) commitment, the block should be rejected.
             return state.DoS(100, false, REJECT_INVALID, "bad-qc-missing");

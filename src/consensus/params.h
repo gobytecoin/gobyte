@@ -172,6 +172,8 @@ struct Params {
     int DIP0003Height;
     /** Block height at which DIP0003 becomes enforced */
     int DIP0003EnforcementHeight;
+    /** Block height at which DIP0003 becomes enforced with no exceptions */
+    int DIP0003EnforcementNoBypassHeight;
     uint256 DIP0003EnforcementHash;
     /**
      * Minimum blocks including miner confirmation of the total of nMinerConfirmationWindow blocks in a retargeting period,

@@ -342,6 +342,7 @@ public:
         consensus.DIP0001Height = 124992;
         consensus.DIP0003Height = 790000;
         consensus.DIP0003EnforcementHeight = 795000;
+        consensus.DIP0003EnforcementNoBypassHeight = 895000;
         consensus.DIP0003EnforcementHash = uint256S("00000000075594bad1f166d92727dc9afc4bfacd352d98c7a6e9f91c5b948ad1");
         consensus.powLimit = uint256S("00000fffff000000000000000000000000000000000000000000000000000000");
         consensus.nPowTargetTimespan = 60 * 60; // GoByte: 1 hour, 24 blocks
