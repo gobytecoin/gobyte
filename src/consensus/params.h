@@ -65,6 +65,7 @@ enum LLMQType : uint8_t
 
     // for testing only
     LLMQ_TEST = 100, // 3 members, 2 (66%) threshold, one per hour. Params might differ when -llmqtestparams is used
+    LLMQ_TESTNET = 100, // 3 members, 2 (66%) threshold, one per hour.
     LLMQ_5_60 = 100, // 5 members, 3 (60%) threshold, one per hour
 
     // for mainnet only

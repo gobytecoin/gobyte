@@ -187,6 +187,26 @@ static Consensus::LLMQParams llmq_test = {
         .recoveryMembers = 3,
 };
 
+// this one is for testing only
+static Consensus::LLMQParams llmq_testnet = {
+        .type = Consensus::LLMQ_TESTNET,
+        .name = "llmq_testnet",
+        .size = 3,
+        .minSize = 2,
+        .threshold = 2,
+
+        .dkgInterval = 24, // one DKG per hour
+        .dkgPhaseBlocks = 2,
+        .dkgMiningWindowStart = 10, // dkgPhaseBlocks * 5 = after finalization
+        .dkgMiningWindowEnd = 18,
+        .dkgBadVotesThreshold = 2,
+
+        .signingActiveQuorumCount = 2, // just a few ones to allow easier testing
+
+        .keepOldConnections = 3,
+        .recoveryMembers = 3,
+};
+
 // this one is for devnets only
 static Consensus::LLMQParams llmq_devnet = {
         .type = Consensus::LLMQ_DEVNET,
@@ -556,6 +576,7 @@ public:
         consensus.DIP0003Height = 3000;
         consensus.DIP0003EnforcementHeight = 3500;
         consensus.DIP0003EnforcementHash = uint256S("00000daf50c206bbd55d1c0eef1a0bf11a2169768e431da760e37aafaa43fccf");
+        consensus.DIP0003EnforcementNoBypassHeight = 88204; // in 1.5 days 864 block. current: 87340
         consensus.powLimit = uint256S("00000fffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"); // ~uint256(0) >> 20
         consensus.nPowTargetTimespan = 60 * 60; // GoByte: 1 hour, 24 blocks
         consensus.nPowTargetSpacing = 2.5 * 60; // GoByte: 150 seconds
@@ -650,11 +671,12 @@ public:
         nExtCoinType = 1;
 
         // long living quorum params
+        consensus.llmqs[Consensus::LLMQ_TESTNET] = llmq_testnet;
         consensus.llmqs[Consensus::LLMQ_5_60] = llmq5_60;
         consensus.llmqs[Consensus::LLMQ_400_60] = llmq400_60;
         consensus.llmqs[Consensus::LLMQ_400_85] = llmq400_85;
-        consensus.llmqTypeChainLocks = Consensus::LLMQ_5_60;
-        consensus.llmqTypeInstantSend = Consensus::LLMQ_5_60;
+        consensus.llmqTypeChainLocks = Consensus::LLMQ_TESTNET;
+        consensus.llmqTypeInstantSend = Consensus::LLMQ_TESTNET;
 
         fDefaultConsistencyChecks = false;
         fRequireStandard = false;
@@ -681,14 +703,15 @@ public:
                 {1299, uint256S("0x00000591a751dab5204cfb18fcba053a8307159f4d0bad035c0a11e1bcb65749")},
                 {2349, uint256S("0x00000091281586ffa24362e2adce9af51b9a899e9e09f88d389c33ef14855c45")},
                 {80500, uint256S("0x000008f3916001ce53e31c7b55bddad4cfdc6dc2ca878fc15ab503e79b73626b")},
+                {87300, uint256S("0x000008f5bdfffc2cf9e7a766ef41198b41a0c916ca1976c03d70a7e46c1fe568")},
             }
         };
 
         chainTxData = ChainTxData{
-            1637424520, // * UNIX timestamp of last known number of transactions (Block 1364)
-            98944,    // * total number of transactions between genesis and that timestamp
+            1647678538, // * UNIX timestamp of last known number of transactions (Block 1364)
+            107303,    // * total number of transactions between genesis and that timestamp
                         //   (the tx=... number in the SetBestChain debug.log lines)
-            0.001      // * estimated number of transactions per second after that timestamp
+            0.003      // * estimated number of transactions per second after that timestamp
         };
 
     }
