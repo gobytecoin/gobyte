@@ -188,23 +188,23 @@ static Consensus::LLMQParams llmq_test = {
 };
 
 // this one is for testing only
-static Consensus::LLMQParams llmq_testnet = {
-        .type = Consensus::LLMQ_TESTNET,
-        .name = "llmq_testnet",
-        .size = 3,
-        .minSize = 2,
-        .threshold = 2,
+static Consensus::LLMQParams llmq4_60 = {
+        .type = Consensus::LLMQ_4_60,
+        .name = "llmq_4_60",
+        .size = 4,
+        .minSize = 3,
+        .threshold = 3,
 
         .dkgInterval = 24, // one DKG per hour
         .dkgPhaseBlocks = 2,
         .dkgMiningWindowStart = 10, // dkgPhaseBlocks * 5 = after finalization
         .dkgMiningWindowEnd = 18,
-        .dkgBadVotesThreshold = 2,
+        .dkgBadVotesThreshold = 3,
 
-        .signingActiveQuorumCount = 2, // just a few ones to allow easier testing
+        .signingActiveQuorumCount = 3, // just a few ones to allow easier testing
 
-        .keepOldConnections = 3,
-        .recoveryMembers = 3,
+        .keepOldConnections = 4,
+        .recoveryMembers = 4,
 };
 
 // this one is for devnets only
@@ -671,12 +671,12 @@ public:
         nExtCoinType = 1;
 
         // long living quorum params
-        consensus.llmqs[Consensus::LLMQ_TESTNET] = llmq_testnet;
+        consensus.llmqs[Consensus::LLMQ_4_60] = llmq4_60;
         consensus.llmqs[Consensus::LLMQ_5_60] = llmq5_60;
         consensus.llmqs[Consensus::LLMQ_400_60] = llmq400_60;
         consensus.llmqs[Consensus::LLMQ_400_85] = llmq400_85;
-        consensus.llmqTypeChainLocks = Consensus::LLMQ_TESTNET;
-        consensus.llmqTypeInstantSend = Consensus::LLMQ_TESTNET;
+        consensus.llmqTypeChainLocks = Consensus::LLMQ_4_60;
+        consensus.llmqTypeInstantSend = Consensus::LLMQ_4_60;
 
         fDefaultConsistencyChecks = false;
         fRequireStandard = false;
@@ -704,12 +704,13 @@ public:
                 {2349, uint256S("0x00000091281586ffa24362e2adce9af51b9a899e9e09f88d389c33ef14855c45")},
                 {80500, uint256S("0x000008f3916001ce53e31c7b55bddad4cfdc6dc2ca878fc15ab503e79b73626b")},
                 {87300, uint256S("0x000008f5bdfffc2cf9e7a766ef41198b41a0c916ca1976c03d70a7e46c1fe568")},
+                {87550, uint256S("0x00000df0c085c5867d72af5c72f7cc3ac01f679d873b47813f45247b649f8288")},
             }
         };
 
         chainTxData = ChainTxData{
-            1647678538, // * UNIX timestamp of last known number of transactions (Block 1364)
-            107303,    // * total number of transactions between genesis and that timestamp
+            1647770194, // * UNIX timestamp of last known number of transactions (Block 1364)
+            107556,    // * total number of transactions between genesis and that timestamp
                         //   (the tx=... number in the SetBestChain debug.log lines)
             0.003      // * estimated number of transactions per second after that timestamp
         };
