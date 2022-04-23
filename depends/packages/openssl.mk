@@ -1,8 +1,8 @@
 package=openssl
 $(package)_version=1.0.1k
-$(package)_download_path=https://www.openssl.org/source
+$(package)_download_path=https://www.openssl.org/source/old/1.1.0/
 $(package)_file_name=$(package)-$($(package)_version).tar.gz
-$(package)_sha256_hash=8f9faeaebad088e772f4ef5e38252d472be4d878c6b3a2718c10a4fcebe7a41c
+$(package)_sha256_hash=efa4965f4f773574d6cbda1cf874dbbe455ab1c0d4f906115f867d30444470b1
 $(package)_patches=0001-Add-OpenSSL-termios-fix-for-musl-libc.patch
 
 define $(package)_set_vars
