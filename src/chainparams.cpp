@@ -187,6 +187,26 @@ static Consensus::LLMQParams llmq_test = {
         .recoveryMembers = 3,
 };
 
+// this one is for testing only
+static Consensus::LLMQParams llmq4_60 = {
+        .type = Consensus::LLMQ_4_60,
+        .name = "llmq_4_60",
+        .size = 4,
+        .minSize = 3,
+        .threshold = 3,
+
+        .dkgInterval = 24, // one DKG per hour
+        .dkgPhaseBlocks = 2,
+        .dkgMiningWindowStart = 10, // dkgPhaseBlocks * 5 = after finalization
+        .dkgMiningWindowEnd = 18,
+        .dkgBadVotesThreshold = 3,
+
+        .signingActiveQuorumCount = 3, // just a few ones to allow easier testing
+
+        .keepOldConnections = 4,
+        .recoveryMembers = 4,
+};
+
 // this one is for devnets only
 static Consensus::LLMQParams llmq_devnet = {
         .type = Consensus::LLMQ_DEVNET,
@@ -342,6 +362,7 @@ public:
         consensus.DIP0001Height = 124992;
         consensus.DIP0003Height = 790000;
         consensus.DIP0003EnforcementHeight = 795000;
+        consensus.DIP0003EnforcementNoBypassHeight = 895000;
         consensus.DIP0003EnforcementHash = uint256S("00000000075594bad1f166d92727dc9afc4bfacd352d98c7a6e9f91c5b948ad1");
         consensus.powLimit = uint256S("00000fffff000000000000000000000000000000000000000000000000000000");
         consensus.nPowTargetTimespan = 60 * 60; // GoByte: 1 hour, 24 blocks
@@ -398,10 +419,10 @@ public:
         consensus.vDeployments[Consensus::DEPLOYMENT_REALLOC].nFalloffCoeff = 5; // this corresponds to 10 periods
 
         // The best chain should have at least this much work.
-        consensus.nMinimumChainWork = uint256S("0x00000000000000000000000000000000000000000000000008878de305e64726"); // 858200
+        consensus.nMinimumChainWork = uint256S("0x0000000000000000000000000000000000000000000000000887e2502cb0bbf5"); // 879287
 
         // By default assume that the signatures in ancestors of this block are valid.
-        consensus.defaultAssumeValid = uint256S("0x0000000094dccfc3fff8a24cec653ca0f297736199ce569b4b17a9e9fd72cc1a"); // 858200
+        consensus.defaultAssumeValid = uint256S("0x0000000046fab4b5391f59fe28f0e656716a56e8925ec4502e7e44b2e038e629"); // 879287
 
         /**
          * The message start string is designed to be unlikely to occur in normal data.
@@ -513,14 +534,15 @@ public:
                 {772700, uint256S("0x0000000008941cc91fc012831c9db33b757b95db2c49ebb15e6777a2b2af508d")},
                 {800000, uint256S("0x00000000bfae74de004393d77f6f9ed116465984465b0e9a761987d1e5182cfe")},
                 {858200, uint256S("0x0000000094dccfc3fff8a24cec653ca0f297736199ce569b4b17a9e9fd72cc1a")},
+                {879287, uint256S("0x0000000046fab4b5391f59fe28f0e656716a56e8925ec4502e7e44b2e038e629")},
             }
         };
 
         chainTxData = ChainTxData{
-            1646958892, // * UNIX timestamp of last known number of transactions (Block 858200)
-            1409153,   // * total number of transactions between genesis and that timestamp
+            1650708856, // * UNIX timestamp of last known number of transactions (Block 858200)
+            1444526,   // * total number of transactions between genesis and that timestamp
                        //   (the tx=... number in the SetBestChain debug.log lines)
-            0.01    // * estimated number of transactions per second after that timestamp
+            0.009    // * estimated number of transactions per second after that timestamp
         };
     }
 };
@@ -555,6 +577,7 @@ public:
         consensus.DIP0003Height = 3000;
         consensus.DIP0003EnforcementHeight = 3500;
         consensus.DIP0003EnforcementHash = uint256S("00000daf50c206bbd55d1c0eef1a0bf11a2169768e431da760e37aafaa43fccf");
+        consensus.DIP0003EnforcementNoBypassHeight = 88204; // in 1.5 days 864 block. current: 87340
         consensus.powLimit = uint256S("00000fffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"); // ~uint256(0) >> 20
         consensus.nPowTargetTimespan = 60 * 60; // GoByte: 1 hour, 24 blocks
         consensus.nPowTargetSpacing = 2.5 * 60; // GoByte: 150 seconds
@@ -610,10 +633,10 @@ public:
         consensus.vDeployments[Consensus::DEPLOYMENT_REALLOC].nFalloffCoeff = 5; // this corresponds to 10 periods
 
         // The best chain should have at least this much work.
-        consensus.nMinimumChainWork = uint256S("0x000000000000000000000000000000000000000000000000000000148ae6172d"); // 80500 getblockheader
+        consensus.nMinimumChainWork = uint256S("0x00000000000000000000000000000000000000000000000000000017848646c7"); // 92686 getblockheader
 
         // By default assume that the signatures in ancestors of this block are valid.
-        consensus.defaultAssumeValid = uint256S("0x000008f3916001ce53e31c7b55bddad4cfdc6dc2ca878fc15ab503e79b73626b"); // 80500 getblockhash
+        consensus.defaultAssumeValid = uint256S("0x0000014ccdeeb7d715bc7e16821801b1d89751683fa3f033fccf64d836f53262"); // 92686 getblockhash
 
         pchMessageStart[0] = 0xd1;
         pchMessageStart[1] = 0x2b;
@@ -649,11 +672,12 @@ public:
         nExtCoinType = 1;
 
         // long living quorum params
+        consensus.llmqs[Consensus::LLMQ_4_60] = llmq4_60;
         consensus.llmqs[Consensus::LLMQ_5_60] = llmq5_60;
         consensus.llmqs[Consensus::LLMQ_400_60] = llmq400_60;
         consensus.llmqs[Consensus::LLMQ_400_85] = llmq400_85;
-        consensus.llmqTypeChainLocks = Consensus::LLMQ_5_60;
-        consensus.llmqTypeInstantSend = Consensus::LLMQ_5_60;
+        consensus.llmqTypeChainLocks = Consensus::LLMQ_4_60;
+        consensus.llmqTypeInstantSend = Consensus::LLMQ_4_60;
 
         fDefaultConsistencyChecks = false;
         fRequireStandard = false;
@@ -680,12 +704,15 @@ public:
                 {1299, uint256S("0x00000591a751dab5204cfb18fcba053a8307159f4d0bad035c0a11e1bcb65749")},
                 {2349, uint256S("0x00000091281586ffa24362e2adce9af51b9a899e9e09f88d389c33ef14855c45")},
                 {80500, uint256S("0x000008f3916001ce53e31c7b55bddad4cfdc6dc2ca878fc15ab503e79b73626b")},
+                {87300, uint256S("0x000008f5bdfffc2cf9e7a766ef41198b41a0c916ca1976c03d70a7e46c1fe568")},
+                {87550, uint256S("0x00000df0c085c5867d72af5c72f7cc3ac01f679d873b47813f45247b649f8288")},
+                {92686, uint256S("0x0000014ccdeeb7d715bc7e16821801b1d89751683fa3f033fccf64d836f53262")},
             }
         };
 
         chainTxData = ChainTxData{
-            1637424520, // * UNIX timestamp of last known number of transactions (Block 1364)
-            98944,    // * total number of transactions between genesis and that timestamp
+            1650713416, // * UNIX timestamp of last known number of transactions (Block 92686)
+            118900,    // * total number of transactions between genesis and that timestamp
                         //   (the tx=... number in the SetBestChain debug.log lines)
             0.001      // * estimated number of transactions per second after that timestamp
         };

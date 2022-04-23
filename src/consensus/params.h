@@ -65,6 +65,7 @@ enum LLMQType : uint8_t
 
     // for testing only
     LLMQ_TEST = 100, // 3 members, 2 (66%) threshold, one per hour. Params might differ when -llmqtestparams is used
+    LLMQ_4_60 = 102, // 4 members, 3 (60%) threshold, one per hour.
     LLMQ_5_60 = 100, // 5 members, 3 (60%) threshold, one per hour
 
     // for mainnet only
@@ -172,6 +173,8 @@ struct Params {
     int DIP0003Height;
     /** Block height at which DIP0003 becomes enforced */
     int DIP0003EnforcementHeight;
+    /** Block height at which DIP0003 becomes enforced with no exceptions */
+    int DIP0003EnforcementNoBypassHeight;
     uint256 DIP0003EnforcementHash;
     /**
      * Minimum blocks including miner confirmation of the total of nMinerConfirmationWindow blocks in a retargeting period,
