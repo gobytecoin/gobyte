@@ -1,16 +1,32 @@
-![GitHub Logo](https://raw.githubusercontent.com/gobytecoin/gobyte/master/share/pixmaps/gobyte128.png "GoByte")
+GoByte Core staging tree
+===========================
 
-GoByte Core v0.16.2.2 (GBX)
-==========================
+| `master` | `develop` |
+| -------- | --------- |
+| [![Build Status](https://github.com/gobytecoin/gobyte/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/gobytecoin/gobyte/actions/workflows/ci.yml) | [![Build Status](https://github.com/gobytecoin/gobyte/actions/workflows/ci.yml/badge.svg?branch=develop)](https://github.com/gobytecoin/gobyte/actions/workflows/ci.yml) |
 
 https://www.gobyte.network
 
+For an immediately usable, binary version of the GoByte Core software, see
+https://www.gobyte.network/downloads/.
+
+GoByte Core connects to the GoByte peer-to-peer network to download and fully
+validate blocks and transactions. It also includes a wallet and graphical user
+interface, which can be optionally built.
+
+Further information about GoByte Core is available in the [doc folder](/doc).
+
 What is GoByte?
-----------------
+-------------
 
-GoByte (GBX) is an innovative cryptocurrency. A form of digital currency secured by cryptography and issued through a decentralized and advanced mining market. Based on GoByte, it's an enhanced and further developed version, featuring the masternode technology with 50% Reward, near-instant and secure payments as well as anonymous transactions. GoByte has great potential for rapid growth and expansion. Based on a total Proof of Work and Masternode system, it is accesible to everyone, it ensures a fair and stable return of investment for the Graphics Processing Units (GPUs) miners and the Masternode holders.
+GoByte is a digital currency that enables instant, private payments to anyone,
+anywhere in the world. GoByte uses peer-to-peer technology to operate with
+no central authority: managing transactions and issuing money are carried out
+collectively by the network. GoByte Core is the name of the open
+source software which enables the use of this currency.
 
-Additional information, wallets, specifications & roadmap: https://bitcointalk.org/index.php?topic=2442185.0
+
+For more information read the original GoByte whitepaper.
 
 License
 -------
@@ -25,7 +41,24 @@ The `master` branch is meant to be stable. Development is normally done in separ
 [Tags](https://github.com/gobytecoin/gobyte/tags) are created to indicate new official,
 stable release versions of GoByte Core.
 
-The contribution workflow is described in [CONTRIBUTING.md](CONTRIBUTING.md).
+The `develop` branch is regularly built (see doc/build-*.md for instructions) and tested, but is not guaranteed to be
+completely stable.
+
+The contribution workflow is described in [CONTRIBUTING.md](CONTRIBUTING.md)
+and useful hints for developers can be found in [doc/developer-notes.md](doc/developer-notes.md).
+
+Build / Compile from Source
+---------------------------
+
+The `./configure`, `make`, and `cmake` steps, as well as build dependencies, are in [./doc/](/doc) as well:
+
+- **Linux**: [./doc/build-unix.md](/doc/build-unix.md) \
+  Ubuntu, Debian, Fedora, Arch, and others
+- **macOS**: [./doc/build-osx.md](/doc/build-osx.md)
+- **Windows**: [./doc/build-windows.md](/doc/build-windows.md)
+- **OpenBSD**: [./doc/build-openbsd.md](/doc/build-openbsd.md)
+- **FreeBSD**: [./doc/build-freebsd.md](/doc/build-freebsd.md)
+- **NetBSD**: [./doc/build-netbsd.md](/doc/build-netbsd.md)
 
 Testing
 -------
@@ -37,16 +70,17 @@ lots of money.
 
 ### Automated Testing
 
-Developers are strongly encouraged to write [unit tests](/doc/unit-tests.md) for new code, and to
+Developers are strongly encouraged to write [unit tests](src/test/README.md) for new code, and to
 submit new unit tests for old code. Unit tests can be compiled and run
-(assuming they weren't disabled in configure) with: `make check`
+(assuming they weren't disabled in configure) with: `make check`. Further details on running
+and extending unit tests can be found in [/src/test/README.md](/src/test/README.md).
 
-There are also [regression and integration tests](/qa) of the RPC interface, written
-in Python, that are run automatically on the build server.
-These tests can be run (if the [test dependencies](/qa) are installed) with: `qa/pull-tester/rpc-tests.py`
+There are also [regression and integration tests](/test), written
+in Python.
+These tests can be run (if the [test dependencies](/test) are installed) with: `test/functional/test_runner.py`
 
-The Travis CI system makes sure that every pull request is built for Windows
-and Linux, OS X, and that unit and sanity tests are automatically run.
+The CI (Continuous Integration) systems make sure that every pull request is built for Windows, Linux, and macOS,
+and that unit/sanity tests are run automatically.
 
 ### Manual Quality Assurance (QA) Testing
 
@@ -54,3 +88,15 @@ Changes should be tested by somebody other than the developer who wrote the
 code. This is especially important for large or high-risk changes. It is useful
 to add a test plan to the pull request description if testing the changes is
 not straightforward.
+
+Translations
+------------
+
+Changes to translations as well as new translations can be submitted to
+[GoByte Core's Transifex page](https://explore.transifex.com/gobyte/gobyte/).
+
+Translations are periodically pulled from Transifex and merged into the git repository. See the
+[translation process](doc/translation_process.md) for details on how this works.
+
+**Important**: We do not accept translation changes as GitHub pull requests because the next
+pull from Transifex would automatically overwrite them again.
