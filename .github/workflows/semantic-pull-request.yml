@@ -50,3 +50,4 @@ jobs:
             utils
             wallet
             zmq
+            guix
