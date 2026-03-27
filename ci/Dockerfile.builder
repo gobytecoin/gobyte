@@ -24,8 +24,8 @@ ARG USER_ID=1000
 ARG GROUP_ID=1000
 
 # add user with specified (or default) user/group ids
-ENV USER_ID ${USER_ID}
-ENV GROUP_ID ${GROUP_ID}
+ENV USER_ID=${USER_ID}
+ENV GROUP_ID=${GROUP_ID}
 RUN groupadd -g ${GROUP_ID} gobyte
 RUN useradd -u ${USER_ID} -g gobyte -s /bin/bash -m -d /gobyte gobyte
 
