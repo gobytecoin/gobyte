@@ -2,7 +2,7 @@
 
 This issue tracker is only for technical issues related to GoByte Core.
 
-General GoByte questions and/or support requests and are best directed to the [GoByte Reddit](https://www.reddit.com/r/gobytenetwork/).
+General GoByte questions and/or support requests are best directed to the [GoByte Reddit](https://www.reddit.com/r/gobytenetwork/).
 
 To report critical security issues, email infosec@gobyte.network and/or see the GoByte bug bounty program on [Bugcrowd](https://bugcrowd.com/gobytenetwork) instead of creating Github issues.
 
