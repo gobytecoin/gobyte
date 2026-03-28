@@ -41,10 +41,10 @@ rm -rf build-ci
 mkdir build-ci
 cd build-ci
 
-../configure --cache-file=config.cache "$BITCOIN_CONFIG_ALL" "$BITCOIN_CONFIG" || ( cat config.log && false)
+../configure --cache-file=config.cache $BITCOIN_CONFIG_ALL $BITCOIN_CONFIG || ( cat config.log && false)
 make distdir VERSION="$BUILD_TARGET"
 
 cd gobytecore-"$BUILD_TARGET"
-./configure --cache-file=../config.cache "$BITCOIN_CONFIG_ALL" "$BITCOIN_CONFIG" || ( cat config.log && false)
+./configure --cache-file=../config.cache $BITCOIN_CONFIG_ALL $BITCOIN_CONFIG || ( cat config.log && false)
 
 make "$MAKEJOBS" "$GOAL" || ( echo "Build failure. Verbose build follows." && make "$GOAL" V=1 ; false )

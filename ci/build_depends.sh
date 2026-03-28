@@ -31,4 +31,4 @@ if [ -n "$OSX_SDK" ]; then
   fi
 fi
 
-make "$MAKEJOBS" -C depends HOST="$HOST" "$DEP_OPTS"
+make "$MAKEJOBS" -C depends HOST="$HOST" $DEP_OPTS
