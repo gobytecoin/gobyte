@@ -2,9 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [develop, master]
-  pull_request:
-    branches: [develop]
+  pull_request_target:
 
 permissions:
   actions: read
@@ -193,6 +191,7 @@ jobs:
 
       - name: Run unit tests
         if: matrix.run_unit_tests
+        timeout-minutes: 60
         run: |
           docker run -t --rm \
             --user "$(id -u):$(id -g)" \
@@ -213,6 +212,7 @@ jobs:
 
       - name: Run integration tests
         if: matrix.run_integration_tests
+        timeout-minutes: 60
         run: |
           docker run -t --rm \
             --user "$(id -u):$(id -g)" \
