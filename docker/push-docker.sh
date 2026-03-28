@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-cd $DIR/..
+cd "$DIR"/.. || exit
 
 DOCKER_IMAGE=${DOCKER_IMAGE:-gobytecoin/gobyted-develop}
 DOCKER_TAG=${DOCKER_TAG:-latest}
@@ -12,6 +12,6 @@ else
   DOCKER_IMAGE_WITH_REPO=$DOCKER_IMAGE
 fi
 
-docker tag $DOCKER_IMAGE:$DOCKER_TAG $DOCKER_IMAGE_WITH_REPO:$DOCKER_TAG
-docker push $DOCKER_IMAGE_WITH_REPO:$DOCKER_TAG
-docker rmi $DOCKER_IMAGE_WITH_REPO:$DOCKER_TAG
+docker tag "$DOCKER_IMAGE":"$DOCKER_TAG" "$DOCKER_IMAGE_WITH_REPO":"$DOCKER_TAG"
+docker push "$DOCKER_IMAGE_WITH_REPO":"$DOCKER_TAG"
+docker rmi "$DOCKER_IMAGE_WITH_REPO":"$DOCKER_TAG"

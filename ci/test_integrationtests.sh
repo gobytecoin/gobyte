@@ -1,10 +1,15 @@
 #!/usr/bin/env bash
-
+# Copyright (c) 2021-2025 The Dash Core developers
+# Copyright (c) 2025-2026 The GoByte Core developers
+# Distributed under the MIT software license, see the accompanying
+# file COPYING or http://www.opensource.org/licenses/mit-license.php.
+#
 # This script is executed inside the builder image
 
+export LC_ALL=C.UTF-8
 set -e
 
-PASS_ARGS="$@"
+PASS_ARGS=("$@")
 
 source ./ci/matrix.sh
 
@@ -15,11 +20,11 @@ fi
 
 export LD_LIBRARY_PATH=$BUILD_DIR/depends/$HOST/lib
 
-cd build-ci/gobytecore-$BUILD_TARGET
+cd build-ci/gobytecore-"$BUILD_TARGET"
 
 if [ "$SOCKETEVENTS" = "" ]; then
   # Let's switch socketevents mode to some random mode
-  R=$(($RANDOM%3))
+  R=$((RANDOM%3))
   if [ "$R" == "0" ]; then
     SOCKETEVENTS="select"
   elif [ "$R" == "1" ]; then
@@ -32,7 +37,7 @@ echo "Using socketevents mode: $SOCKETEVENTS"
 EXTRA_ARGS="--gobyted-arg=-socketevents=$SOCKETEVENTS"
 
 set +e
-./test/functional/test_runner.py --ci --coverage --failfast --nocleanup --tmpdir=$(pwd)/testdatadirs $PASS_ARGS $EXTRA_ARGS
+./test/functional/test_runner.py --ci --coverage --failfast --nocleanup --tmpdir="$(pwd)/testdatadirs" "${PASS_ARGS[@]}" "$EXTRA_ARGS"
 RESULT=$?
 set -e
 
@@ -40,17 +45,21 @@ echo "Collecting logs..."
 BASEDIR=$(ls testdatadirs)
 if [ "$BASEDIR" != "" ]; then
   mkdir testlogs
-  for d in $(ls testdatadirs/$BASEDIR | grep -v '^cache$'); do
-    mkdir testlogs/$d
-    ./test/functional/combine_logs.py -c ./testdatadirs/$BASEDIR/$d > ./testlogs/$d/combined.log
-    ./test/functional/combine_logs.py --html ./testdatadirs/$BASEDIR/$d > ./testlogs/$d/combined.html
-    cd testdatadirs/$BASEDIR/$d
+  for d in testdatadirs/"$BASEDIR"/*/; do
+    d=$(basename "$d")
+    if [ "$d" = "cache" ]; then
+      continue
+    fi
+    mkdir testlogs/"$d"
+    ./test/functional/combine_logs.py -c ./testdatadirs/"$BASEDIR"/"$d" > ./testlogs/"$d"/combined.log
+    ./test/functional/combine_logs.py --html ./testdatadirs/"$BASEDIR"/"$d" > ./testlogs/"$d"/combined.html
+    cd testdatadirs/"$BASEDIR"/"$d"
     LOGFILES="$(find . -name 'debug.log' -or -name "test_framework.log")"
     cd ../../..
     for f in $LOGFILES; do
-      d2="testlogs/$d/$(dirname $f)"
-      mkdir -p $d2
-      cp testdatadirs/$BASEDIR/$d/$f $d2/
+      d2="testlogs/$d/$(dirname "$f")"
+      mkdir -p "$d2"
+      cp testdatadirs/"$BASEDIR"/"$d"/"$f" "$d2"/
     done
   done
 fi
