@@ -69,20 +69,10 @@ jobs:
             run_unit_tests: false
             run_integration_tests: false
             dep_opts: ""
-          - target: win32
-            host: i686-w64-mingw32
-            run_unit_tests: true
-            run_integration_tests: false
-            dep_opts: ""
           - target: win64
             host: x86_64-w64-mingw32
             run_unit_tests: true
             run_integration_tests: false
-            dep_opts: ""
-          - target: linux32
-            host: i686-pc-linux-gnu
-            run_unit_tests: true
-            run_integration_tests: true
             dep_opts: ""
           - target: linux64
             host: x86_64-unknown-linux-gnu
