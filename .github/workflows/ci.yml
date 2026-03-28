@@ -6,9 +6,23 @@ on:
   pull_request:
     branches: [develop]
 
+permissions:
+  actions: read
+  contents: read
+  packages: write
+
 env:
   DOCKER_BUILDKIT: 1
   COMPOSE_DOCKER_CLI_BUILD: 1
+
+concurrency:
+  group: |
+    ${{ github.workflow }}-${{
+      (vars.ALLOW_CONCURRENCY != '' && github.sha) ||
+      (github.event_name == 'pull_request_target' && github.event.pull_request.number) ||
+      (github.event_name == 'push' && github.ref)
+    }}
+  cancel-in-progress: ${{ github.ref_type != 'tag' }}
 
 jobs:
   builder-image:
