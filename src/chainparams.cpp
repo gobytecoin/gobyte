@@ -70,11 +70,11 @@ static CBlock CreateDevNetGenesisBlock(const uint256& prevBlockHash, const std::
  * transaction cannot be spent since it did not originally exist in the
  * database.
  *
- * CBlock(hash=00000ffd590b14, ver=1, hashPrevBlock=00000000000000, hashMerkleRoot=e0028e, nTime=1390095618, nBits=1e0ffff0, nNonce=28917698, vtx=1)
- *   CTransaction(hash=e0028e, ver=1, vin.size=1, vout.size=1, nLockTime=0)
- *     CTxIn(COutPoint(000000, -1), coinbase 04ffff001d01044c5957697265642030392f4a616e2f3230313420546865204772616e64204578706572696d656e7420476f6573204c6976653a204f76657273746f636b2e636f6d204973204e6f7720416363657074696e6720426974636f696e73)
- *     CTxOut(nValue=50.00000000, scriptPubKey=0xA9037BAC7050C479B121CF)
- *   vMerkleTree: e0028e
+ * CBlock(hash=0000033b01055c, ver=1, hashPrevBlock=00000000000000, hashMerkleRoot=dc9a71, nTime=1510848000, nBits=1e0ffff0, nNonce=1631855, vtx=1)
+ *   CTransaction(hash=dc9a71, ver=1, vin.size=1, vout.size=1, nLockTime=0)
+ *     CTxIn(COutPoint(000000, -1), coinbase 04ffff001d01043a5468652053746172204d616c61797369612031377468204e6f76656d626572203230313720476f427974652047656e65736973205265626f726e)
+ *     CTxOut(nValue=50.00000000, scriptPubKey=0x41043E5A5FBFBB2CAA5F4B)
+ *   vMerkleTree: dc9a71
  */
 static CBlock CreateGenesisBlock(uint32_t nTime, uint32_t nNonce, uint32_t nBits, int32_t nVersion, const CAmount& genesisReward)
 {
@@ -301,8 +301,11 @@ public:
         consensus.nGovernanceMinQuorum = 10;
         consensus.nGovernanceFilterElements = 20000;
         consensus.nMasternodeMinimumConfirmations = 15;
-        consensus.BIP34Height = 1;
-        consensus.BIP34Hash = uint256S("0x00000c8a1ff01bae3f3875c81cb14115429af5744643b34b4ad1cbb7d2d59ca2");
+// BIP34 enforcement begins at height 17: the first height at which
+// PUSHDATA1 is the only minimal encoding for the block height integer,
+// preventing non-minimal coinbase scriptSig encodings from earlier blocks.
+        consensus.BIP34Height = 17;
+        consensus.BIP34Hash = uint256S("0x0000003f796a7213b048b71f86e692206880e9638dce198955fd5f4e16dc8a2d");
         consensus.BIP65Height = 619382; // 00000000000076d8fcea02ec0963de4abfd01e771fec0863f960c2c64fe6f357
         consensus.BIP66Height = 245817; // 00000000000b1fa2dfa312863570e13fae9ca7b5566cb27e55422620b469aefa
         consensus.DIP0001Height = 124992;
@@ -439,7 +442,7 @@ public:
         nPoolNewMaxParticipants = 20;
         nFulfilledRequestExpireTime = 60 * 60; // fulfilled requests expire in 1 hour
 
-        vSporkAddresses = {"GX324HN5jrHLZg1oV1QLsTeuFsPBzhAXNd"};
+        vSporkAddresses = {"GS7REhk1msjCJsmcUdSdpgYBiiyjA1eM6Z"};
         nMinSporkKeys = 1;
         fBIP9CheckMasternodesUpgraded = true;
 
@@ -513,6 +516,9 @@ public:
         consensus.nGovernanceMinQuorum = 1;
         consensus.nGovernanceFilterElements = 500;
         consensus.nMasternodeMinimumConfirmations = 1;
+// BIP34 enforcement begins at height 17: the first height at which
+// PUSHDATA1 is the only minimal encoding for the block height integer,
+// preventing non-minimal coinbase scriptSig encodings from earlier blocks.
         consensus.BIP34Height = 17;
         consensus.BIP34Hash = uint256(); // FIXME: This will need to be updated after the testnet reset && revert to uint256S("0x...")
         consensus.BIP65Height = 500;      // FIXME: This will need to be updated after the testnet reset
@@ -526,7 +532,7 @@ public:
         consensus.nPowTargetSpacing = 2.5 * 60;                                                            // GoByte: 150 seconds
         consensus.fPowAllowMinDifficultyBlocks = true;
         consensus.fPowNoRetargeting = false;
-        consensus.nPowDGWHeight = 650;                   // TODO: make sure to drop all spork6 related code on next testnet reset
+        consensus.nPowDGWHeight = 650;
         consensus.nRuleChangeActivationThreshold = 1512; // 75% for testchains
         consensus.nMinerConfirmationWindow = 2016;       // nPowTargetTimespan / nPowTargetSpacing
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].bit = 28;
@@ -579,7 +585,7 @@ public:
         consensus.nMinimumChainWork = uint256S("0x0000000000000000000000000000000000000000000000000000000000000000"); // FIXME: set to a valid value once we have some blocks mined on testnet
 
         // By default assume that the signatures in ancestors of this block are valid.
-        // consensus.defaultAssumeValid = uint256S("0x000008f3916001ce53e31c7b55bddad4cfdc6dc2ca878fc15ab503e79b73626b"); FIXME: set to a valid block once we have some blocks mined on testnet
+        consensus.defaultAssumeValid = uint256S("0x00"); // FIXME: set to a valid block once we have some blocks mined on testnet
 
         pchMessageStart[0] = 0xd1;
         pchMessageStart[1] = 0x2b;
@@ -588,9 +594,9 @@ public:
         nDefaultPort = 13455;
         nPruneAfterHeight = 1000;
 
-        genesis = CreateGenesisBlock(1743000000, 396944, 0x1e0ffff0, 1, 50 * COIN); // last reset: March 26, 2025
+        genesis = CreateGenesisBlock(1774483200, 359663, 0x1e0ffff0, 1, 50 * COIN); // last reset: March 26, 2026
         consensus.hashGenesisBlock = genesis.GetHash();
-        assert(consensus.hashGenesisBlock == uint256S("0x000001b38a18c71fa97799cc4cd763f5a2e6f046fa91eb94d64c056ffd861049"));
+        assert(consensus.hashGenesisBlock == uint256S("0x00000b103faa9ba192192fa8905fc5b8a11bf79026fa089f8c0742cb79559b56"));
         assert(genesis.hashMerkleRoot == uint256S("0xdc9a719dc1bcda39107ea55424f00cab512170a1cb69efa08531f483f2399f21"));
 
         vFixedSeeds.clear();
@@ -635,21 +641,21 @@ public:
         nPoolNewMaxParticipants = 20;
         nFulfilledRequestExpireTime = 5 * 60; // fulfilled requests expire in 5 minutes
 
-        vSporkAddresses = {"nJtKPFc1ERZx8kwEtDPLnJZzScC5qiCGSB"};
+        vSporkAddresses = {"nKxideDexymYFs3yxMSuJHLN3sNF3koezn"};
         nMinSporkKeys = 1;
         fBIP9CheckMasternodesUpgraded = true;
 
         checkpointData = {
             {
-                {0, uint256S("0x000001b38a18c71fa97799cc4cd763f5a2e6f046fa91eb94d64c056ffd861049")},
+                {0, uint256S("0x00000b103faa9ba192192fa8905fc5b8a11bf79026fa089f8c0742cb79559b56")},
                 // Add more checkpoints as blocks are mined
             }};
 
         chainTxData = ChainTxData{
-            1743000000, // * UNIX timestamp of genesis block (March 26, 2025)
+            1774483200, // * UNIX timestamp of genesis block (March 26, 2026)
             1,          // * total number of transactions (genesis only)
                         //   (the tx=... number in the SetBestChain debug.log lines)
-            0.001       // * estimated number of transactions per second after that timestamp
+            0       // * estimated number of transactions per second after that timestamp
         };
     }
 };
@@ -754,7 +760,7 @@ public:
 
         genesis = CreateGenesisBlock(1564741609, 1096447, 0x207fffff, 1, 50 * COIN);
         consensus.hashGenesisBlock = genesis.GetHash();
-        assert(consensus.hashGenesisBlock == uint256S("0x0000016e388ef82ceeee54a65f885b66216cd0bbf8f30d31ce3ec995d9374d68"));
+        assert(consensus.hashGenesisBlock == uint256S("0x339500f3a84f1d4231087409104fafda47e652bd7e5301d343ceb60ed501c5ac"));
         assert(genesis.hashMerkleRoot == uint256S("0xdc9a719dc1bcda39107ea55424f00cab512170a1cb69efa08531f483f2399f21"));
 
         devnetGenesis = FindDevNetGenesisBlock(genesis, 50 * COIN);
@@ -808,14 +814,14 @@ public:
 
         checkpointData = (CCheckpointData){
             {
-                {0, uint256S("0x0000016e388ef82ceeee54a65f885b66216cd0bbf8f30d31ce3ec995d9374d68")},
+                {0, uint256S("0x339500f3a84f1d4231087409104fafda47e652bd7e5301d343ceb60ed501c5ac")},
                 {1, devnetGenesis.GetHash()},
             }};
 
         chainTxData = ChainTxData{
             devnetGenesis.GetBlockTime(), // * UNIX timestamp of devnet genesis block
             2,                            // * we only have 2 coinbase transactions when a devnet is started up
-            0.01                          // * estimated number of transactions per second
+            0.001                          // * estimated number of transactions per second
         };
     }
 };
