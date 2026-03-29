@@ -514,13 +514,13 @@ public:
         consensus.nGovernanceFilterElements = 500;
         consensus.nMasternodeMinimumConfirmations = 1;
         consensus.BIP34Height = 17;
-        consensus.BIP34Hash = uint256S(); // FIXME: This will need to be updated after the testnet reset
+        consensus.BIP34Hash = uint256(); // FIXME: This will need to be updated after the testnet reset && revert to uint256S("0x...")
         consensus.BIP65Height = 500;      // FIXME: This will need to be updated after the testnet reset
         consensus.BIP66Height = 800;      // FIXME: This will need to be updated after the testnet reset
         consensus.DIP0001Height = 2950;   // FIXME: This will need to be updated after the testnet reset
         consensus.DIP0003Height = 3000;   // FIXME: This will need to be updated after the testnet reset
         consensus.DIP0003EnforcementHeight = 3500;
-        consensus.DIP0003EnforcementHash = uint256S();                                                     // FIXME: This will need to be updated after the testnet reset
+        consensus.DIP0003EnforcementHash = uint256();                                                     // FIXME: This will need to be updated after the testnet reset && revert to uint256S("0x...")
         consensus.powLimit = uint256S("00000fffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"); // ~uint256(0) >> 20
         consensus.nPowTargetTimespan = 60 * 60;                                                            // GoByte: 1 hour, 24 blocks
         consensus.nPowTargetSpacing = 2.5 * 60;                                                            // GoByte: 150 seconds
@@ -530,45 +530,45 @@ public:
         consensus.nRuleChangeActivationThreshold = 1512; // 75% for testchains
         consensus.nMinerConfirmationWindow = 2016;       // nPowTargetTimespan / nPowTargetSpacing
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].bit = 28;
-        consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].nStartTime = 1774915200;    // April 1st, 2026
+        consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].nStartTime = 1775001600;    // April 1st, 2026
         consensus.vDeployments[Consensus::DEPLOYMENT_TESTDUMMY].nTimeout = 999999999999ULL; // infinite
 
         // Deployment of BIP68, BIP112, and BIP113.
         consensus.vDeployments[Consensus::DEPLOYMENT_CSV].bit = 0;
-        consensus.vDeployments[Consensus::DEPLOYMENT_CSV].nStartTime = 1774915200;    // April 1st, 2026
+        consensus.vDeployments[Consensus::DEPLOYMENT_CSV].nStartTime = 1775001600;    // April 1st, 2026
         consensus.vDeployments[Consensus::DEPLOYMENT_CSV].nTimeout = 999999999999ULL; // infinite
 
         // Deployment of DIP0001
         consensus.vDeployments[Consensus::DEPLOYMENT_DIP0001].bit = 1;
-        consensus.vDeployments[Consensus::DEPLOYMENT_DIP0001].nStartTime = 1774915200;    // April 1st, 2026
+        consensus.vDeployments[Consensus::DEPLOYMENT_DIP0001].nStartTime = 1775001600;    // April 1st, 2026
         consensus.vDeployments[Consensus::DEPLOYMENT_DIP0001].nTimeout = 999999999999ULL; // infinite
         consensus.vDeployments[Consensus::DEPLOYMENT_DIP0001].nWindowSize = 100;
         consensus.vDeployments[Consensus::DEPLOYMENT_DIP0001].nThresholdStart = 50; // 50% of 100
 
         // Deployment of BIP147
         consensus.vDeployments[Consensus::DEPLOYMENT_BIP147].bit = 2;
-        consensus.vDeployments[Consensus::DEPLOYMENT_BIP147].nStartTime = 1774915200;    // April 1st, 2026
+        consensus.vDeployments[Consensus::DEPLOYMENT_BIP147].nStartTime = 1775001600;    // April 1st, 2026
         consensus.vDeployments[Consensus::DEPLOYMENT_BIP147].nTimeout = 999999999999ULL; // infinite
         consensus.vDeployments[Consensus::DEPLOYMENT_BIP147].nWindowSize = 100;
         consensus.vDeployments[Consensus::DEPLOYMENT_BIP147].nThresholdStart = 50; // 50% of 100
 
         // Deployment of DIP0003
         consensus.vDeployments[Consensus::DEPLOYMENT_DIP0003].bit = 3;
-        consensus.vDeployments[Consensus::DEPLOYMENT_DIP0003].nStartTime = 1774915200;    // April 1st, 2026
+        consensus.vDeployments[Consensus::DEPLOYMENT_DIP0003].nStartTime = 1775001600;    // April 1st, 2026
         consensus.vDeployments[Consensus::DEPLOYMENT_DIP0003].nTimeout = 999999999999ULL; // infinite
         consensus.vDeployments[Consensus::DEPLOYMENT_DIP0003].nWindowSize = 100;
         consensus.vDeployments[Consensus::DEPLOYMENT_DIP0003].nThresholdStart = 50; // 50% of 100
 
         // Deployment of DIP0008
         consensus.vDeployments[Consensus::DEPLOYMENT_DIP0008].bit = 4;
-        consensus.vDeployments[Consensus::DEPLOYMENT_DIP0008].nStartTime = 1774915200;    // April 1st, 2026
+        consensus.vDeployments[Consensus::DEPLOYMENT_DIP0008].nStartTime = 1775001600;    // April 1st, 2026
         consensus.vDeployments[Consensus::DEPLOYMENT_DIP0008].nTimeout = 999999999999ULL; // infinite
         consensus.vDeployments[Consensus::DEPLOYMENT_DIP0008].nWindowSize = 100;
         consensus.vDeployments[Consensus::DEPLOYMENT_DIP0008].nThresholdStart = 50; // 50% of 100
 
         // Deployment of Block Reward Reallocation
         consensus.vDeployments[Consensus::DEPLOYMENT_REALLOC].bit = 5;
-        consensus.vDeployments[Consensus::DEPLOYMENT_REALLOC].nStartTime = 1774915200;    // April 1st, 2026
+        consensus.vDeployments[Consensus::DEPLOYMENT_REALLOC].nStartTime = 1775001600;    // April 1st, 2026
         consensus.vDeployments[Consensus::DEPLOYMENT_REALLOC].nTimeout = 999999999999ULL; // infinite
         consensus.vDeployments[Consensus::DEPLOYMENT_REALLOC].nWindowSize = 100;
         consensus.vDeployments[Consensus::DEPLOYMENT_REALLOC].nThresholdStart = 80; // 80% of 100
@@ -588,7 +588,7 @@ public:
         nDefaultPort = 13455;
         nPruneAfterHeight = 1000;
 
-        genesis = CreateGenesisBlock(1743000000, 396944, 0x1e0ffff0, 1, 50 * COIN); // last reset: 29 March 2026
+        genesis = CreateGenesisBlock(1743000000, 396944, 0x1e0ffff0, 1, 50 * COIN); // last reset: March 26, 2025
         consensus.hashGenesisBlock = genesis.GetHash();
         assert(consensus.hashGenesisBlock == uint256S("0x000001b38a18c71fa97799cc4cd763f5a2e6f046fa91eb94d64c056ffd861049"));
         assert(genesis.hashMerkleRoot == uint256S("0xdc9a719dc1bcda39107ea55424f00cab512170a1cb69efa08531f483f2399f21"));
@@ -646,7 +646,7 @@ public:
             }};
 
         chainTxData = ChainTxData{
-            1743000000, // * UNIX timestamp of genesis block (March 28, 2026)
+            1743000000, // * UNIX timestamp of genesis block (March 26, 2025)
             1,          // * total number of transactions (genesis only)
                         //   (the tx=... number in the SetBestChain debug.log lines)
             0.001       // * estimated number of transactions per second after that timestamp
