@@ -183,6 +183,23 @@ static std::tuple<std::string, Consensus::LLMQType, uint32_t> BuildInversedHeigh
 
 bool CQuorumBlockProcessor::ProcessCommitment(int nHeight, const uint256& blockHash, const CFinalCommitment& qc, CValidationState& state)
 {
+    // Null commitments for unregistered LLMQ types are a safe no-op: they
+    // carry no cryptographic content and write no quorum state to the EvoDb.
+    // This can occur when a later protocol version introduces a new LLMQ type
+    // and mines null sentinels into blocks that older nodes must also validate.
+    // We must guard here before the unconditional .at() call below, which would
+    // throw std::out_of_range for any type absent from consensus.llmqs.
+    if (!Params().GetConsensus().llmqs.count((Consensus::LLMQType)qc.llmqType)) {
+        if (!qc.IsNull()) {
+            // A non-null commitment for an unknown type is always invalid.
+            return state.DoS(100, false, REJECT_INVALID, "bad-qc-type");
+        }
+        // Null commitment for unknown type: verify structural zero fields only.
+        if (!qc.VerifyNull()) {
+            return state.DoS(100, false, REJECT_INVALID, "bad-qc-invalid-null");
+        }
+        return true;
+    }
     auto& params = Params().GetConsensus().llmqs.at((Consensus::LLMQType)qc.llmqType);
 
     uint256 quorumHash = GetQuorumBlockHash((Consensus::LLMQType)qc.llmqType, nHeight);
