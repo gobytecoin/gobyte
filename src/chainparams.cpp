@@ -70,11 +70,11 @@ static CBlock CreateDevNetGenesisBlock(const uint256& prevBlockHash, const std::
  * transaction cannot be spent since it did not originally exist in the
  * database.
  *
- * CBlock(hash=00000ffd590b14, ver=1, hashPrevBlock=00000000000000, hashMerkleRoot=e0028e, nTime=1390095618, nBits=1e0ffff0, nNonce=28917698, vtx=1)
- *   CTransaction(hash=e0028e, ver=1, vin.size=1, vout.size=1, nLockTime=0)
- *     CTxIn(COutPoint(000000, -1), coinbase 04ffff001d01044c5957697265642030392f4a616e2f3230313420546865204772616e64204578706572696d656e7420476f6573204c6976653a204f76657273746f636b2e636f6d204973204e6f7720416363657074696e6720426974636f696e73)
- *     CTxOut(nValue=50.00000000, scriptPubKey=0xA9037BAC7050C479B121CF)
- *   vMerkleTree: e0028e
+ * CBlock(hash=0000033b01055c, ver=1, hashPrevBlock=00000000000000, hashMerkleRoot=dc9a71, nTime=1510848000, nBits=1e0ffff0, nNonce=1631855, vtx=1)
+ *   CTransaction(hash=dc9a71, ver=1, vin.size=1, vout.size=1, nLockTime=0)
+ *     CTxIn(COutPoint(000000, -1), coinbase 04ffff001d01043a5468652053746172204d616c61797369612031377468204e6f76656d626572203230313720476f427974652047656e65736973205265626f726e)
+ *     CTxOut(nValue=50.00000000, scriptPubKey=0x41043E5A5FBFBB2CAA5F4B)
+ *   vMerkleTree: dc9a71
  */
 static CBlock CreateGenesisBlock(uint32_t nTime, uint32_t nNonce, uint32_t nBits, int32_t nVersion, const CAmount& genesisReward)
 {
@@ -594,9 +594,9 @@ public:
         nDefaultPort = 13455;
         nPruneAfterHeight = 1000;
 
-        genesis = CreateGenesisBlock(1743000000, 413870, 0x1e0ffff0, 1, 50 * COIN); // last reset: March 26, 2025
+        genesis = CreateGenesisBlock(1774483200, 359663, 0x1e0ffff0, 1, 50 * COIN); // last reset: March 26, 2026
         consensus.hashGenesisBlock = genesis.GetHash();
-        assert(consensus.hashGenesisBlock == uint256S("0x000004884661254ce576ee006aab69b00453e0eb8e5175077e234375c248346b"));
+        assert(consensus.hashGenesisBlock == uint256S("0x00000b103faa9ba192192fa8905fc5b8a11bf79026fa089f8c0742cb79559b56"));
         assert(genesis.hashMerkleRoot == uint256S("0xdc9a719dc1bcda39107ea55424f00cab512170a1cb69efa08531f483f2399f21"));
 
         vFixedSeeds.clear();
@@ -647,15 +647,15 @@ public:
 
         checkpointData = {
             {
-                {0, uint256S("0x000004884661254ce576ee006aab69b00453e0eb8e5175077e234375c248346b")},
+                {0, uint256S("0x00000b103faa9ba192192fa8905fc5b8a11bf79026fa089f8c0742cb79559b56")},
                 // Add more checkpoints as blocks are mined
             }};
 
         chainTxData = ChainTxData{
-            1743000000, // * UNIX timestamp of genesis block (March 26, 2025)
+            1774483200, // * UNIX timestamp of genesis block (March 26, 2026)
             1,          // * total number of transactions (genesis only)
                         //   (the tx=... number in the SetBestChain debug.log lines)
-            0.001       // * estimated number of transactions per second after that timestamp
+            0       // * estimated number of transactions per second after that timestamp
         };
     }
 };
@@ -821,7 +821,7 @@ public:
         chainTxData = ChainTxData{
             devnetGenesis.GetBlockTime(), // * UNIX timestamp of devnet genesis block
             2,                            // * we only have 2 coinbase transactions when a devnet is started up
-            0.01                          // * estimated number of transactions per second
+            0.001                          // * estimated number of transactions per second
         };
     }
 };
