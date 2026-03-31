@@ -39,12 +39,10 @@ export MAKEJOBS="-j4"
 export RUN_UNITTESTS=false
 export RUN_INTEGRATIONTESTS=false
 
-if [ "$BUILD_TARGET" = "arm-linux" ]; then
-  export HOST=arm-linux-gnueabihf
+if [ "$BUILD_TARGET" = "arm64-linux" ]; then
+  export HOST=aarch64-linux-gnu
   export CHECK_DOC=1
-  # -Wno-psabi is to disable ABI warnings: "note: parameter passing for argument of type ... changed in GCC 7.1"
-  # This could be removed once the ABI change warning does not show up by default
-  export BITCOIN_CONFIG="--enable-glibc-back-compat --enable-reduce-exports CXXFLAGS=-Wno-psabi"
+  export BITCOIN_CONFIG="--enable-glibc-back-compat --enable-reduce-exports"
 elif [ "$BUILD_TARGET" = "win64" ]; then
   export HOST=x86_64-w64-mingw32
   export DPKG_ADD_ARCH="i386"

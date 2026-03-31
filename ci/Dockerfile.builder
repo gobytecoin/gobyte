@@ -32,17 +32,17 @@ RUN useradd -u ${USER_ID} -g gobyte -s /bin/bash -m -d /gobyte gobyte
 # Packages needed for all target builds
 RUN dpkg --add-architecture i386
 RUN apt-get update && apt-get install $APT_ARGS g++-7-multilib && rm -rf /var/lib/apt/lists/*
-RUN apt-get update && apt-get install $APT_ARGS g++-arm-linux-gnueabihf && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install $APT_ARGS g++-aarch64-linux-gnu && rm -rf /var/lib/apt/lists/*
 RUN apt-get update && apt-get install $APT_ARGS g++-mingw-w64-i686 && rm -rf /var/lib/apt/lists/*
 RUN apt-get update && apt-get install $APT_ARGS g++-mingw-w64-x86-64 && rm -rf /var/lib/apt/lists/*
 RUN apt-get update && apt-get install $APT_ARGS wine-stable wine32 wine64 bc nsis && rm -rf /var/lib/apt/lists/*
 RUN apt-get update && apt-get install $APT_ARGS python3-zmq && rm -rf /var/lib/apt/lists/*
 RUN apt-get update && apt-get install $APT_ARGS imagemagick libcap-dev librsvg2-bin libz-dev libbz2-dev libtiff-tools && rm -rf /var/lib/apt/lists/*
 
-# This is a hack. It is needed because gcc-multilib and g++-multilib are conflicting with g++-arm-linux-gnueabihf. This is
-# due to gcc-multilib installing the following symbolic link, which is needed for -m32 support. However, this causes
-# arm builds to also have the asm folder implicitely in the include search path. This is kind of ok, because the asm folder
-# for arm has precedence.
+# This is a hack. It is needed because gcc-multilib and g++-multilib are conflicting with g++-aarch64-linux-gnu. This is
+# due to gcc-multilib installing the following symbolic link, which is needed for -m32 support (required by the win64
+# target via Wine). The aarch64 cross-compiler uses its own sysroot under /usr/aarch64-linux-gnu/, so the x86_64 asm
+# symlink in the host include path does not affect cross-compilation target headers.
 RUN ln -s x86_64-linux-gnu/asm /usr/include/asm
 
 # Make sure std::thread and friends is available

@@ -76,8 +76,8 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - target: arm-linux
-            host: arm-linux-gnueabihf
+          - target: arm64-linux
+            host: aarch64-linux-gnu
             run_unit_tests: false
             run_integration_tests: false
             dep_opts: ""
