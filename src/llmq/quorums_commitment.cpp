@@ -106,16 +106,22 @@ bool CFinalCommitment::Verify(const std::vector<CDeterministicMNCPtr>& members, 
 
 bool CFinalCommitment::VerifyNull() const
 {
-    if (!Params().GetConsensus().llmqs.count((Consensus::LLMQType)llmqType)) {
-        LogPrintfFinalCommitment("invalid llmqType=%d\n", llmqType);
+    if (!IsNull()) {
+        LogPrintfFinalCommitment("expected null commitment for llmqType=%d\n", llmqType);
         return false;
     }
-    const auto& params = Params().GetConsensus().llmqs.at((Consensus::LLMQType)llmqType);
-
-    if (!IsNull() || !VerifySizes(params)) {
-        return false;
+    // For registered LLMQ types, additionally verify that the bitvector
+    // sizes match the expected quorum membership count from params.
+    // Unknown types (introduced in later protocol versions) cannot be
+    // size-checked but are safe to accept as null: IsNull() guarantees
+    // all cryptographic fields are zero, so no quorum state is committed.
+    if (Params().GetConsensus().llmqs.count((Consensus::LLMQType)llmqType)) {
+        const auto& params = Params().GetConsensus().llmqs.at((Consensus::LLMQType)llmqType);
+        if (!VerifySizes(params)) {
+            LogPrintfFinalCommitment("invalid bitvector sizes for llmqType=%d\n", llmqType);
+            return false;
+        }
     }
-
     return true;
 }
 
@@ -158,17 +164,17 @@ bool CheckLLMQCommitment(const CTransaction& tx, const CBlockIndex* pindexPrev, 
         return state.DoS(100, false, REJECT_INVALID, "bad-qc-quorum-hash");
     }
 
-    if (!Params().GetConsensus().llmqs.count((Consensus::LLMQType)qcTx.commitment.llmqType)) {
-        return state.DoS(100, false, REJECT_INVALID, "bad-qc-type");
-    }
-    const auto& params = Params().GetConsensus().llmqs.at((Consensus::LLMQType)qcTx.commitment.llmqType);
-
     if (qcTx.commitment.IsNull()) {
         if (!qcTx.commitment.VerifyNull()) {
             return state.DoS(100, false, REJECT_INVALID, "bad-qc-invalid-null");
         }
         return true;
     }
+
+    if (!Params().GetConsensus().llmqs.count((Consensus::LLMQType)qcTx.commitment.llmqType)) {
+        return state.DoS(100, false, REJECT_INVALID, "bad-qc-type");
+    }
+    const auto& params = Params().GetConsensus().llmqs.at((Consensus::LLMQType)qcTx.commitment.llmqType);
 
     auto members = CLLMQUtils::GetAllQuorumMembers(params.type, pindexQuorum);
     if (!qcTx.commitment.Verify(members, false)) {
