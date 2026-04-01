@@ -13,11 +13,21 @@
 #include <util.h>
 #include <validation.h>
 
+#include <governance/governance-vote.h>
+#include <governance/governance-object.h>
+#include <llmq/quorums_chainlocks.h>
+#include <llmq/quorums_instantsend.h>
+
 #include <list>
 #include <atomic>
 #include <future>
 
+#include <boost/bind/bind.hpp>
 #include <boost/signals2/signal.hpp>
+
+using boost::placeholders::_1;
+using boost::placeholders::_2;
+using boost::placeholders::_3;
 
 struct MainSignalsInstance {
     boost::signals2::signal<void (const CBlockIndex *, const CBlockIndex *, bool fInitialDownload)> UpdatedBlockTip;
@@ -32,12 +42,13 @@ struct MainSignalsInstance {
     boost::signals2::signal<void (const CBlockIndex *, const std::shared_ptr<const CBlock>&)> NewPoWValidBlock;
     boost::signals2::signal<void (const CBlockIndex *)>AcceptedBlockHeader;
     boost::signals2::signal<void (const CBlockIndex *, bool)>NotifyHeaderTip;
-    boost::signals2::signal<void (const CTransaction &tx, const llmq::CInstantSendLock& islock)>NotifyTransactionLock;
-    boost::signals2::signal<void (const CBlockIndex* pindex, const llmq::CChainLockSig& clsig)>NotifyChainLock;
-    boost::signals2::signal<void (const CGovernanceVote &vote)>NotifyGovernanceVote;
-    boost::signals2::signal<void (const CGovernanceObject &object)>NotifyGovernanceObject;
-    boost::signals2::signal<void (const CTransaction &currentTx, const CTransaction &previousTx)>NotifyInstantSendDoubleSpendAttempt;
+    boost::signals2::signal<void (const CTransactionRef& tx, const std::shared_ptr<const llmq::CInstantSendLock>& islock)>NotifyTransactionLock;
+    boost::signals2::signal<void (const CBlockIndex* pindex, const std::shared_ptr<const llmq::CChainLockSig>& clsig)>NotifyChainLock;
+    boost::signals2::signal<void (const std::shared_ptr<const CGovernanceVote>& vote)>NotifyGovernanceVote;
+    boost::signals2::signal<void (const std::shared_ptr<const CGovernanceObject>& object)>NotifyGovernanceObject;
+    boost::signals2::signal<void (const CTransactionRef& currentTx, const CTransactionRef& previousTx)>NotifyInstantSendDoubleSpendAttempt;
     boost::signals2::signal<void (bool undo, const CDeterministicMNList& oldMNList, const CDeterministicMNListDiff& diff)>NotifyMasternodeListChanged;
+    boost::signals2::signal<void (const std::shared_ptr<const llmq::CRecoveredSig>& sig)>NotifyRecoveredSig;
     // We are not allowed to assume the scheduler only runs in one thread,
     // but must ensure all callbacks happen in-order, so we end up creating
     // our own queue here :(
@@ -99,6 +110,7 @@ void RegisterValidationInterface(CValidationInterface* pwalletIn) {
     g_signals.m_internals->NotifyGovernanceObject.connect(boost::bind(&CValidationInterface::NotifyGovernanceObject, pwalletIn, _1));
     g_signals.m_internals->NotifyGovernanceVote.connect(boost::bind(&CValidationInterface::NotifyGovernanceVote, pwalletIn, _1));
     g_signals.m_internals->NotifyInstantSendDoubleSpendAttempt.connect(boost::bind(&CValidationInterface::NotifyInstantSendDoubleSpendAttempt, pwalletIn, _1, _2));
+    g_signals.m_internals->NotifyRecoveredSig.connect(boost::bind(&CValidationInterface::NotifyRecoveredSig, pwalletIn, _1));
     g_signals.m_internals->NotifyMasternodeListChanged.connect(boost::bind(&CValidationInterface::NotifyMasternodeListChanged, pwalletIn, _1, _2, _3));
 }
 
@@ -120,6 +132,7 @@ void UnregisterValidationInterface(CValidationInterface* pwalletIn) {
     g_signals.m_internals->NotifyGovernanceObject.disconnect(boost::bind(&CValidationInterface::NotifyGovernanceObject, pwalletIn, _1));
     g_signals.m_internals->NotifyGovernanceVote.disconnect(boost::bind(&CValidationInterface::NotifyGovernanceVote, pwalletIn, _1));
     g_signals.m_internals->NotifyInstantSendDoubleSpendAttempt.disconnect(boost::bind(&CValidationInterface::NotifyInstantSendDoubleSpendAttempt, pwalletIn, _1, _2));
+    g_signals.m_internals->NotifyRecoveredSig.disconnect(boost::bind(&CValidationInterface::NotifyRecoveredSig, pwalletIn, _1));
     g_signals.m_internals->NotifyMasternodeListChanged.disconnect(boost::bind(&CValidationInterface::NotifyMasternodeListChanged, pwalletIn, _1, _2, _3));
 }
 
@@ -144,6 +157,7 @@ void UnregisterAllValidationInterfaces() {
     g_signals.m_internals->NotifyGovernanceObject.disconnect_all_slots();
     g_signals.m_internals->NotifyGovernanceVote.disconnect_all_slots();
     g_signals.m_internals->NotifyInstantSendDoubleSpendAttempt.disconnect_all_slots();
+    g_signals.m_internals->NotifyRecoveredSig.disconnect_all_slots();
     g_signals.m_internals->NotifyMasternodeListChanged.disconnect_all_slots();
 }
 
@@ -170,6 +184,10 @@ void CMainSignals::MempoolEntryRemoved(CTransactionRef ptx, MemPoolRemovalReason
 }
 
 void CMainSignals::UpdatedBlockTip(const CBlockIndex *pindexNew, const CBlockIndex *pindexFork, bool fInitialDownload) {
+    // Dependencies exist that require UpdatedBlockTip events to be delivered in the order in which
+    // the chain actually updates. One way to ensure this is for the caller to invoke this signal
+    // in the same critical section where the chain is updated
+
     m_internals->m_schedulerClient.AddToProcessQueue([pindexNew, pindexFork, fInitialDownload, this] {
         m_internals->UpdatedBlockTip(pindexNew, pindexFork, fInitialDownload);
     });
@@ -223,24 +241,40 @@ void CMainSignals::NotifyHeaderTip(const CBlockIndex *pindexNew, bool fInitialDo
     m_internals->NotifyHeaderTip(pindexNew, fInitialDownload);
 }
 
-void CMainSignals::NotifyTransactionLock(const CTransaction &tx, const llmq::CInstantSendLock& islock) {
-    m_internals->NotifyTransactionLock(tx, islock);
+void CMainSignals::NotifyTransactionLock(const CTransactionRef &tx, const std::shared_ptr<const llmq::CInstantSendLock>& islock) {
+    m_internals->m_schedulerClient.AddToProcessQueue([tx, islock, this] {
+        m_internals->NotifyTransactionLock(tx, islock);
+    });
 }
 
-void CMainSignals::NotifyChainLock(const CBlockIndex* pindex, const llmq::CChainLockSig& clsig) {
-    m_internals->NotifyChainLock(pindex, clsig);
+void CMainSignals::NotifyChainLock(const CBlockIndex* pindex, const std::shared_ptr<const llmq::CChainLockSig>& clsig) {
+    m_internals->m_schedulerClient.AddToProcessQueue([pindex, clsig, this] {
+        m_internals->NotifyChainLock(pindex, clsig);
+    });
 }
 
-void CMainSignals::NotifyGovernanceVote(const CGovernanceVote &vote) {
-    m_internals->NotifyGovernanceVote(vote);
+void CMainSignals::NotifyGovernanceVote(const std::shared_ptr<const CGovernanceVote>& vote) {
+    m_internals->m_schedulerClient.AddToProcessQueue([vote, this] {
+        m_internals->NotifyGovernanceVote(vote);
+    });
 }
 
-void CMainSignals::NotifyGovernanceObject(const CGovernanceObject &object) {
-    m_internals->NotifyGovernanceObject(object);
+void CMainSignals::NotifyGovernanceObject(const std::shared_ptr<const CGovernanceObject>& object) {
+    m_internals->m_schedulerClient.AddToProcessQueue([object, this] {
+        m_internals->NotifyGovernanceObject(object);
+    });
 }
 
-void CMainSignals::NotifyInstantSendDoubleSpendAttempt(const CTransaction &currentTx, const CTransaction &previousTx) {
-    m_internals->NotifyInstantSendDoubleSpendAttempt(currentTx, previousTx);
+void CMainSignals::NotifyInstantSendDoubleSpendAttempt(const CTransactionRef& currentTx, const CTransactionRef& previousTx) {
+    m_internals->m_schedulerClient.AddToProcessQueue([currentTx, previousTx, this] {
+        m_internals->NotifyInstantSendDoubleSpendAttempt(currentTx, previousTx);
+    });
+}
+
+void CMainSignals::NotifyRecoveredSig(const std::shared_ptr<const llmq::CRecoveredSig>& sig) {
+    m_internals->m_schedulerClient.AddToProcessQueue([sig, this] {
+        m_internals->NotifyRecoveredSig(sig);
+    });
 }
 
 void CMainSignals::NotifyMasternodeListChanged(bool undo, const CDeterministicMNList& oldMNList, const CDeterministicMNListDiff& diff) {

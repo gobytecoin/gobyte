@@ -63,6 +63,7 @@ Currently, the following notifications are supported:
     -zmqpubhashgovernancevote=address
     -zmqpubhashgovernanceobject=address
     -zmqpubhashinstantsenddoublespend=address
+    -zmqpubhashrecoveredsig=address
     -zmqpubrawblock=address
     -zmqpubrawchainlock=address
     -zmqpubrawchainlocksig=address
@@ -72,6 +73,7 @@ Currently, the following notifications are supported:
     -zmqpubrawgovernancevote=address
     -zmqpubrawgovernanceobject=address
     -zmqpubrawinstantsenddoublespend=address
+    -zmqpubrawrecoveredsig=address
 
 The socket type is PUB and the address must be a valid ZeroMQ socket
 address. The same address can be used in more than one notification.
@@ -113,6 +115,6 @@ and just the tip will be notified. It is up to the subscriber to
 retrieve the chain from the last known block to the new tip.
 
 There are several possibilities that ZMQ notification can get lost
-during transmission depending on the communication type your are
+during transmission depending on the communication type you are
 using. GoByted appends an up-counting sequence number to each
 notification which allows listeners to detect lost notifications.

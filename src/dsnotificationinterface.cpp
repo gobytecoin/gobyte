@@ -1,17 +1,16 @@
-// Copyright (c) 2014-2019 The Dash Core developers
-// Copyright (c) 2017-2021 The GoByte Core developers
+// Copyright (c) 2014-2021 The GoByte Core developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include <chainparams.h>
+#include <coinjoin/coinjoin.h>
+#ifdef ENABLE_WALLET
+#include <coinjoin/coinjoin-client.h>
+#endif // ENABLE_WALLET
 #include <dsnotificationinterface.h>
 #include <governance/governance.h>
 #include <masternode/masternode-payments.h>
 #include <masternode/masternode-sync.h>
-#include <privatesend/privatesend.h>
-#ifdef ENABLE_WALLET
-#include <privatesend/privatesend-client.h>
-#endif // ENABLE_WALLET
 #include <validation.h>
 
 #include <evo/deterministicmns.h>
@@ -19,8 +18,8 @@
 
 #include <llmq/quorums.h>
 #include <llmq/quorums_chainlocks.h>
-#include <llmq/quorums_instantsend.h>
 #include <llmq/quorums_dkgsessionmgr.h>
+#include <llmq/quorums_instantsend.h>
 
 void CDSNotificationInterface::InitializeCurrentBlockTip()
 {
@@ -29,18 +28,18 @@ void CDSNotificationInterface::InitializeCurrentBlockTip()
     UpdatedBlockTip(chainActive.Tip(), nullptr, IsInitialBlockDownload());
 }
 
-void CDSNotificationInterface::AcceptedBlockHeader(const CBlockIndex *pindexNew)
+void CDSNotificationInterface::AcceptedBlockHeader(const CBlockIndex* pindexNew)
 {
     llmq::chainLocksHandler->AcceptedBlockHeader(pindexNew);
     masternodeSync.AcceptedBlockHeader(pindexNew);
 }
 
-void CDSNotificationInterface::NotifyHeaderTip(const CBlockIndex *pindexNew, bool fInitialDownload)
+void CDSNotificationInterface::NotifyHeaderTip(const CBlockIndex* pindexNew, bool fInitialDownload)
 {
     masternodeSync.NotifyHeaderTip(pindexNew, fInitialDownload, connman);
 }
 
-void CDSNotificationInterface::SynchronousUpdatedBlockTip(const CBlockIndex *pindexNew, const CBlockIndex *pindexFork, bool fInitialDownload)
+void CDSNotificationInterface::SynchronousUpdatedBlockTip(const CBlockIndex* pindexNew, const CBlockIndex* pindexFork, bool fInitialDownload)
 {
     if (pindexNew == pindexFork) // blocks were disconnected without any new ones
         return;
@@ -48,7 +47,7 @@ void CDSNotificationInterface::SynchronousUpdatedBlockTip(const CBlockIndex *pin
     deterministicMNManager->UpdatedBlockTip(pindexNew);
 }
 
-void CDSNotificationInterface::UpdatedBlockTip(const CBlockIndex *pindexNew, const CBlockIndex *pindexFork, bool fInitialDownload)
+void CDSNotificationInterface::UpdatedBlockTip(const CBlockIndex* pindexNew, const CBlockIndex* pindexFork, bool fInitialDownload)
 {
     if (pindexNew == pindexFork) // blocks were disconnected without any new ones
         return;
@@ -61,9 +60,11 @@ void CDSNotificationInterface::UpdatedBlockTip(const CBlockIndex *pindexNew, con
     if (fInitialDownload)
         return;
 
-    CPrivateSend::UpdatedBlockTip(pindexNew);
+    CCoinJoin::UpdatedBlockTip(pindexNew);
 #ifdef ENABLE_WALLET
-    privateSendClient.UpdatedBlockTip(pindexNew);
+    for (auto& pair : coinJoinClientManagers) {
+        pair.second->UpdatedBlockTip(pindexNew);
+    }
 #endif // ENABLE_WALLET
 
     llmq::quorumInstantSendManager->UpdatedBlockTip(pindexNew);
@@ -79,7 +80,12 @@ void CDSNotificationInterface::TransactionAddedToMempool(const CTransactionRef& 
 {
     llmq::quorumInstantSendManager->TransactionAddedToMempool(ptx);
     llmq::chainLocksHandler->TransactionAddedToMempool(ptx, nAcceptTime);
-    CPrivateSend::TransactionAddedToMempool(ptx);
+    CCoinJoin::TransactionAddedToMempool(ptx);
+}
+
+void CDSNotificationInterface::TransactionRemovedFromMempool(const CTransactionRef& ptx)
+{
+    llmq::quorumInstantSendManager->TransactionRemovedFromMempool(ptx);
 }
 
 void CDSNotificationInterface::BlockConnected(const std::shared_ptr<const CBlock>& pblock, const CBlockIndex* pindex, const std::vector<CTransactionRef>& vtxConflicted)
@@ -94,14 +100,14 @@ void CDSNotificationInterface::BlockConnected(const std::shared_ptr<const CBlock
 
     llmq::quorumInstantSendManager->BlockConnected(pblock, pindex, vtxConflicted);
     llmq::chainLocksHandler->BlockConnected(pblock, pindex, vtxConflicted);
-    CPrivateSend::BlockConnected(pblock, pindex, vtxConflicted);
+    CCoinJoin::BlockConnected(pblock, pindex, vtxConflicted);
 }
 
 void CDSNotificationInterface::BlockDisconnected(const std::shared_ptr<const CBlock>& pblock, const CBlockIndex* pindexDisconnected)
 {
     llmq::quorumInstantSendManager->BlockDisconnected(pblock, pindexDisconnected);
     llmq::chainLocksHandler->BlockDisconnected(pblock, pindexDisconnected);
-    CPrivateSend::BlockDisconnected(pblock, pindexDisconnected);
+    CCoinJoin::BlockDisconnected(pblock, pindexDisconnected);
 }
 
 void CDSNotificationInterface::NotifyMasternodeListChanged(bool undo, const CDeterministicMNList& oldMNList, const CDeterministicMNListDiff& diff)
@@ -110,8 +116,8 @@ void CDSNotificationInterface::NotifyMasternodeListChanged(bool undo, const CDet
     governance.UpdateCachesAndClean();
 }
 
-void CDSNotificationInterface::NotifyChainLock(const CBlockIndex* pindex, const llmq::CChainLockSig& clsig)
+void CDSNotificationInterface::NotifyChainLock(const CBlockIndex* pindex, const std::shared_ptr<const llmq::CChainLockSig>& clsig)
 {
     llmq::quorumInstantSendManager->NotifyChainLock(pindex);
-    CPrivateSend::NotifyChainLock(pindex);
+    CCoinJoin::NotifyChainLock(pindex);
 }

@@ -72,7 +72,7 @@ bool Solver(const CScript& scriptPubKey, txnouttype& typeRet, std::vector<std::v
 
     // Scan templates
     const CScript& script1 = scriptPubKey;
-    for (const std::pair<txnouttype, CScript>& tplate : mTemplates)
+    for (const std::pair<const txnouttype, CScript>& tplate : mTemplates)
     {
         const CScript& script2 = tplate.second;
         vSolutionsRet.clear();
@@ -107,7 +107,7 @@ bool Solver(const CScript& scriptPubKey, txnouttype& typeRet, std::vector<std::v
             // Template matching opcodes:
             if (opcode2 == OP_PUBKEYS)
             {
-                while (vch1.size() >= 33 && vch1.size() <= 65)
+                while (CPubKey::ValidSize(vch1))
                 {
                     vSolutionsRet.push_back(vch1);
                     if (!script1.GetOp(pc1, opcode1, vch1))
@@ -121,7 +121,7 @@ bool Solver(const CScript& scriptPubKey, txnouttype& typeRet, std::vector<std::v
 
             if (opcode2 == OP_PUBKEY)
             {
-                if (vch1.size() < 33 || vch1.size() > 65)
+                if (!CPubKey::ValidSize(vch1))
                     break;
                 vSolutionsRet.push_back(vch1);
             }

@@ -1,5 +1,4 @@
-// Copyright (c) 2014-2018 The Dash Core developers
-// Copyright (c) 2017-2021 The GoByte Core developers
+// Copyright (c) 2014-2020 The GoByte Core developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -8,8 +7,8 @@
 
 #include <support/allocators/pooled_secure.h>
 
-#include <thread>
 #include <mutex>
+#include <thread>
 
 //
 // Manages a pool of pools to balance allocation between those when multiple threads are involved
@@ -27,8 +26,8 @@ struct mt_pooled_secure_allocator : public std::allocator<T> {
     typedef typename base::const_reference const_reference;
     typedef typename base::value_type value_type;
     mt_pooled_secure_allocator(size_type nrequested_size = 32,
-                               size_type nnext_size = 32,
-                               size_type nmax_size = 0) noexcept
+        size_type nnext_size = 32,
+        size_type nmax_size = 0) noexcept
     {
         // we add enough bytes to the requested size so that we can store the bucket as well
         nrequested_size += sizeof(size_t);
@@ -71,9 +70,9 @@ private:
 
     struct internal_pool : pooled_secure_allocator<uint8_t> {
         internal_pool(size_type nrequested_size,
-                      size_type nnext_size,
-                      size_type nmax_size) :
-                      pooled_secure_allocator(nrequested_size, nnext_size, nmax_size)
+            size_type nnext_size,
+            size_type nmax_size) :
+            pooled_secure_allocator(nrequested_size, nnext_size, nmax_size)
         {
         }
         std::mutex mutex;

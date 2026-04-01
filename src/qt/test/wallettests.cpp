@@ -1,9 +1,17 @@
 #include <qt/test/wallettests.h>
 
+#include <coinjoin/coinjoin-client.h>
+#include <interfaces/node.h>
+#include <key_io.h>
 #include <qt/bitcoinamountfield.h>
 #include <qt/callback.h>
+#include <qt/clientmodel.h>
 #include <qt/optionsmodel.h>
+#include <qt/overviewpage.h>
 #include <qt/qvalidatedlineedit.h>
+#include <qt/receivecoinsdialog.h>
+#include <qt/receiverequestdialog.h>
+#include <qt/recentrequeststablemodel.h>
 #include <qt/sendcoinsdialog.h>
 #include <qt/sendcoinsentry.h>
 #include <qt/transactiontablemodel.h>
@@ -12,10 +20,6 @@
 #include <test/test_gobyte.h>
 #include <validation.h>
 #include <wallet/wallet.h>
-#include <qt/overviewpage.h>
-#include <qt/receivecoinsdialog.h>
-#include <qt/recentrequeststablemodel.h>
-#include <qt/receiverequestdialog.h>
 
 #include <memory>
 
@@ -23,15 +27,14 @@
 #include <QAction>
 #include <QApplication>
 #include <QCheckBox>
+#include <QDialogButtonBox>
+#include <QListView>
 #include <QPushButton>
+#include <QTextEdit>
 #include <QTimer>
 #include <QVBoxLayout>
-#include <QTextEdit>
-#include <QListView>
-#include <QDialogButtonBox>
 
-namespace
-{
+namespace {
 //! Press "Ok" button in message box dialog.
 void ConfirmMessage(QString* text = nullptr)
 {
@@ -44,7 +47,8 @@ void ConfirmMessage(QString* text = nullptr)
             }
         }
         delete callback;
-    }), SLOT(call()));
+    }),
+        SLOT(call()));
 }
 
 //! Press "Yes" or "Cancel" buttons in modal send confirmation dialog.
@@ -61,7 +65,8 @@ void ConfirmSend(QString* text = nullptr, bool cancel = false)
             }
         }
         delete callback;
-    }), SLOT(call()));
+    }),
+        SLOT(call()));
 }
 
 //! Send coins to address and return txid.
@@ -109,52 +114,56 @@ QModelIndex FindTx(const QAbstractItemModel& model, const uint256& txid)
 //     src/qt/test/test_gobyte-qt -platform cocoa    # macOS
 void TestGUI()
 {
-    GUIUtil::loadFonts();
     // Set up wallet and chain with 105 blocks (5 mature blocks for spending).
     TestChain100Setup test;
     for (int i = 0; i < 5; ++i) {
         test.CreateAndProcessBlock({}, GetScriptForRawPubKey(test.coinbaseKey.GetPubKey()));
     }
-    CWallet wallet("mock", WalletDatabase::CreateMock());
+    std::shared_ptr<CWallet> wallet = std::make_shared<CWallet>(WalletLocation(), WalletDatabase::CreateMock());
+    AddWallet(wallet);
     bool firstRun;
-    wallet.LoadWallet(firstRun);
+    wallet->LoadWallet(firstRun);
     {
-        LOCK(wallet.cs_wallet);
-        wallet.SetAddressBook(test.coinbaseKey.GetPubKey().GetID(), "", "receive");
-        wallet.AddKeyPubKey(test.coinbaseKey, test.coinbaseKey.GetPubKey());
+        LOCK(wallet->cs_wallet);
+        wallet->SetAddressBook(test.coinbaseKey.GetPubKey().GetID(), "", "receive");
+        wallet->AddKeyPubKey(test.coinbaseKey, test.coinbaseKey.GetPubKey());
     }
     {
         LOCK(cs_main);
-        WalletRescanReserver reserver(&wallet);
+        WalletRescanReserver reserver(wallet.get());
         reserver.reserve();
-        wallet.ScanForWalletTransactions(chainActive.Genesis(), nullptr, reserver, true);
+        wallet->ScanForWalletTransactions(chainActive.Genesis(), nullptr, reserver, true);
     }
-    wallet.SetBroadcastTransactions(true);
+    wallet->SetBroadcastTransactions(true);
 
     // Create widgets for sending coins and listing transactions.
     SendCoinsDialog sendCoinsDialog;
     TransactionView transactionView;
-    OptionsModel optionsModel;
-    WalletModel walletModel(&wallet, &optionsModel);
+    auto node = interfaces::MakeNode();
+    OptionsModel optionsModel(*node);
+    ClientModel clientModel(*node, &optionsModel);
+    WalletModel walletModel(std::move(node->getWallets()[0]), *node, &optionsModel);
+    ;
     sendCoinsDialog.setModel(&walletModel);
     transactionView.setModel(&walletModel);
 
     // Send two transactions, and verify they are added to transaction list.
     TransactionTableModel* transactionTableModel = walletModel.getTransactionTableModel();
     QCOMPARE(transactionTableModel->rowCount({}), 105);
-    uint256 txid1 = SendCoins(wallet, sendCoinsDialog, CKeyID(), 5 * COIN);
-    uint256 txid2 = SendCoins(wallet, sendCoinsDialog, CKeyID(), 10 * COIN);
+    uint256 txid1 = SendCoins(*wallet.get(), sendCoinsDialog, CKeyID(), 5 * COIN);
+    uint256 txid2 = SendCoins(*wallet.get(), sendCoinsDialog, CKeyID(), 10 * COIN);
     QCOMPARE(transactionTableModel->rowCount({}), 107);
     QVERIFY(FindTx(*transactionTableModel, txid1).isValid());
     QVERIFY(FindTx(*transactionTableModel, txid2).isValid());
 
     // Check current balance on OverviewPage
     OverviewPage overviewPage;
+    overviewPage.setClientModel(&clientModel);
     overviewPage.setWalletModel(&walletModel);
     QLabel* balanceLabel = overviewPage.findChild<QLabel*>("labelBalance");
     QString balanceText = balanceLabel->text();
     int unit = walletModel.getOptionsModel()->getDisplayUnit();
-    CAmount balance = walletModel.getBalance();
+    CAmount balance = walletModel.wallet().getBalance();
     QString balanceComparison = BitcoinUnits::floorHtmlWithUnit(unit, balance, false, BitcoinUnits::separatorAlways);
     QCOMPARE(balanceText, balanceComparison);
 
@@ -201,17 +210,18 @@ void TestGUI()
 
     // Check addition to history
     int currentRowCount = requestTableModel->rowCount({});
-    QCOMPARE(currentRowCount, initialRowCount+1);
+    QCOMPARE(currentRowCount, initialRowCount + 1);
 
     // Check Remove button
     QTableView* table = receiveCoinsDialog.findChild<QTableView*>("recentRequestsView");
-    table->selectRow(currentRowCount-1);
+    table->selectRow(currentRowCount - 1);
     QPushButton* removeRequestButton = receiveCoinsDialog.findChild<QPushButton*>("removeRequestButton");
     removeRequestButton->click();
-    QCOMPARE(requestTableModel->rowCount({}), currentRowCount-1);
+    QCOMPARE(requestTableModel->rowCount({}), currentRowCount - 1);
+    RemoveWallet(wallet);
 }
 
-}
+} // namespace
 
 void WalletTests::walletTests()
 {

@@ -1,12 +1,11 @@
-// Copyright (c) 2017-2021 The GoByte Core developers
+// Copyright (c) 2014-2021 The GoByte Core developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include <governance/governance-vote.h>
 #include <governance/governance-object.h>
+#include <governance/governance-vote.h>
 #include <masternode/masternode-sync.h>
 #include <messagesigner.h>
-#include <spork.h>
 #include <util.h>
 
 #include <evo/deterministicmns.h>
@@ -14,10 +13,10 @@
 std::string CGovernanceVoting::ConvertOutcomeToString(vote_outcome_enum_t nOutcome)
 {
     static const std::map<vote_outcome_enum_t, std::string> mapOutcomeString = {
-        { VOTE_OUTCOME_NONE, "none" },
-        { VOTE_OUTCOME_YES, "yes" },
-        { VOTE_OUTCOME_NO, "no" },
-        { VOTE_OUTCOME_ABSTAIN, "abstain" } };
+        {VOTE_OUTCOME_NONE, "none"},
+        {VOTE_OUTCOME_YES, "yes"},
+        {VOTE_OUTCOME_NO, "no"},
+        {VOTE_OUTCOME_ABSTAIN, "abstain"}};
 
     const auto& it = mapOutcomeString.find(nOutcome);
     if (it == mapOutcomeString.end()) {
@@ -30,10 +29,10 @@ std::string CGovernanceVoting::ConvertOutcomeToString(vote_outcome_enum_t nOutco
 std::string CGovernanceVoting::ConvertSignalToString(vote_signal_enum_t nSignal)
 {
     static const std::map<vote_signal_enum_t, std::string> mapSignalsString = {
-        { VOTE_SIGNAL_FUNDING, "funding" },
-        { VOTE_SIGNAL_VALID, "valid" },
-        { VOTE_SIGNAL_DELETE, "delete" },
-        { VOTE_SIGNAL_ENDORSED, "endorsed" } };
+        {VOTE_SIGNAL_FUNDING, "funding"},
+        {VOTE_SIGNAL_VALID, "valid"},
+        {VOTE_SIGNAL_DELETE, "delete"},
+        {VOTE_SIGNAL_ENDORSED, "endorsed"}};
 
     const auto& it = mapSignalsString.find(nSignal);
     if (it == mapSignalsString.end()) {
@@ -47,10 +46,10 @@ std::string CGovernanceVoting::ConvertSignalToString(vote_signal_enum_t nSignal)
 vote_outcome_enum_t CGovernanceVoting::ConvertVoteOutcome(const std::string& strVoteOutcome)
 {
     static const std::map<std::string, vote_outcome_enum_t> mapStringOutcome = {
-        { "none", VOTE_OUTCOME_NONE },
-        { "yes", VOTE_OUTCOME_YES },
-        { "no", VOTE_OUTCOME_NO },
-        { "abstain", VOTE_OUTCOME_ABSTAIN } };
+        {"none", VOTE_OUTCOME_NONE},
+        {"yes", VOTE_OUTCOME_YES},
+        {"no", VOTE_OUTCOME_NO},
+        {"abstain", VOTE_OUTCOME_ABSTAIN}};
 
     const auto& it = mapStringOutcome.find(strVoteOutcome);
     if (it == mapStringOutcome.end()) {
@@ -58,7 +57,6 @@ vote_outcome_enum_t CGovernanceVoting::ConvertVoteOutcome(const std::string& str
         return VOTE_OUTCOME_NONE;
     }
     return it->second;
-
 }
 
 vote_signal_enum_t CGovernanceVoting::ConvertVoteSignal(const std::string& strVoteSignal)
@@ -229,16 +227,13 @@ bool CGovernanceVote::Sign(const CBLSSecretKey& key)
     if (!sig.IsValid()) {
         return false;
     }
-    sig.GetBuf(vchSig);
+    vchSig = sig.ToByteVector();
     return true;
 }
 
 bool CGovernanceVote::CheckSignature(const CBLSPublicKey& pubKey) const
 {
-    uint256 hash = GetSignatureHash();
-    CBLSSignature sig;
-    sig.SetBuf(vchSig);
-    if (!sig.VerifyInsecure(pubKey, hash)) {
+    if (!CBLSSignature(vchSig).VerifyInsecure(pubKey, GetSignatureHash())) {
         LogPrintf("CGovernanceVote::CheckSignature -- VerifyInsecure() failed\n");
         return false;
     }
@@ -299,19 +294,19 @@ bool operator<(const CGovernanceVote& vote1, const CGovernanceVote& vote2)
     if (!fResult) {
         return false;
     }
-    fResult = fResult && (vote1.nParentHash == vote2.nParentHash);
+    fResult = (vote1.nParentHash == vote2.nParentHash);
 
     fResult = fResult && (vote1.nVoteOutcome < vote2.nVoteOutcome);
     if (!fResult) {
         return false;
     }
-    fResult = fResult && (vote1.nVoteOutcome == vote2.nVoteOutcome);
+    fResult = (vote1.nVoteOutcome == vote2.nVoteOutcome);
 
     fResult = fResult && (vote1.nVoteSignal == vote2.nVoteSignal);
     if (!fResult) {
         return false;
     }
-    fResult = fResult && (vote1.nVoteSignal == vote2.nVoteSignal);
+    fResult = (vote1.nVoteSignal == vote2.nVoteSignal);
 
     fResult = fResult && (vote1.nTime < vote2.nTime);
 

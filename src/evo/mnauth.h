@@ -1,10 +1,9 @@
-// Copyright (c) 2019 The Dash Core developers
-// Copyright (c) 2021 The GoByte Core developers
+// Copyright (c) 2019-2020 The GoByte Core developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef GOBYTE_MNAUTH_H
-#define GOBYTE_MNAUTH_H
+#ifndef BITCOIN_EVO_MNAUTH_H
+#define BITCOIN_EVO_MNAUTH_H
 
 #include <bls/bls.h>
 #include <serialize.h>
@@ -56,4 +55,4 @@ public:
 };
 
 
-#endif //GOBYTE_MNAUTH_H
+#endif // BITCOIN_EVO_MNAUTH_H

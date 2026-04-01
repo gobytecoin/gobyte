@@ -42,4 +42,3 @@ If a type is not listed here, its size is the return of sizeof (except STL conta
 
 ## common_helpers.py
 Several helper functions that are used in other python code.
-

@@ -1,6 +1,6 @@
 /**
 Copyright (c) 2020 The Dash Core developers
-Copyright (c) 2021 The GoByte Core developers
+Copyright (c) 2026 The GoByte Core developers
 Distributed under the MIT/X11 software license, see the accompanying
 file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -55,7 +55,7 @@ QPushButton - Special case, tabbar replacement buttons
 /* Options dialog buttons */
 #btnMain,
 #btnWallet,
-#btnPrivateSend,
+#btnCoinJoin,
 #btnNetwork,
 #btnDisplay,
 #btnAppearance,
@@ -79,7 +79,7 @@ QPushButton - Special case, tabbar replacement buttons
 /* Options dialog buttons */
 #btnMain:hover:checked,
 #btnWallet:hover:checked,
-#btnPrivateSend:hover:checked,
+#btnCoinJoin:hover:checked,
 #btnNetwork:hover:checked,
 #btnDisplay:hover:checked,
 #btnAppearance:hover:checked,
@@ -102,7 +102,7 @@ QPushButton - Special case, tabbar replacement buttons
 /* Options dialog buttons */
 #btnMain:hover:!checked,
 #btnWallet:hover:!checked,
-#btnPrivateSend:hover:!checked,
+#btnCoinJoin:hover:!checked,
 #btnNetwork:hover:!checked,
 #btnDisplay:hover:!checked,
 #btnAppearance:hover:!checked,
@@ -125,7 +125,7 @@ QPushButton - Special case, tabbar replacement buttons
 /* Options dialog buttons */
 #btnMain:checked,
 #btnWallet:checked,
-#btnPrivateSend:checked,
+#btnCoinJoin:checked,
 #btnNetwork:checked,
 #btnDisplay:checked,
 #btnAppearance:checked,
@@ -240,7 +240,7 @@ QWidget#OverviewPage QLabel#labelAlerts {
  }
 
 QWidget .QFrame#frame .QLabel#labelWalletStatus, /* Wallet Sync Status */
-QWidget .QFrame#framePrivateSend .QLabel#labelPrivateSendSyncStatus, /* PrivateSend Sync Status */
+QWidget .QFrame#frameCoinJoin .QLabel#labelCoinJoinSyncStatus, /* CoinJoin Sync Status */
 QWidget .QFrame#frame_2 .QLabel#labelTransactionsStatus { /* Recent Transactions Sync Status */
     color: #a84832;
 }

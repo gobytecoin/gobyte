@@ -1,5 +1,4 @@
-// Copyright (c) 2019 The Dash Core developers
-// Copyright (c) 2021 The GoByte Core developers
+// Copyright (c) 2019-2020 The GoByte Core developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -47,8 +46,7 @@ BOOST_AUTO_TEST_CASE(bls_sig_tests)
     BOOST_CHECK(sig2.VerifyInsecure(sk2.GetPublicKey(), msgHash1));
 }
 
-struct Message
-{
+struct Message {
     uint32_t sourceId;
     uint32_t msgId;
     uint256 msgHash;

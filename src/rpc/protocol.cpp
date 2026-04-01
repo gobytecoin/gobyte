@@ -1,7 +1,6 @@
 // Copyright (c) 2010 Satoshi Nakamoto
 // Copyright (c) 2009-2015 The Bitcoin Core developers
-// Copyright (c) 2014-2020 The Dash Core developers
-// Copyright (c) 2017-2021 The GoByte Core developers
+// Copyright (c) 2014-2020 The GoByte Core developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -28,9 +27,9 @@
 UniValue JSONRPCRequestObj(const std::string& strMethod, const UniValue& params, const UniValue& id)
 {
     UniValue request(UniValue::VOBJ);
-    request.push_back(Pair("method", strMethod));
-    request.push_back(Pair("params", params));
-    request.push_back(Pair("id", id));
+    request.pushKV("method", strMethod);
+    request.pushKV("params", params);
+    request.pushKV("id", id);
     return request;
 }
 
@@ -38,11 +37,11 @@ UniValue JSONRPCReplyObj(const UniValue& result, const UniValue& error, const Un
 {
     UniValue reply(UniValue::VOBJ);
     if (!error.isNull())
-        reply.push_back(Pair("result", NullUniValue));
+        reply.pushKV("result", NullUniValue);
     else
-        reply.push_back(Pair("result", result));
-    reply.push_back(Pair("error", error));
-    reply.push_back(Pair("id", id));
+        reply.pushKV("result", result);
+    reply.pushKV("error", error);
+    reply.pushKV("id", id);
     return reply;
 }
 
@@ -55,8 +54,8 @@ std::string JSONRPCReply(const UniValue& result, const UniValue& error, const Un
 UniValue JSONRPCError(int code, const std::string& message)
 {
     UniValue error(UniValue::VOBJ);
-    error.push_back(Pair("code", code));
-    error.push_back(Pair("message", message));
+    error.pushKV("code", code);
+    error.pushKV("message", message);
     return error;
 }
 
@@ -68,7 +67,7 @@ static const std::string COOKIEAUTH_USER = "__cookie__";
 static const std::string COOKIEAUTH_FILE = ".cookie";
 
 /** Get name of RPC authentication cookie file */
-static fs::path GetAuthCookieFile(bool temp=false)
+static fs::path GetAuthCookieFile(bool temp = false)
 {
     std::string arg = gArgs.GetArg("-rpccookiefile", COOKIEAUTH_FILE);
     if (temp) {
@@ -77,13 +76,13 @@ static fs::path GetAuthCookieFile(bool temp=false)
     return AbsPathForConfigVal(fs::path(arg));
 }
 
-bool GenerateAuthCookie(std::string *cookie_out)
+bool GenerateAuthCookie(std::string* cookie_out)
 {
     const size_t COOKIE_SIZE = 32;
     unsigned char rand_pwd[COOKIE_SIZE];
     GetRandBytes(rand_pwd, COOKIE_SIZE);
 
-    std::string cookie = COOKIEAUTH_USER + ":" + HexStr(rand_pwd, rand_pwd+COOKIE_SIZE);
+    std::string cookie = COOKIEAUTH_USER + ":" + HexStr(rand_pwd, rand_pwd + COOKIE_SIZE);
 
     /** the umask determines what permissions are used to create this file -
      * these are set to 077 in init.cpp unless overridden with -sysperms.
@@ -110,7 +109,7 @@ bool GenerateAuthCookie(std::string *cookie_out)
     return true;
 }
 
-bool GetAuthCookie(std::string *cookie_out)
+bool GetAuthCookie(std::string* cookie_out)
 {
     std::ifstream file;
     std::string cookie;
@@ -135,14 +134,14 @@ void DeleteAuthCookie()
     }
 }
 
-std::vector<UniValue> JSONRPCProcessBatchReply(const UniValue &in, size_t num)
+std::vector<UniValue> JSONRPCProcessBatchReply(const UniValue& in, size_t num)
 {
     if (!in.isArray()) {
         throw std::runtime_error("Batch must be an array");
     }
     std::vector<UniValue> batch(num);
-    for (size_t i=0; i<in.size(); ++i) {
-        const UniValue &rec = in[i];
+    for (size_t i = 0; i < in.size(); ++i) {
+        const UniValue& rec = in[i];
         if (!rec.isObject()) {
             throw std::runtime_error("Batch member must be object");
         }

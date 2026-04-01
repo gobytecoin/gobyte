@@ -25,7 +25,7 @@ In this transaction we prepare collateral for "_cool-project_". This proposal wi
 
 Format: ```mngovernance prepare proposal-name url payment-count block-start gobyte-address monthly-payment-gobyte```
 
-Example: ```mngovernance prepare cool-project http://www.cool-project/one.json 12 100000 y6R9oN12KnB9zydzTLc3LikD9cCjjQzYG7 1200 true```
+Example: ```mngovernance prepare cool-project http://www.cool-project/one.json 12 100000 G6R9oN12KnB9zydzTLc3LikD9cCjjQzYG7 1200 true```
 
 Output: ```464a0eb70ea91c94295214df48c47baa72b3876cfb658744aaf863c7b5bf1ff0```
 
@@ -38,7 +38,7 @@ Now we can submit our proposal to the network.
 
 Format: ```mngovernance submit proposal-name url payment-count block-start gobyte-address monthly-payment-gobyte fee-tx```
 
-Example: ```mngovernance submit cool-project http://www.cool-project/one.json 12 100000 y6R9oN12KnB9zydzTLc3LikD9cCjjQzYG7 1200 464a0eb70ea91c94295214df48c47baa72b3876cfb658744aaf863c7b5bf1ff0```
+Example: ```mngovernance submit cool-project http://www.cool-project/one.json 12 100000 G6R9oN12KnB9zydzTLc3LikD9cCjjQzYG7 1200 464a0eb70ea91c94295214df48c47baa72b3876cfb658744aaf863c7b5bf1ff0```
 
 Output : ```a2b29778ae82e45a973a94309ffa6aa2e2388b8f95b39ab3739f0078835f0491```
 
@@ -63,7 +63,7 @@ Example: ```mngovernance getproposal a2b29778ae82e45a973a94309ffa6aa2e2388b8f95b
     "BlockEnd" : 100625,
     "TotalPaymentCount" : 12,
     "RemainingPaymentCount" : 12,
-    "PaymentAddress" : "y6R9oN12KnB9zydzTLc3LikD9cCjjQzYG7",
+    "PaymentAddress" : "G6R9oN12KnB9zydzTLc3LikD9cCjjQzYG7",
     "Ratio" : 0.00000000,
     "Yeas" : 0,
     "Nays" : 0,
@@ -97,7 +97,7 @@ After you get enough votes, execute ```mngovernance projection``` to see if you 
         "BlockEnd" : 100625,
         "TotalPaymentCount" : 12,
         "RemainingPaymentCount" : 12,
-        "PaymentAddress" : "y6R9oN12KnB9zydzTLc3LikD9cCjjQzYG7",
+        "PaymentAddress" : "G6R9oN12KnB9zydzTLc3LikD9cCjjQzYG7",
         "Ratio" : 1.00000000,
         "Yeas" : 33,
         "Nays" : 0,
@@ -128,7 +128,7 @@ After you get enough votes, execute ```mngovernance projection``` to see if you 
 6. Get paid
 --
 
-When block ```1000000``` is reached you'll receive a payment for ```1200``` GBX to ```y6R9oN12KnB9zydzTLc3LikD9cCjjQzYG7```.
+When block ```1000000``` is reached you'll receive a payment for ```1200``` GBX to ```G6R9oN12KnB9zydzTLc3LikD9cCjjQzYG7```.
 
 7. Command list
 --
@@ -156,3 +156,4 @@ The following RPC commands are supported:
   - getvotes    - Get vote information for each finalized budget
   - prepare     - Manually prepare a finalized budget
   - submit      - Manually submit a finalized budget
+

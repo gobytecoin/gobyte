@@ -1,6 +1,5 @@
 # Copyright (c) 2013-2016 The Bitcoin Core developers
-# Copyright (c) 2014-2018 The Dash Core developers
-# Copyright (c) 2017-2021 The GoByte Core developers
+# Copyright (c) 2014-2018 The GoByte Core developers
 # Distributed under the MIT software license, see the accompanying
 # file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -186,17 +185,19 @@ BITCOIN_QT_H = \
   qt/winshutdownmonitor.h
 
 RES_ICONS = \
-  qt/res/icons/bitcoin.ico \
-  qt/res/icons/bitcoin_testnet.ico \
-  qt/res/icons/bitcoin.png \
-  qt/res/icons/chevron.png \
+  qt/res/icons/gobyte.ico \
+  qt/res/icons/gobyte_testnet.ico \
+  qt/res/icons/gobyte.png \
   qt/res/icons/warning.png \
   qt/res/icons/address-book.png \
-  qt/res/icons/clock1.png \
-  qt/res/icons/clock2.png \
-  qt/res/icons/clock3.png \
-  qt/res/icons/clock4.png \
-  qt/res/icons/clock5.png \
+  qt/res/icons/transaction0.png \
+  qt/res/icons/transaction1.png \
+  qt/res/icons/transaction2.png \
+  qt/res/icons/transaction3.png \
+  qt/res/icons/transaction4.png \
+  qt/res/icons/transaction5.png \
+  qt/res/icons/transaction_abandoned.png \
+  qt/res/icons/transaction_locked.png \
   qt/res/icons/connect1_16.png \
   qt/res/icons/connect2_16.png \
   qt/res/icons/connect3_16.png \
@@ -211,11 +212,8 @@ RES_ICONS = \
   qt/res/icons/lock_open.png \
   qt/res/icons/remove.png \
   qt/res/icons/synced.png \
-  qt/res/icons/transaction0.png \
-  qt/res/icons/verify.png \
   qt/res/icons/fontbigger.png \
-  qt/res/icons/fontsmaller.png \
-  qt/res/icons/transaction_abandoned.png
+  qt/res/icons/fontsmaller.png
 
 BITCOIN_QT_BASE_CPP = \
   qt/appearancewidget.cpp \
@@ -403,7 +401,7 @@ if TARGET_WINDOWS
 endif
 qt_gobyte_qt_LDADD = qt/libgobyteqt.a $(LIBBITCOIN_SERVER)
 if ENABLE_WALLET
-qt_gobyte_qt_LDADD += $(LIBBITCOIN_WALLET)
+qt_gobyte_qt_LDADD += $(LIBBITCOIN_UTIL) $(LIBBITCOIN_WALLET)
 endif
 if ENABLE_ZMQ
 qt_gobyte_qt_LDADD += $(LIBBITCOIN_ZMQ) $(ZMQ_LIBS)
@@ -412,20 +410,20 @@ qt_gobyte_qt_LDADD += $(LIBBITCOIN_CLI) $(LIBBITCOIN_COMMON) $(LIBBITCOIN_UTIL) 
   $(BACKTRACE_LIB) $(BOOST_LIBS) $(QT_LIBS) $(QT_DBUS_LIBS) $(QR_LIBS) $(PROTOBUF_LIBS) $(BDB_LIBS) $(SSL_LIBS) $(CRYPTO_LIBS) $(MINIUPNPC_LIBS) $(LIBSECP256K1) \
   $(EVENT_PTHREADS_LIBS) $(EVENT_LIBS) $(BLS_LIBS)
 qt_gobyte_qt_LDFLAGS = $(LDFLAGS_WRAP_EXCEPTIONS) $(RELDFLAGS) $(AM_LDFLAGS) $(QT_LDFLAGS) $(LIBTOOL_APP_LDFLAGS)
-qt_gobyte_qt_LIBTOOLFLAGS = --tag CXX
+qt_gobyte_qt_LIBTOOLFLAGS = $(AM_LIBTOOLFLAGS) --tag CXX
 
 #locale/foo.ts -> locale/foo.qm
 QT_QM=$(QT_TS:.ts=.qm)
 
 SECONDARY: $(QT_QM)
 
-$(srcdir)/qt/gobytestrings.cpp: $(libgobyte_server_a_SOURCES) $(libgobyte_wallet_a_SOURCES) $(libgobyte_common_a_SOURCES) $(libgobyte_zmq_a_SOURCES) $(libgobyte_consensus_a_SOURCES) $(libgobyte_util_a_SOURCES)
+$(srcdir)/qt/gobytestrings.cpp: FORCE
 	@test -n $(XGETTEXT) || echo "xgettext is required for updating translations"
-	$(AM_V_GEN) cd $(srcdir); XGETTEXT=$(XGETTEXT) PACKAGE_NAME="$(PACKAGE_NAME)" COPYRIGHT_HOLDERS="$(COPYRIGHT_HOLDERS)" COPYRIGHT_HOLDERS_SUBSTITUTION="$(COPYRIGHT_HOLDERS_SUBSTITUTION)" $(PYTHON) ../share/qt/extract_strings_qt.py $^
+	$(AM_V_GEN) cd $(srcdir); XGETTEXT=$(XGETTEXT) PACKAGE_NAME="$(PACKAGE_NAME)" COPYRIGHT_HOLDERS="$(COPYRIGHT_HOLDERS)" COPYRIGHT_HOLDERS_SUBSTITUTION="$(COPYRIGHT_HOLDERS_SUBSTITUTION)" $(PYTHON) ../share/qt/extract_strings_qt.py $(libgobyte_server_a_SOURCES) $(libgobyte_wallet_a_SOURCES) $(libgobyte_common_a_SOURCES) $(libgobyte_zmq_a_SOURCES) $(libgobyte_consensus_a_SOURCES) $(libgobyte_util_a_SOURCES)
 
 translate: $(srcdir)/qt/gobytestrings.cpp $(QT_FORMS_UI) $(QT_FORMS_UI) $(BITCOIN_QT_BASE_CPP) qt/gobyte.cpp $(BITCOIN_QT_WINDOWS_CPP) $(BITCOIN_QT_WALLET_CPP) $(BITCOIN_QT_H) $(BITCOIN_MM)
 	@test -n $(LUPDATE) || echo "lupdate is required for updating translations"
-	$(AM_V_GEN) QT_SELECT=$(QT_SELECT) $(LUPDATE) $^ -locations relative -no-obsolete -ts $(srcdir)/qt/locale/gobyte_en.ts
+	$(AM_V_GEN) QT_SELECT=$(QT_SELECT) $(LUPDATE) $^ -I$(srcdir) -locations relative -no-obsolete -ts $(srcdir)/qt/locale/gobyte_en.ts
 
 $(QT_QRC_LOCALE_CPP): $(QT_QRC_LOCALE) $(QT_QM)
 	@test -f $(RCC)

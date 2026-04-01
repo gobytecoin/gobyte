@@ -41,10 +41,11 @@ const std::string CLIENT_NAME("GoByte Core");
 #include <obj/build.h>
 #endif
 
-//! git will put "#define GIT_ARCHIVE 1" on the next line inside archives. $Format:%n#define GIT_ARCHIVE 1$
+//! git will put "#define GIT_ARCHIVE 1" on the next line inside archives.
+#define GIT_ARCHIVE 1
 #ifdef GIT_ARCHIVE
-#define GIT_COMMIT_ID "$Format:%h$"
-#define GIT_COMMIT_DATE "$Format:%cD$"
+#define GIT_COMMIT_ID "0e3aea8c4ec8266b19bab381a129b6740e097aee"
+#define GIT_COMMIT_DATE "Tue, 18 May 2021 01:02:18 +0300"
 #endif
 
 #define BUILD_DESC_WITH_SUFFIX(maj, min, rev, build, suffix) \
@@ -70,10 +71,7 @@ const std::string CLIENT_BUILD(BUILD_DESC CLIENT_VERSION_SUFFIX);
 
 std::string FormatVersion(int nVersion)
 {
-    if (nVersion % 100 == 0)
-        return strprintf("%d.%d.%d", nVersion / 1000000, (nVersion / 10000) % 100, (nVersion / 100) % 100);
-    else
-        return strprintf("%d.%d.%d.%d", nVersion / 1000000, (nVersion / 10000) % 100, (nVersion / 100) % 100, nVersion % 100);
+    return strprintf("%d.%d.%d.%d", nVersion / 1000000, (nVersion / 10000) % 100, (nVersion / 100) % 100, nVersion % 100);
 }
 
 std::string FormatFullVersion()
@@ -81,19 +79,18 @@ std::string FormatFullVersion()
     return CLIENT_BUILD;
 }
 
-/** 
- * Format the subversion field according to BIP 14 spec (https://github.com/bitcoin/bips/blob/master/bip-0014.mediawiki) 
+/**
+ * Format the subversion field according to BIP 14 spec (https://github.com/bitcoin/bips/blob/master/bip-0014.mediawiki)
  */
 std::string FormatSubVersion(const std::string& name, int nClientVersion, const std::vector<std::string>& comments)
 {
     std::ostringstream ss;
     ss << "/";
     ss << name << ":" << FormatVersion(nClientVersion);
-    if (!comments.empty())
-    {
+    if (!comments.empty()) {
         std::vector<std::string>::const_iterator it(comments.begin());
         ss << "(" << *it;
-        for(++it; it != comments.end(); ++it)
+        for (++it; it != comments.end(); ++it)
             ss << "; " << *it;
         ss << ")";
     }

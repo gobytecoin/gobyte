@@ -1,10 +1,10 @@
-// Copyright (c) 2017-2021 The GoByte Core developers
+// Copyright (c) 2014-2021 The GoByte Core developers
 // Distributed under the MIT software license, see the accompanying
 
-#include <base58.h>
 #include <bip39.h>
 #include <chainparams.h>
 #include <hdchain.h>
+#include <key_io.h>
 #include <tinyformat.h>
 #include <util.h>
 #include <utilstrencodings.h>
@@ -55,18 +55,13 @@ void CHDChain::Debug(const std::string& strName) const
             CExtKey extkey;
             extkey.SetMaster(vchSeed.data(), vchSeed.size());
 
-            CBitcoinExtKey b58extkey;
-            b58extkey.SetKey(extkey);
-            std::cout << "extended private masterkey: " << b58extkey.ToString().c_str() << std::endl;
+            std::cout << "extended private masterkey: " << EncodeExtKey(extkey).c_str() << std::endl;
 
             CExtPubKey extpubkey;
             extpubkey = extkey.Neuter();
 
-            CBitcoinExtPubKey b58extpubkey;
-            b58extpubkey.SetKey(extpubkey);
-            std::cout << "extended public masterkey: " << b58extpubkey.ToString().c_str() << std::endl;
-        }
-    );
+            std::cout << "extended public masterkey: " << EncodeExtPubKey(extpubkey).c_str() << std::endl;
+        });
 }
 
 bool CHDChain::SetMnemonic(const SecureVector& vchMnemonic, const SecureVector& vchMnemonicPassphrase, bool fUpdateID)
@@ -82,6 +77,10 @@ bool CHDChain::SetMnemonic(const SecureString& ssMnemonic, const SecureString& s
         // can't (re)set mnemonic if seed was already set
         if (!IsNull())
             return false;
+
+        if (ssMnemonicPassphrase.size() > 256) {
+            throw std::runtime_error(std::string(__func__) + ": Mnemonic passphrase is too long, must be at most 256 characters");
+        }
 
         // empty mnemonic i.e. "generate a new one"
         if (ssMnemonic.empty()) {
@@ -151,12 +150,12 @@ uint256 CHDChain::GetSeedHash()
 void CHDChain::DeriveChildExtKey(uint32_t nAccountIndex, bool fInternal, uint32_t nChildIndex, CExtKey& extKeyRet)
 {
     // Use BIP44 keypath scheme i.e. m / purpose' / coin_type' / account' / change / address_index
-    CExtKey masterKey;              //hd master key
-    CExtKey purposeKey;             //key at m/purpose'
-    CExtKey cointypeKey;            //key at m/purpose'/coin_type'
-    CExtKey accountKey;             //key at m/purpose'/coin_type'/account'
-    CExtKey changeKey;              //key at m/purpose'/coin_type'/account'/change
-    CExtKey childKey;               //key at m/purpose'/coin_type'/account'/change/address_index
+    CExtKey masterKey;   // hd master key
+    CExtKey purposeKey;  // key at m/purpose'
+    CExtKey cointypeKey; // key at m/purpose'/coin_type'
+    CExtKey accountKey;  // key at m/purpose'/coin_type'/account'
+    CExtKey changeKey;   // key at m/purpose'/coin_type'/account'/change
+    CExtKey childKey;    // key at m/purpose'/coin_type'/account'/change/address_index
 
     masterKey.SetMaster(vchSeed.data(), vchSeed.size());
 

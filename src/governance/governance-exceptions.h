@@ -1,9 +1,9 @@
-// Copyright (c) 2017-2021 The GoByte Core developers
+// Copyright (c) 2014-2021 The GoByte Core developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef GOVERNANCE_EXCEPTIONS_H
-#define GOVERNANCE_EXCEPTIONS_H
+#ifndef BITCOIN_GOVERNANCE_GOVERNANCE_EXCEPTIONS_H
+#define BITCOIN_GOVERNANCE_GOVERNANCE_EXCEPTIONS_H
 
 #include <exception>
 #include <iostream>
@@ -62,7 +62,7 @@ private:
     int nNodePenalty;
 
 public:
-    CGovernanceException(const std::string& strMessageIn = "",
+    explicit CGovernanceException(const std::string& strMessageIn = "",
         governance_exception_type_enum_t eTypeIn = GOVERNANCE_EXCEPTION_NONE,
         int nNodePenaltyIn = 0) :
         strMessage(),
@@ -74,9 +74,9 @@ public:
         strMessage = ostr.str();
     }
 
-    virtual ~CGovernanceException() noexcept {}
+    ~CGovernanceException() noexcept override = default;
 
-    virtual const char* what() const noexcept override
+    const char* what() const noexcept override
     {
         return strMessage.c_str();
     }
@@ -97,4 +97,4 @@ public:
     }
 };
 
-#endif
+#endif // BITCOIN_GOVERNANCE_GOVERNANCE_EXCEPTIONS_H

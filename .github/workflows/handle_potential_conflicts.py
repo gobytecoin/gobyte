@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # Copyright (c) 2022-2026 The Dash Core developers
-# Copyright (c) 2026-2027 The GoByte Core developers
+# Copyright (c) 2022-2026 The GoByte Core developers
 # Distributed under the MIT software license, see the accompanying
 # file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -34,10 +34,10 @@ except ImportError:
 
 def get_pr_json(pr_num):
     # Get repository from environment or default to gobytecoin/gobyte
-    repo = os.environ.get('GITHUB_REPOSITORY', 'gobytecoin/gobyte')
+    repo = os.environ.get('GITHUB_REPOSITORY', 'd0wn3d/gobyte')
 
     try:
-        response = requests.get(f'https://api.github.com/repos/{repo}/pulls/{pr_num}', timeout=30)
+        response = requests.get(f'https://api.github.com/repos/{repo}/pulls/{pr_num}')
         response.raise_for_status()
         pr_data = response.json()
 
@@ -47,9 +47,6 @@ def get_pr_json(pr_num):
             return None
 
         return pr_data
-    except requests.exceptions.Timeout as e:
-        print(f"Warning: Timeout fetching PR {pr_num}: {e}", file=sys.stderr)
-        return None
     except requests.RequestException as e:
         print(f"Warning: Error fetching PR {pr_num}: {e}", file=sys.stderr)
         return None
@@ -141,15 +138,12 @@ def main():
             continue
 
         # Get repository from environment
-        repo = os.environ.get('GITHUB_REPOSITORY', 'gobytecoin/gobyte')
+        repo = os.environ.get('GITHUB_REPOSITORY', 'd0wn3d/gobyte')
         merge_check_url = f'https://github.com/{repo}/branches/pre_mergeable/{our_pr_label}...{conflict_pr_label}'
 
         try:
-            pre_mergeable = requests.get(merge_check_url, timeout=30)
+            pre_mergeable = requests.get(merge_check_url)
             pre_mergeable.raise_for_status()
-        except requests.exceptions.Timeout as e:
-            print(f"Timeout checking mergeability for PR {conflict_pr_num}: {e}", file=sys.stderr)
-            continue
         except requests.RequestException as e:
             print(f"Error checking mergeability for PR {conflict_pr_num}: {e}", file=sys.stderr)
             continue

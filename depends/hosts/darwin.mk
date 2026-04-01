@@ -1,17 +1,80 @@
-OSX_MIN_VERSION=10.8
-OSX_SDK_VERSION=10.11
-OSX_SDK=$(SDK_PATH)/MacOSX$(OSX_SDK_VERSION).sdk
-LD64_VERSION=253.9
-darwin_CC=clang -target $(host) -mmacosx-version-min=$(OSX_MIN_VERSION) --sysroot $(OSX_SDK) -mlinker-version=$(LD64_VERSION)
-darwin_CXX=clang++ -target $(host) -mmacosx-version-min=$(OSX_MIN_VERSION) --sysroot $(OSX_SDK) -mlinker-version=$(LD64_VERSION) -stdlib=libc++
+OSX_MIN_VERSION=14.0
+OSX_SDK_VERSION=14.0
+XCODE_VERSION=26.1.1
+XCODE_BUILD_ID=17B100
+LLD_VERSION=711
+OSX_SDK=$(SDK_PATH)/Xcode-$(XCODE_VERSION)-$(XCODE_BUILD_ID)-extracted-SDK-with-libcxx-headers
 
-darwin_CFLAGS=-pipe
-darwin_CXXFLAGS=$(darwin_CFLAGS)
+# Use system clang/LLVM tools
+clang_prog=$(shell $(SHELL) $(.SHELLFLAGS) "command -v clang")
+clangxx_prog=$(shell $(SHELL) $(.SHELLFLAGS) "command -v clang++")
+
+darwin_AR=$(shell $(SHELL) $(.SHELLFLAGS) "command -v llvm-ar")
+darwin_DSYMUTIL=$(shell $(SHELL) $(.SHELLFLAGS) "command -v dsymutil")
+darwin_NM=$(shell $(SHELL) $(.SHELLFLAGS) "command -v llvm-nm")
+darwin_OBJCOPY=$(shell $(SHELL) $(.SHELLFLAGS) "command -v llvm-objcopy")
+darwin_OBJDUMP=$(shell $(SHELL) $(.SHELLFLAGS) "command -v llvm-objdump")
+darwin_RANLIB=$(shell $(SHELL) $(.SHELLFLAGS) "command -v llvm-ranlib")
+darwin_STRIP=$(shell $(SHELL) $(.SHELLFLAGS) "command -v llvm-strip")
+
+# Flag explanations:
+#
+#     -mlinker-version
+#
+#         Ensures that modern linker features are enabled.
+#
+#     -isysroot $(OSX_SDK) -nostdlibinc
+#
+#         Disable default include paths built into the compiler as well as
+#         those normally included for libc and libc++. The only path that
+#         remains implicitly is the clang resource dir.
+#
+#     -iwithsysroot / -iframeworkwithsysroot
+#
+#         Adds the desired paths from the SDK
+#
+#     -platform_version
+#
+#         Indicate to the linker the platform, the oldest supported version,
+#         and the SDK used.
+#
+#     -no_adhoc_codesign
+#
+#         Disable adhoc codesigning (for now) when using LLVM tooling, to avoid
+#         non-determinism issues with the Identifier field.
+#
+#     -Xclang -fno-cxx-modules
+#
+#         Disable C++ modules. We don't use these, and modules cause definition issues
+#         in the SDK, where __has_feature(modules) is used to define USE_CLANG_TYPES,
+#         which is in turn used as an include guard.
+
+# TODO: remove C_INCLUDE_PATH when it is indeed useless
+darwin_CC=env -u C_INCLUDE_PATH -u CPLUS_INCLUDE_PATH $(clang_prog) --target=$(host) \
+              -isysroot$(OSX_SDK) -nostdlibinc \
+              -iwithsysroot/usr/include -iframeworkwithsysroot/System/Library/Frameworks
+
+# TODO: remove C_INCLUDE_PATH when it is indeed useless
+darwin_CXX=env -u C_INCLUDE_PATH -u CPLUS_INCLUDE_PATH $(clangxx_prog) --target=$(host) \
+               -isysroot$(OSX_SDK) -nostdlibinc \
+               -iwithsysroot/usr/include/c++/v1 \
+               -iwithsysroot/usr/include -iframeworkwithsysroot/System/Library/Frameworks
+
+darwin_CFLAGS=-mmacos-version-min=$(OSX_MIN_VERSION)
+darwin_CXXFLAGS=-mmacos-version-min=$(OSX_MIN_VERSION) -Xclang -fno-cxx-modules
+darwin_LDFLAGS=-Wl,-platform_version,macos,$(OSX_MIN_VERSION),$(OSX_SDK_VERSION)
+
+ifneq ($(build_os),darwin)
+darwin_CFLAGS += -mlinker-version=$(LLD_VERSION)
+darwin_CXXFLAGS += -mlinker-version=$(LLD_VERSION)
+darwin_LDFLAGS += -Wl,-no_adhoc_codesign -fuse-ld=lld
+endif
 
 darwin_release_CFLAGS=-O2
 darwin_release_CXXFLAGS=$(darwin_release_CFLAGS)
 
-darwin_debug_CFLAGS=-O1
+darwin_debug_CFLAGS=-O1 -g
 darwin_debug_CXXFLAGS=$(darwin_debug_CFLAGS)
 
-darwin_native_toolchain=native_cctools
+darwin_cmake_system_name=Darwin
+darwin_cmake_system_version=23.0

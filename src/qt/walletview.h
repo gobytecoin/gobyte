@@ -40,39 +40,39 @@ public:
     explicit WalletView(QWidget* parent);
     ~WalletView();
 
-    void setBitcoinGUI(BitcoinGUI *gui);
+    void setBitcoinGUI(BitcoinGUI* gui);
     /** Set the client model.
         The client model represents the part of the core that communicates with the P2P network, and is wallet-agnostic.
     */
-    void setClientModel(ClientModel *clientModel);
-    WalletModel *getWalletModel() { return walletModel; }
+    void setClientModel(ClientModel* clientModel);
+    WalletModel* getWalletModel() { return walletModel; }
     /** Set the wallet model.
         The wallet model represents a bitcoin wallet, and offers access to the list of transactions, address book and sending
         functionality.
     */
-    void setWalletModel(WalletModel *walletModel);
+    void setWalletModel(WalletModel* walletModel);
 
     bool handlePaymentRequest(const SendCoinsRecipient& recipient);
 
     void showOutOfSyncWarning(bool fShow);
 
 private:
-    ClientModel *clientModel;
-    WalletModel *walletModel;
+    ClientModel* clientModel;
+    WalletModel* walletModel;
 
-    OverviewPage *overviewPage;
-    QWidget *transactionsPage;
-    ReceiveCoinsDialog *receiveCoinsPage;
-    SendCoinsDialog *sendCoinsPage;
-    SendCoinsDialog* privateSendCoinsPage;
-    AddressBookPage *usedSendingAddressesPage;
-    AddressBookPage *usedReceivingAddressesPage;
-    MasternodeList *masternodeListPage;
+    OverviewPage* overviewPage;
+    QWidget* transactionsPage;
+    ReceiveCoinsDialog* receiveCoinsPage;
+    SendCoinsDialog* sendCoinsPage;
+    SendCoinsDialog* coinJoinCoinsPage;
+    AddressBookPage* usedSendingAddressesPage;
+    AddressBookPage* usedReceivingAddressesPage;
+    MasternodeList* masternodeListPage;
 
-    TransactionView *transactionView;
+    TransactionView* transactionView;
 
-    QProgressDialog *progressDialog;
-    QLabel *transactionSum;
+    QProgressDialog* progressDialog;
+    QLabel* transactionSum;
 
 public Q_SLOTS:
     /** Switch to overview (home) page */
@@ -85,8 +85,8 @@ public Q_SLOTS:
     void gotoReceiveCoinsPage();
     /** Switch to send coins page */
     void gotoSendCoinsPage(QString addr = "");
-    /** Switch to PrivateSend coins page */
-    void gotoPrivateSendCoinsPage(QString addr = "");
+    /** Switch to CoinJoin coins page */
+    void gotoCoinJoinCoinsPage(QString addr = "");
 
     /** Show Sign/Verify Message dialog and switch to sign message tab */
     void gotoSignMessageTab(QString addr = "");
@@ -105,7 +105,7 @@ public Q_SLOTS:
     /** Change encrypted wallet passphrase */
     void changePassphrase();
     /** Ask for passphrase to unlock wallet temporarily */
-    void unlockWallet(bool fAnonymizeOnly=false);
+    void unlockWallet(bool fAnonymizeOnly = false);
     /** Lock wallet */
     void lockWallet();
 
@@ -118,7 +118,7 @@ public Q_SLOTS:
     void updateEncryptionStatus();
 
     /** Show progress dialog e.g. for rescan */
-    void showProgress(const QString &title, int nProgress);
+    void showProgress(const QString& title, int nProgress);
 
     /** User has requested more information about the out of sync state */
     void requestedSyncWarningInfo();
@@ -130,13 +130,13 @@ Q_SIGNALS:
     /** Signal that we want to show the main window */
     void showNormalIfMinimized();
     /**  Fired when a message should be reported to the user */
-    void message(const QString &title, const QString &message, unsigned int style);
+    void message(const QString& title, const QString& message, unsigned int style);
     /** Encryption status of wallet changed */
-    void encryptionStatusChanged(int status);
+    void encryptionStatusChanged();
     /** HD-Enabled status of wallet changed (only possible during startup) */
-    void hdEnabledStatusChanged(int hdEnabled);
+    void hdEnabledStatusChanged();
     /** Notify that a new transaction appeared */
-    void incomingTransaction(const QString& date, int unit, const CAmount& amount, const QString& type, const QString& address, const QString& label);
+    void incomingTransaction(const QString& date, int unit, const CAmount& amount, const QString& type, const QString& address, const QString& label, const QString& walletName);
     /** Notify that the out of sync warning icon has been pressed */
     void outOfSyncWarningClicked();
 };

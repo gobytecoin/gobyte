@@ -1,6 +1,6 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
 // Copyright (c) 2009-2015 The Bitcoin Core developers
-// Copyright (c) 2017-2021 The GoByte Core developers
+// Copyright (c) 2014-2021 The GoByte Core developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -12,17 +12,15 @@
 #include <clientversion.h>
 #include <compat.h>
 #include <fs.h>
-#include <rpc/server.h>
+#include <httprpc.h>
+#include <httpserver.h>
 #include <init.h>
 #include <noui.h>
+#include <rpc/server.h>
+#include <stacktraces.h>
 #include <util.h>
-#include <httpserver.h>
-#include <httprpc.h>
 #include <utilstrencodings.h>
 #include <walletinitinterface.h>
-#include <stacktraces.h>
-
-#include <boost/thread.hpp>
 
 #include <stdio.h>
 
@@ -44,8 +42,7 @@
 
 void WaitForShutdown()
 {
-    while (!ShutdownRequested())
-    {
+    while (!ShutdownRequested()) {
         MilliSleep(200);
     }
     Interrupt();
@@ -63,6 +60,10 @@ bool AppInit(int argc, char* argv[])
     // Parameters
     //
     // If Qt is used, parameters/gobyte.conf are parsed in qt/gobyte.cpp's main()
+    SetupServerArgs();
+#if HAVE_DECL_DAEMON
+    gArgs.AddArg("-daemon", "Run in the background as a daemon and accept commands", false, OptionsCategory::OPTIONS);
+#endif
     gArgs.ParseParameters(argc, argv);
 
     if (gArgs.IsArgSet("-printcrashinfo")) {
@@ -71,43 +72,36 @@ bool AppInit(int argc, char* argv[])
     }
 
     // Process help and version before taking care about datadir
-    if (gArgs.IsArgSet("-?") || gArgs.IsArgSet("-h") ||  gArgs.IsArgSet("-help") || gArgs.IsArgSet("-version"))
-    {
-        std::string strUsage = strprintf(_("%s Daemon"), _(PACKAGE_NAME)) + " " + _("version") + " " + FormatFullVersion() + "\n";
+    if (gArgs.IsArgSet("-?") || gArgs.IsArgSet("-h") || gArgs.IsArgSet("-help") || gArgs.IsArgSet("-version")) {
+        std::string strUsage = strprintf("%s Daemon", PACKAGE_NAME) + " version " + FormatFullVersion() + "\n";
 
-        if (gArgs.IsArgSet("-version"))
-        {
+        if (gArgs.IsArgSet("-version")) {
             strUsage += FormatParagraph(LicenseInfo());
-        }
-        else
-        {
-            strUsage += "\n" + _("Usage:") + "\n" +
-                  "  gobyted [options]                     " + strprintf(_("Start %s Daemon"), _(PACKAGE_NAME)) + "\n";
+        } else {
+            strUsage += "\nUsage:\n"
+                        "  gobyted [options]                     " +
+                        strprintf("Start %s Daemon", PACKAGE_NAME) + "\n";
 
-            strUsage += "\n" + HelpMessage(HMM_BITCOIND);
+            strUsage += "\n" + gArgs.GetHelpMessage();
         }
 
         fprintf(stdout, "%s", strUsage.c_str());
         return true;
     }
 
-    try
-    {
+    try {
         bool datadirFromCmdLine = gArgs.IsArgSet("-datadir");
-        if (datadirFromCmdLine && !fs::is_directory(GetDataDir(false)))
-        {
+        if (datadirFromCmdLine && !fs::is_directory(GetDataDir(false))) {
             fprintf(stderr, "Error: Specified data directory \"%s\" does not exist.\n", gArgs.GetArg("-datadir", "").c_str());
             return false;
         }
-        try
-        {
+        try {
             gArgs.ReadConfigFile(gArgs.GetArg("-conf", BITCOIN_CONF_FILENAME));
         } catch (const std::exception& e) {
-            fprintf(stderr,"Error reading configuration file: %s\n", e.what());
+            fprintf(stderr, "Error reading configuration file: %s\n", e.what());
             return false;
         }
-        if (!datadirFromCmdLine && !fs::is_directory(GetDataDir(false)))
-        {
+        if (!datadirFromCmdLine && !fs::is_directory(GetDataDir(false))) {
             fprintf(stderr, "Error: Specified data directory \"%s\" from config file does not exist.\n", gArgs.GetArg("-datadir", "").c_str());
             return EXIT_FAILURE;
         }
@@ -132,24 +126,24 @@ bool AppInit(int argc, char* argv[])
         // Set this early so that parameter interactions go to console
         InitLogging();
         InitParameterInteraction();
-        if (!AppInitBasicSetup())
-        {
+        if (!AppInitBasicSetup()) {
             // InitError will have been called with detailed error, which ends up on console
             return false;
         }
-        if (!AppInitParameterInteraction())
-        {
+        if (!AppInitParameterInteraction()) {
             // InitError will have been called with detailed error, which ends up on console
             return false;
         }
-        if (!AppInitSanityChecks())
-        {
+        if (!AppInitSanityChecks()) {
             // InitError will have been called with detailed error, which ends up on console
             return false;
         }
-        if (gArgs.GetBoolArg("-daemon", false))
-        {
+        if (gArgs.GetBoolArg("-daemon", false)) {
 #if HAVE_DECL_DAEMON
+#if defined(MAC_OSX)
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
+#endif
             fprintf(stdout, "GoByte Core server starting\n");
 
             // Daemonize
@@ -157,14 +151,16 @@ bool AppInit(int argc, char* argv[])
                 fprintf(stderr, "Error: daemon() failed: %s\n", strerror(errno));
                 return false;
             }
+#if defined(MAC_OSX)
+#pragma GCC diagnostic pop
+#endif
 #else
             fprintf(stderr, "Error: -daemon is not supported on this operating system\n");
             return false;
 #endif // HAVE_DECL_DAEMON
         }
         // Lock data directory after daemonization
-        if (!AppInitLockDataDirectory())
-        {
+        if (!AppInitLockDataDirectory()) {
             // If locking the data directory failed, exit immediately
             return false;
         }
@@ -173,8 +169,7 @@ bool AppInit(int argc, char* argv[])
         PrintExceptionContinue(std::current_exception(), "AppInit()");
     }
 
-    if (!fRet)
-    {
+    if (!fRet) {
         Interrupt();
     } else {
         WaitForShutdown();

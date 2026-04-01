@@ -1,10 +1,11 @@
-// Copyright (c) 2017-2021 The GoByte Core developers
+// Copyright (c) 2014-2021 The GoByte Core developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
+#include <governance/governance-object.h>
 #include <governance/governance-validators.h>
 
-#include <base58.h>
+#include <key_io.h>
 #include <timedata.h>
 #include <tinyformat.h>
 #include <utilstrencodings.h>
@@ -41,6 +42,10 @@ bool CProposalValidator::Validate(bool fCheckExpiration)
         strErrorMessages += "JSON parsing error;";
         return false;
     }
+    if (!ValidateType()) {
+        strErrorMessages += "Invalid type;";
+        return false;
+    }
     if (!ValidateName()) {
         strErrorMessages += "Invalid name;";
         return false;
@@ -61,6 +66,22 @@ bool CProposalValidator::Validate(bool fCheckExpiration)
         strErrorMessages += "Invalid URL;";
         return false;
     }
+    return true;
+}
+
+bool CProposalValidator::ValidateType()
+{
+    int64_t nType;
+    if (!GetDataValue("type", nType)) {
+        strErrorMessages += "type field not found;";
+        return false;
+    }
+
+    if (nType != GOVERNANCE_OBJECT_PROPOSAL) {
+        strErrorMessages += strprintf("type is not %d;", GOVERNANCE_OBJECT_PROPOSAL);
+        return false;
+    }
+
     return true;
 }
 
@@ -158,7 +179,7 @@ bool CProposalValidator::ValidatePaymentAddress()
         return false;
     }
 
-    const CScriptID *scriptID = boost::get<CScriptID>(&dest);
+    const CScriptID* scriptID = boost::get<CScriptID>(&dest);
     if (scriptID) {
         strErrorMessages += "script addresses are not supported;";
         return false;
@@ -294,8 +315,6 @@ bool CProposalValidator::CheckURL(const std::string& strURLIn)
     std::string::size_type nPos = strRest.find(':');
 
     if (nPos != std::string::npos) {
-        //std::string strSchema = strRest.substr(0,nPos);
-
         if (nPos < strRest.size()) {
             strRest = strRest.substr(nPos + 1);
         } else {

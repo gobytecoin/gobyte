@@ -1,0 +1,44 @@
+services:
+  container:
+    entrypoint: /bin/bash
+    build:
+      context: '..'
+      dockerfile: './develop/Dockerfile'
+      args:
+        USER_ID: 1000 # set this to $(id -u) of the host
+        GROUP_ID: 1000 # set this to $(id -g) of the host
+    ports:
+      - "12454:12454" # Mainnet Ports
+      - "12455:12455"
+      - "13454:13454" # Testnet Ports
+      - "13455:13455"
+    security_opt:
+      - seccomp:unconfined
+    stdin_open: true # Equivalent to -i
+    tty: true # Equivalent to -t
+    volumes:
+      - type: bind
+        source: ../../..
+        target: /src/gobyte
+
+# Sharing your ccache
+#
+# As the container is supposed to be a reproducible replica of the build
+# environment 1:1, it will not interact with your filesystem except as
+# defined in this file. This comes with the disadvantage of having to engage
+# in repeated re-compilation of object files, which will prolong your build
+# times and make the process more arduous. Therefore it is recommended to share
+# your local ccache with the container. The example below connects to a remote
+# samba share and can be adopted to fit your needs.
+#
+# NOTE: Only the first line is a continuation of the services.container.volumes
+#       definition
+
+#      - cache:/home/gobyte/.ccache
+#
+# volumes:
+#    cache:
+#      driver_opts:
+#        type: cifs
+#        o: "username=example,password=changemeplsfix"
+#        device: "//127.0.0.1/cache"

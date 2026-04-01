@@ -1,0 +1,30 @@
+From: GoByte Core Developers <dev@gobyte.network>
+Subject: [PATCH] qt 5.9.6 win32: guard tagTOUCHINPUT typedef against mingw-w64 11.x
+
+mingw-w64 >= 11.0 declares tagTOUCHINPUT / TOUCHINPUT / PTOUCHINPUT
+unconditionally in winuser.h when _WIN32_WINNT >= 0x0601.  Qt 5.9.6's
+qwindowsmousehandler.cpp re-declares the same struct unconditionally as
+a compatibility shim for older SDK headers that lacked it.  On Ubuntu
+24.04 the newer mingw-w64 headers expose the conflict as a hard
+multiple-definition error:
+
+  qwindowsmousehandler.cpp:65:16: error: redefinition of 'struct tagTOUCHINPUT'
+  qwindowsmousehandler.cpp:76:3:  error: conflicting declaration 'typedef int TOUCHINPUT'
+
+WM_TOUCH (0x0240) is defined in every winuser.h version that provides
+the full touch-input API surface (TOUCHINPUT, TOUCHEVENTF_*, etc.).
+Guard the compatibility block on !defined(WM_TOUCH) so the shim is
+emitted only for SDK headers that need it.
+
+Observed: Ubuntu 24.04 / mingw-w64 11.0 / x86_64-w64-mingw32
+          (GitHub Actions ubuntu-latest, 2026-Q1)
+---
+ qtbase/src/plugins/platforms/windows/qwindowsmousehandler.cpp | 2 ++
+ 1 file changed, 2 insertions(+)
+
+--- a/qtbase/src/plugins/platforms/windows/qwindowsmousehandler.cpp
++++ b/qtbase/src/plugins/platforms/windows/qwindowsmousehandler.cpp
+@@ -64,0 +65 @@
++#ifndef WM_TOUCH
+@@ -76,0 +78 @@
++#endif /* WM_TOUCH */

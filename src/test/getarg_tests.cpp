@@ -2,8 +2,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include <util.h>
 #include <test/test_gobyte.h>
+#include <util.h>
 
 #include <string>
 #include <vector>
@@ -17,7 +17,7 @@ static void ResetArgs(const std::string& strArg)
 {
     std::vector<std::string> vecArg;
     if (strArg.size())
-      boost::split(vecArg, strArg, boost::is_space(), boost::token_compress_on);
+        boost::split(vecArg, strArg, boost::is_space(), boost::token_compress_on);
 
     // Insert dummy executable name:
     vecArg.insert(vecArg.begin(), "testgobyte");
@@ -59,15 +59,15 @@ BOOST_AUTO_TEST_CASE(boolarg)
     BOOST_CHECK(!gArgs.GetBoolArg("-foo", false));
     BOOST_CHECK(!gArgs.GetBoolArg("-foo", true));
 
-    ResetArgs("-foo -nofoo");  // -nofoo should win
+    ResetArgs("-foo -nofoo"); // -nofoo should win
     BOOST_CHECK(!gArgs.GetBoolArg("-foo", false));
     BOOST_CHECK(!gArgs.GetBoolArg("-foo", true));
 
-    ResetArgs("-foo=1 -nofoo=1");  // -nofoo should win
+    ResetArgs("-foo=1 -nofoo=1"); // -nofoo should win
     BOOST_CHECK(!gArgs.GetBoolArg("-foo", false));
     BOOST_CHECK(!gArgs.GetBoolArg("-foo", true));
 
-    ResetArgs("-foo=0 -nofoo=0");  // -nofoo=0 should win
+    ResetArgs("-foo=0 -nofoo=0"); // -nofoo=0 should win
     BOOST_CHECK(gArgs.GetBoolArg("-foo", false));
     BOOST_CHECK(gArgs.GetBoolArg("-foo", true));
 
@@ -79,7 +79,6 @@ BOOST_AUTO_TEST_CASE(boolarg)
     ResetArgs("--nofoo=1");
     BOOST_CHECK(!gArgs.GetBoolArg("-foo", false));
     BOOST_CHECK(!gArgs.GetBoolArg("-foo", true));
-
 }
 
 BOOST_AUTO_TEST_CASE(stringarg)
@@ -103,7 +102,6 @@ BOOST_AUTO_TEST_CASE(stringarg)
     ResetArgs("-foo=eleven");
     BOOST_CHECK_EQUAL(gArgs.GetArg("-foo", ""), "eleven");
     BOOST_CHECK_EQUAL(gArgs.GetArg("-foo", "eleven"), "eleven");
-
 }
 
 BOOST_AUTO_TEST_CASE(intarg)

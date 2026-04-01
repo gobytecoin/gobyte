@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+
+set -eo pipefail
+
+WORKSPACE_PATH="${1:-$(pwd)}"
+
+if [[ ! -d "${WORKSPACE_PATH}" || ! "${WORKSPACE_PATH}" = /* || ! -f "${WORKSPACE_PATH}/contrib/guix/libexec/prelude.bash" ]]; then
+    echo "${0##*/}: ${WORKSPACE_PATH} is not the top directory of the GoByte Core repository, exiting!"
+    exit 1
+fi
+
+cd "$WORKSPACE_PATH"
+
+source "contrib/guix/libexec/prelude.bash"
+
+GUIX_SIGS_REPO="$(mktemp -d)"
+trap 'rm -rf -- "$GUIX_SIGS_REPO"' EXIT
+SIGNER=dummy
+env GUIX_SIGS_REPO="${GUIX_SIGS_REPO}" NO_SIGN=1 SIGNER=${SIGNER} ./contrib/guix/guix-attest
+SHASUM_LOC="${GUIX_SIGS_REPO}/${VERSION}/${SIGNER}"
+cat "${SHASUM_LOC}/all.sha256sums" 2>/dev/null || cat "${SHASUM_LOC}/noncodesigned.SHA256SUMS"

@@ -1,19 +1,17 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
 // Copyright (c) 2009-2015 The Bitcoin Core developers
-// Copyright (c) 2014-2019 The Dash Core developers
-// Copyright (c) 2017-2021 The GoByte Core developers
+// Copyright (c) 2014-2021 The GoByte Core developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include <util.h>
-#include <fs.h>
 
-#include <support/allocators/secure.h>
 #include <chainparamsbase.h>
 #include <ctpl.h>
 #include <random.h>
 #include <serialize.h>
 #include <stacktraces.h>
+#include <support/allocators/secure.h>
 #include <utilstrencodings.h>
 
 #include <stdarg.h>
@@ -37,16 +35,17 @@
 
 #include <algorithm>
 #include <fcntl.h>
+#include <sched.h>
 #include <sys/resource.h>
 #include <sys/stat.h>
 
 #else
 
 #ifdef _MSC_VER
-#pragma warning(disable:4786)
-#pragma warning(disable:4804)
-#pragma warning(disable:4805)
-#pragma warning(disable:4717)
+#pragma warning(disable : 4786)
+#pragma warning(disable : 4804)
+#pragma warning(disable : 4805)
+#pragma warning(disable : 4717)
 #endif
 
 #ifdef _WIN32_WINNT
@@ -76,21 +75,19 @@
 #include <malloc.h>
 #endif
 
-#include <boost/algorithm/string/join.hpp>
-#include <boost/algorithm/string/split.hpp>
-#include <boost/algorithm/string/classification.hpp>
 #include <boost/interprocess/sync/file_lock.hpp>
 #include <boost/program_options/detail/config_file.hpp>
 #include <boost/program_options/parsers.hpp>
 #include <boost/thread.hpp>
+#include <openssl/conf.h>
 #include <openssl/crypto.h>
 #include <openssl/rand.h>
-#include <openssl/conf.h>
+#include <thread>
 
 // Application startup time (used for uptime calculation)
 const int64_t nStartupTime = GetTime();
 
-//GoByte only features
+// GoByte only features
 bool fMasternodeMode = false;
 bool fDisableGovernance = false;
 /**
@@ -102,23 +99,12 @@ bool fDisableGovernance = false;
 */
 int nWalletBackups = 10;
 
-const char * const BITCOIN_CONF_FILENAME = "gobyte.conf";
-const char * const BITCOIN_PID_FILENAME = "gobyted.pid";
-const char * const DEFAULT_DEBUGLOGFILE = "debug.log";
+const char* const BITCOIN_CONF_FILENAME = "gobyte.conf";
+const char* const BITCOIN_PID_FILENAME = "gobyted.pid";
 
 ArgsManager gArgs;
-bool fPrintToConsole = false;
-bool fPrintToDebugLog = true;
 
-bool fLogTimestamps = DEFAULT_LOGTIMESTAMPS;
-bool fLogTimeMicros = DEFAULT_LOGTIMEMICROS;
-bool fLogThreadNames = DEFAULT_LOGTHREADNAMES;
-bool fLogIPs = DEFAULT_LOGIPS;
-std::atomic<bool> fReopenDebugLog(false);
 CTranslationInterface translationInterface;
-
-/** Log categories bitfield. */
-std::atomic<uint64_t> logCategories(0);
 
 /** Init OpenSSL library multithreading support */
 static std::unique_ptr<CCriticalSection[]> ppmutexOpenSSL;
@@ -165,306 +151,7 @@ public:
         // Clear the set of locks now to maintain symmetry with the constructor.
         ppmutexOpenSSL.reset();
     }
-}
-instance_of_cinit;
-
-/**
- * LogPrintf() has been broken a couple of times now
- * by well-meaning people adding mutexes in the most straightforward way.
- * It breaks because it may be called by global destructors during shutdown.
- * Since the order of destruction of static/global objects is undefined,
- * defining a mutex as a global object doesn't work (the mutex gets
- * destroyed, and then some later destructor calls OutputDebugStringF,
- * maybe indirectly, and you get a core dump at shutdown trying to lock
- * the mutex).
- */
-
-static boost::once_flag debugPrintInitFlag = BOOST_ONCE_INIT;
-
-/**
- * We use boost::call_once() to make sure mutexDebugLog and
- * vMsgsBeforeOpenLog are initialized in a thread-safe manner.
- *
- * NOTE: fileout, mutexDebugLog and sometimes vMsgsBeforeOpenLog
- * are leaked on exit. This is ugly, but will be cleaned up by
- * the OS/libc. When the shutdown sequence is fully audited and
- * tested, explicit destruction of these objects can be implemented.
- */
-static FILE* fileout = nullptr;
-static boost::mutex* mutexDebugLog = nullptr;
-static std::list<std::string>* vMsgsBeforeOpenLog;
-
-static int FileWriteStr(const std::string &str, FILE *fp)
-{
-    return fwrite(str.data(), 1, str.size(), fp);
-}
-
-static void DebugPrintInit()
-{
-    assert(mutexDebugLog == nullptr);
-    mutexDebugLog = new boost::mutex();
-    vMsgsBeforeOpenLog = new std::list<std::string>;
-}
-
-fs::path GetDebugLogPath()
-{
-    fs::path logfile(gArgs.GetArg("-debuglogfile", DEFAULT_DEBUGLOGFILE));
-    return AbsPathForConfigVal(logfile);
-}
-
-bool OpenDebugLog()
-{
-    boost::call_once(&DebugPrintInit, debugPrintInitFlag);
-    boost::mutex::scoped_lock scoped_lock(*mutexDebugLog);
-
-    assert(fileout == nullptr);
-    assert(vMsgsBeforeOpenLog);
-    fs::path pathDebug = GetDebugLogPath();
-
-    fileout = fsbridge::fopen(pathDebug, "a");
-    if (!fileout) {
-        return false;
-    }
-
-    setbuf(fileout, nullptr); // unbuffered
-    // dump buffered messages from before we opened the log
-    while (!vMsgsBeforeOpenLog->empty()) {
-        FileWriteStr(vMsgsBeforeOpenLog->front(), fileout);
-        vMsgsBeforeOpenLog->pop_front();
-    }
-
-    delete vMsgsBeforeOpenLog;
-    vMsgsBeforeOpenLog = nullptr;
-    return true;
-}
-
-struct CLogCategoryDesc
-{
-    uint64_t flag;
-    std::string category;
-};
-
-const CLogCategoryDesc LogCategories[] =
-{
-    {BCLog::NONE, "0"},
-    {BCLog::NONE, "none"},
-    {BCLog::NET, "net"},
-    {BCLog::TOR, "tor"},
-    {BCLog::MEMPOOL, "mempool"},
-    {BCLog::HTTP, "http"},
-    {BCLog::BENCHMARK, "bench"},
-    {BCLog::ZMQ, "zmq"},
-    {BCLog::DB, "db"},
-    {BCLog::RPC, "rpc"},
-    {BCLog::ESTIMATEFEE, "estimatefee"},
-    {BCLog::ADDRMAN, "addrman"},
-    {BCLog::SELECTCOINS, "selectcoins"},
-    {BCLog::REINDEX, "reindex"},
-    {BCLog::CMPCTBLOCK, "cmpctblock"},
-    {BCLog::RANDOM, "rand"},
-    {BCLog::PRUNE, "prune"},
-    {BCLog::PROXY, "proxy"},
-    {BCLog::MEMPOOLREJ, "mempoolrej"},
-    {BCLog::LIBEVENT, "libevent"},
-    {BCLog::COINDB, "coindb"},
-    {BCLog::QT, "qt"},
-    {BCLog::LEVELDB, "leveldb"},
-    {BCLog::ALL, "1"},
-    {BCLog::ALL, "all"},
-
-    //Start GoByte
-    {BCLog::CHAINLOCKS, "chainlocks"},
-    {BCLog::GOBJECT, "gobject"},
-    {BCLog::INSTANTSEND, "instantsend"},
-    {BCLog::KEEPASS, "keepass"},
-    {BCLog::LLMQ, "llmq"},
-    {BCLog::LLMQ_DKG, "llmq-dkg"},
-    {BCLog::LLMQ_SIGS, "llmq-sigs"},
-    {BCLog::MNPAYMENTS, "mnpayments"},
-    {BCLog::MNSYNC, "mnsync"},
-    {BCLog::PRIVATESEND, "privatesend"},
-    {BCLog::SPORK, "spork"},
-    {BCLog::NETCONN, "netconn"},
-    //End GoByte
-
-};
-
-bool GetLogCategory(uint64_t *f, const std::string *str)
-{
-    if (f && str) {
-        if (*str == "") {
-            *f = BCLog::ALL;
-            return true;
-        }
-        if (*str == "gobyte") {
-            *f = BCLog::CHAINLOCKS
-                | BCLog::GOBJECT
-                | BCLog::INSTANTSEND
-                | BCLog::KEEPASS
-                | BCLog::LLMQ
-                | BCLog::LLMQ_DKG
-                | BCLog::LLMQ_SIGS
-                | BCLog::MNPAYMENTS
-                | BCLog::MNSYNC
-                | BCLog::PRIVATESEND
-                | BCLog::SPORK;
-            return true;
-        }
-        for (unsigned int i = 0; i < ARRAYLEN(LogCategories); i++) {
-            if (LogCategories[i].category == *str) {
-                *f = LogCategories[i].flag;
-                return true;
-            }
-        }
-    }
-    return false;
-}
-
-std::string ListLogCategories()
-{
-    std::string ret;
-    int outcount = 0;
-    for (unsigned int i = 0; i < ARRAYLEN(LogCategories); i++) {
-        // Omit the special cases.
-        if (LogCategories[i].flag != BCLog::NONE && LogCategories[i].flag != BCLog::ALL) {
-            if (outcount != 0) ret += ", ";
-            ret += LogCategories[i].category;
-            outcount++;
-        }
-    }
-    return ret;
-}
-
-std::vector<CLogCategoryActive> ListActiveLogCategories()
-{
-    std::vector<CLogCategoryActive> ret;
-    for (unsigned int i = 0; i < ARRAYLEN(LogCategories); i++) {
-        // Omit the special cases.
-        if (LogCategories[i].flag != BCLog::NONE && LogCategories[i].flag != BCLog::ALL) {
-            CLogCategoryActive catActive;
-            catActive.category = LogCategories[i].category;
-            catActive.active = LogAcceptCategory(LogCategories[i].flag);
-            ret.push_back(catActive);
-        }
-    }
-    return ret;
-}
-
-std::string ListActiveLogCategoriesString()
-{
-    if (logCategories == BCLog::NONE)
-        return "0";
-    if (logCategories == BCLog::ALL)
-        return "1";
-
-    std::string ret;
-    int outcount = 0;
-    for (unsigned int i = 0; i < ARRAYLEN(LogCategories); i++) {
-        // Omit the special cases.
-        if (LogCategories[i].flag != BCLog::NONE && LogCategories[i].flag != BCLog::ALL && LogAcceptCategory(LogCategories[i].flag)) {
-            if (outcount != 0) ret += ", ";
-            ret += LogCategories[i].category;
-            outcount++;
-        }
-    }
-    return ret;
-}
-
-/**
- * fStartedNewLine is a state variable held by the calling context that will
- * suppress printing of the timestamp when multiple calls are made that don't
- * end in a newline. Initialize it to true, and hold/manage it, in the calling context.
- */
-static std::string LogTimestampStr(const std::string &str, std::atomic_bool *fStartedNewLine)
-{
-    std::string strStamped;
-
-    if (!fLogTimestamps)
-        return str;
-
-    if (*fStartedNewLine) {
-        int64_t nTimeMicros = GetTimeMicros();
-        strStamped = DateTimeStrFormat("%Y-%m-%d %H:%M:%S", nTimeMicros/1000000);
-        if (fLogTimeMicros)
-            strStamped += strprintf(".%06d", nTimeMicros%1000000);
-        int64_t mocktime = GetMockTime();
-        if (mocktime) {
-            strStamped += " (mocktime: " + DateTimeStrFormat("%Y-%m-%d %H:%M:%S", mocktime) + ")";
-        }
-        strStamped += ' ' + str;
-    } else
-        strStamped = str;
-
-    return strStamped;
-}
-
-/**
- * fStartedNewLine is a state variable held by the calling context that will
- * suppress printing of the thread name when multiple calls are made that don't
- * end in a newline. Initialize it to true, and hold/manage it, in the calling context.
- */
-static std::string LogThreadNameStr(const std::string &str, std::atomic_bool *fStartedNewLine)
-{
-    std::string strThreadLogged;
-
-    if (!fLogThreadNames)
-        return str;
-
-    std::string strThreadName = GetThreadName();
-
-    if (*fStartedNewLine)
-        strThreadLogged = strprintf("%16s | %s", strThreadName.c_str(), str.c_str());
-    else
-        strThreadLogged = str;
-
-    return strThreadLogged;
-}
-
-int LogPrintStr(const std::string &str)
-{
-    int ret = 0; // Returns total number of characters written
-    static std::atomic_bool fStartedNewLine(true);
-
-    std::string strThreadLogged = LogThreadNameStr(str, &fStartedNewLine);
-    std::string strTimestamped = LogTimestampStr(strThreadLogged, &fStartedNewLine);
-
-    if (!str.empty() && str[str.size()-1] == '\n')
-        fStartedNewLine = true;
-    else
-        fStartedNewLine = false;
-
-    if (fPrintToConsole)
-    {
-        // print to console
-        ret = fwrite(strTimestamped.data(), 1, strTimestamped.size(), stdout);
-        fflush(stdout);
-    }
-    else if (fPrintToDebugLog)
-    {
-        boost::call_once(&DebugPrintInit, debugPrintInitFlag);
-        boost::mutex::scoped_lock scoped_lock(*mutexDebugLog);
-
-        // buffer if we haven't opened the log yet
-        if (fileout == nullptr) {
-            assert(vMsgsBeforeOpenLog);
-            ret = strTimestamped.length();
-            vMsgsBeforeOpenLog->push_back(strTimestamped);
-        }
-        else
-        {
-            // reopen the log file, if requested
-            if (fReopenDebugLog) {
-                fReopenDebugLog = false;
-                fs::path pathDebug = GetDebugLogPath();
-                if (fsbridge::freopen(pathDebug,"a",fileout) != nullptr)
-                    setbuf(fileout, nullptr); // unbuffered
-            }
-
-            ret = FileWriteStr(strTimestamped, fileout);
-        }
-    }
-    return ret;
-}
+} instance_of_cinit;
 
 /** A map that contains all the currently held directory locks. After
  * successful locking, these will be held here until the global destructor
@@ -510,6 +197,19 @@ void ReleaseDirectoryLocks()
     dir_locks.clear();
 }
 
+bool DirIsWritable(const fs::path& directory)
+{
+    fs::path tmpFile = directory / fs::unique_path();
+
+    FILE* file = fsbridge::fopen(tmpFile, "a");
+    if (!file) return false;
+
+    fclose(file);
+    remove(tmpFile);
+
+    return true;
+}
+
 /**
  * Interpret a string argument as a boolean.
  *
@@ -535,7 +235,8 @@ static bool InterpretBool(const std::string& strValue)
 }
 
 /** Internal helper functions for ArgsManager */
-class ArgsManagerHelper {
+class ArgsManagerHelper
+{
 public:
     typedef std::map<std::string, std::vector<std::string>> MapArgs;
 
@@ -565,7 +266,7 @@ public:
     /** Return true/false if an argument is set in a map, and also
      *  return the first (or last) of the possibly multiple values it has
      */
-    static inline std::pair<bool,std::string> GetArgHelper(const MapArgs& map_args, const std::string& arg, bool getLast = false)
+    static inline std::pair<bool, std::string> GetArgHelper(const MapArgs& map_args, const std::string& arg, bool getLast = false)
     {
         auto it = map_args.find(arg);
 
@@ -584,10 +285,10 @@ public:
      * indicating the argument was found, and the value for the argument
      * if it was found (or the empty string if not found).
      */
-    static inline std::pair<bool,std::string> GetArg(const ArgsManager &am, const std::string& arg)
+    static inline std::pair<bool, std::string> GetArg(const ArgsManager& am, const std::string& arg)
     {
         LOCK(am.cs_args);
-        std::pair<bool,std::string> found_result(false, std::string());
+        std::pair<bool, std::string> found_result(false, std::string());
 
         // We pass "true" to GetArgHelper in order to return the last
         // argument value seen from the command line (so "gobyted -foo=bar
@@ -620,9 +321,9 @@ public:
     /* Special test for -testnet and -regtest args, because we
      * don't want to be confused by craziness like "[regtest] testnet=1"
      */
-    static inline bool GetNetBoolArg(const ArgsManager &am, const std::string& net_arg, bool interpret_bool)
+    static inline bool GetNetBoolArg(const ArgsManager& am, const std::string& net_arg, bool interpret_bool)
     {
-        std::pair<bool,std::string> found_result(false,std::string());
+        std::pair<bool, std::string> found_result(false, std::string());
         found_result = GetArgHelper(am.m_override_args, net_arg, true);
         if (!found_result.first) {
             found_result = GetArgHelper(am.m_config_args, net_arg, true);
@@ -668,7 +369,7 @@ static bool InterpretNegatedOption(std::string& key, std::string& val)
     if (key.substr(option_index, 2) == "no") {
         bool bool_val = InterpretBool(val);
         key.erase(option_index, 2);
-        if (!bool_val ) {
+        if (!bool_val) {
             // Double negatives like -nofoo=0 are supported (but discouraged)
             LogPrintf("Warning: parsed potentially confusing double-negative %s=%s\n", key, val);
             val = "1";
@@ -686,10 +387,13 @@ ArgsManager::ArgsManager() :
      * between mainnet and regtest/testnet won't cause problems due to these
      * parameters by accident. */
     m_network_only_args{
-      "-addnode", "-connect",
-      "-port", "-bind",
-      "-rpcport", "-rpcbind",
-      "-wallet",
+        "-addnode",
+        "-connect",
+        "-port",
+        "-bind",
+        "-rpcport",
+        "-rpcbind",
+        "-wallet",
     }
 {
     // nothing to do
@@ -809,7 +513,7 @@ bool ArgsManager::IsArgNegated(const std::string& strArg) const
 std::string ArgsManager::GetArg(const std::string& strArg, const std::string& strDefault) const
 {
     if (IsArgNegated(strArg)) return "0";
-    std::pair<bool,std::string> found_res = ArgsManagerHelper::GetArg(*this, strArg);
+    std::pair<bool, std::string> found_res = ArgsManagerHelper::GetArg(*this, strArg);
     if (found_res.first) return found_res.second;
     return strDefault;
 }
@@ -817,7 +521,7 @@ std::string ArgsManager::GetArg(const std::string& strArg, const std::string& st
 int64_t ArgsManager::GetArg(const std::string& strArg, int64_t nDefault) const
 {
     if (IsArgNegated(strArg)) return 0;
-    std::pair<bool,std::string> found_res = ArgsManagerHelper::GetArg(*this, strArg);
+    std::pair<bool, std::string> found_res = ArgsManagerHelper::GetArg(*this, strArg);
     if (found_res.first) return atoi64(found_res.second);
     return nDefault;
 }
@@ -825,7 +529,7 @@ int64_t ArgsManager::GetArg(const std::string& strArg, int64_t nDefault) const
 bool ArgsManager::GetBoolArg(const std::string& strArg, bool fDefault) const
 {
     if (IsArgNegated(strArg)) return false;
-    std::pair<bool,std::string> found_res = ArgsManagerHelper::GetArg(*this, strArg);
+    std::pair<bool, std::string> found_res = ArgsManagerHelper::GetArg(*this, strArg);
     if (found_res.first) return InterpretBool(found_res.second);
     return fDefault;
 }
@@ -850,6 +554,69 @@ void ArgsManager::ForceSetArg(const std::string& strArg, const std::string& strV
 {
     LOCK(cs_args);
     m_override_args[strArg] = {strValue};
+}
+
+void ArgsManager::AddArg(const std::string& name, const std::string& help, const bool debug_only, const OptionsCategory& cat)
+{
+    std::pair<OptionsCategory, std::string> key(cat, name);
+    assert(m_available_args.count(key) == 0);
+    m_available_args.emplace(key, std::pair<std::string, bool>(help, debug_only));
+}
+
+std::string ArgsManager::GetHelpMessage()
+{
+    const bool show_debug = gArgs.GetBoolArg("-help-debug", false);
+
+    std::string usage = HelpMessageGroup("Options:");
+
+    OptionsCategory last_cat = OptionsCategory::OPTIONS;
+    for (auto& arg : m_available_args) {
+        if (arg.first.first != last_cat) {
+            last_cat = arg.first.first;
+            if (last_cat == OptionsCategory::CONNECTION)
+                usage += HelpMessageGroup("Connection options:");
+            else if (last_cat == OptionsCategory::INDEXING)
+                usage += HelpMessageGroup("Indexing options:");
+            else if (last_cat == OptionsCategory::MASTERNODE)
+                usage += HelpMessageGroup("Masternode options:");
+            else if (last_cat == OptionsCategory::STATSD)
+                usage += HelpMessageGroup("Statsd options:");
+            else if (last_cat == OptionsCategory::ZMQ)
+                usage += HelpMessageGroup("ZeroMQ notification options:");
+            else if (last_cat == OptionsCategory::DEBUG_TEST)
+                usage += HelpMessageGroup("Debugging/Testing options:");
+            else if (last_cat == OptionsCategory::NODE_RELAY)
+                usage += HelpMessageGroup("Node relay options:");
+            else if (last_cat == OptionsCategory::BLOCK_CREATION)
+                usage += HelpMessageGroup("Block creation options:");
+            else if (last_cat == OptionsCategory::RPC)
+                usage += HelpMessageGroup("RPC server options:");
+            else if (last_cat == OptionsCategory::WALLET)
+                usage += HelpMessageGroup("Wallet options:");
+            else if (last_cat == OptionsCategory::WALLET)
+                usage += HelpMessageGroup("Wallet fee options:");
+            else if (last_cat == OptionsCategory::WALLET)
+                usage += HelpMessageGroup("HD wallet options:");
+            else if (last_cat == OptionsCategory::WALLET)
+                usage += HelpMessageGroup("KeePass options:");
+            else if (last_cat == OptionsCategory::WALLET)
+                usage += HelpMessageGroup("CoinJoin options:");
+            else if (last_cat == OptionsCategory::WALLET_DEBUG_TEST && show_debug)
+                usage += HelpMessageGroup("Wallet debugging/testing options:");
+            else if (last_cat == OptionsCategory::CHAINPARAMS)
+                usage += HelpMessageGroup("Chain selection options:");
+            else if (last_cat == OptionsCategory::GUI)
+                usage += HelpMessageGroup("UI Options:");
+            else if (last_cat == OptionsCategory::COMMANDS)
+                usage += HelpMessageGroup("Commands:");
+            else if (last_cat == OptionsCategory::REGISTER_COMMANDS)
+                usage += HelpMessageGroup("Register Commands:");
+        }
+        if (show_debug || !arg.second.second) {
+            usage += HelpMessageOpt(arg.first.second, arg.second.first);
+        }
+    }
+    return usage;
 }
 
 void ArgsManager::ForceRemoveArg(const std::string& strArg)
@@ -878,13 +645,15 @@ static const int screenWidth = 79;
 static const int optIndent = 2;
 static const int msgIndent = 7;
 
-std::string HelpMessageGroup(const std::string &message) {
+std::string HelpMessageGroup(const std::string& message)
+{
     return std::string(message) + std::string("\n\n");
 }
 
-std::string HelpMessageOpt(const std::string &option, const std::string &message) {
-    return std::string(optIndent,' ') + std::string(option) +
-           std::string("\n") + std::string(msgIndent,' ') +
+std::string HelpMessageOpt(const std::string& option, const std::string& message)
+{
+    return std::string(optIndent, ' ') + std::string(option) +
+           std::string("\n") + std::string(msgIndent, ' ') +
            FormatParagraph(message, screenWidth - msgIndent, msgIndent) +
            std::string("\n\n");
 }
@@ -922,16 +691,45 @@ fs::path GetDefaultDataDir()
 #endif
 }
 
+static fs::path g_blocks_path_cached;
+static fs::path g_blocks_path_cache_net_specific;
 static fs::path pathCached;
 static fs::path pathCachedNetSpecific;
 static CCriticalSection csPathCached;
 
-const fs::path &GetDataDir(bool fNetSpecific)
+const fs::path& GetBlocksDir(bool fNetSpecific)
 {
-
     LOCK(csPathCached);
 
-    fs::path &path = fNetSpecific ? pathCachedNetSpecific : pathCached;
+    fs::path& path = fNetSpecific ? g_blocks_path_cache_net_specific : g_blocks_path_cached;
+
+    // This can be called during exceptions by LogPrintf(), so we cache the
+    // value so we don't have to do memory allocations after that.
+    if (!path.empty())
+        return path;
+
+    if (gArgs.IsArgSet("-blocksdir")) {
+        path = fs::system_complete(gArgs.GetArg("-blocksdir", ""));
+        if (!fs::is_directory(path)) {
+            path = "";
+            return path;
+        }
+    } else {
+        path = GetDataDir(false);
+    }
+    if (fNetSpecific)
+        path /= BaseParams().DataDir();
+
+    path /= "blocks";
+    fs::create_directories(path);
+    return path;
+}
+
+const fs::path& GetDataDir(bool fNetSpecific)
+{
+    LOCK(csPathCached);
+
+    fs::path& path = fNetSpecific ? pathCachedNetSpecific : pathCached;
 
     // This can be called during exceptions by LogPrintf(), so we cache the
     // value so we don't have to do memory allocations after that.
@@ -972,6 +770,8 @@ void ClearDatadirCache()
 
     pathCached = fs::path();
     pathCachedNetSpecific = fs::path();
+    g_blocks_path_cached = fs::path();
+    g_blocks_path_cache_net_specific = fs::path();
 }
 
 fs::path GetConfigFile(const std::string& confPath)
@@ -986,8 +786,7 @@ void ArgsManager::ReadConfigStream(std::istream& stream)
     std::set<std::string> setOptions;
     setOptions.insert("*");
 
-    for (boost::program_options::detail::config_file_iterator it(stream, setOptions), end; it != end; ++it)
-    {
+    for (boost::program_options::detail::config_file_iterator it(stream, setOptions), end; it != end; ++it) {
         std::string strKey = std::string("-") + it->string_key;
         std::string strValue = it->value[0];
         if (InterpretNegatedOption(strKey, strValue)) {
@@ -1056,11 +855,10 @@ fs::path GetPidFile()
     return AbsPathForConfigVal(fs::path(gArgs.GetArg("-pid", BITCOIN_PID_FILENAME)));
 }
 
-void CreatePidFile(const fs::path &path, pid_t pid)
+void CreatePidFile(const fs::path& path, pid_t pid)
 {
     FILE* file = fsbridge::fopen(path, "w");
-    if (file)
-    {
+    if (file) {
         fprintf(file, "%d\n", pid);
         fclose(file);
     }
@@ -1071,7 +869,7 @@ bool RenameOver(fs::path src, fs::path dest)
 {
 #ifdef WIN32
     return MoveFileExA(src.string().c_str(), dest.string().c_str(),
-                       MOVEFILE_REPLACE_EXISTING) != 0;
+               MOVEFILE_REPLACE_EXISTING) != 0;
 #else
     int rc = std::rename(src.string().c_str(), dest.string().c_str());
     return (rc == 0);
@@ -1085,8 +883,7 @@ bool RenameOver(fs::path src, fs::path dest)
  */
 bool TryCreateDirectories(const fs::path& p)
 {
-    try
-    {
+    try {
         return fs::create_directories(p);
     } catch (const fs::filesystem_error&) {
         if (!fs::exists(p) || !fs::is_directory(p))
@@ -1097,24 +894,41 @@ bool TryCreateDirectories(const fs::path& p)
     return false;
 }
 
-void FileCommit(FILE *file)
+bool FileCommit(FILE* file)
 {
-    fflush(file); // harmless if redundantly called
+    if (fflush(file) != 0) { // harmless if redundantly called
+        LogPrintf("%s: fflush failed: %d\n", __func__, errno);
+        return false;
+    }
 #ifdef WIN32
     HANDLE hFile = (HANDLE)_get_osfhandle(_fileno(file));
-    FlushFileBuffers(hFile);
+    if (FlushFileBuffers(hFile) == 0) {
+        LogPrintf("%s: FlushFileBuffers failed: %d\n", __func__, GetLastError());
+        return false;
+    }
 #else
-    #if defined(__linux__) || defined(__NetBSD__)
-    fdatasync(fileno(file));
-    #elif defined(__APPLE__) && defined(F_FULLFSYNC)
-    fcntl(fileno(file), F_FULLFSYNC, 0);
-    #else
-    fsync(fileno(file));
-    #endif
+#if defined(__linux__) || defined(__NetBSD__)
+    if (fdatasync(fileno(file)) != 0 && errno != EINVAL) { // Ignore EINVAL for filesystems that don't support sync
+        LogPrintf("%s: fdatasync failed: %d\n", __func__, errno);
+        return false;
+    }
+#elif defined(MAC_OSX) && defined(F_FULLFSYNC)
+    if (fcntl(fileno(file), F_FULLFSYNC, 0) == -1) { // Manpage says "value other than -1" is returned on success
+        LogPrintf("%s: fcntl F_FULLFSYNC failed: %d\n", __func__, errno);
+        return false;
+    }
+#else
+    if (fsync(fileno(file)) != 0 && errno != EINVAL) {
+        LogPrintf("%s: fsync failed: %d\n", __func__, errno);
+        return false;
+    }
 #endif
+#endif
+    return true;
 }
 
-bool TruncateFile(FILE *file, unsigned int length) {
+bool TruncateFile(FILE* file, unsigned int length)
+{
 #if defined(WIN32)
     return _chsize(_fileno(file), length) == 0;
 #else
@@ -1126,7 +940,8 @@ bool TruncateFile(FILE *file, unsigned int length) {
  * this function tries to raise the file descriptor limit to the requested number.
  * It returns the actual file descriptor limit (which may be more or less than nMinFD)
  */
-int RaiseFileDescriptorLimit(int nMinFD) {
+int RaiseFileDescriptorLimit(int nMinFD)
+{
 #if defined(WIN32)
     return 2048;
 #else
@@ -1149,7 +964,8 @@ int RaiseFileDescriptorLimit(int nMinFD) {
  * this function tries to make a particular range of a file allocated (corresponding to disk space)
  * it is advisory, and the range specified in the arguments will never contain live data
  */
-void AllocateFileRange(FILE *file, unsigned int offset, unsigned int length) {
+void AllocateFileRange(FILE* file, unsigned int offset, unsigned int length)
+{
 #if defined(WIN32)
     // Windows-specific version
     HANDLE hFile = (HANDLE)_get_osfhandle(_fileno(file));
@@ -1191,41 +1007,12 @@ void AllocateFileRange(FILE *file, unsigned int offset, unsigned int length) {
 #endif
 }
 
-void ShrinkDebugFile()
-{
-    // Amount of debug.log to save at end when shrinking (must fit in memory)
-    constexpr size_t RECENT_DEBUG_HISTORY_SIZE = 10 * 1000000;
-    // Scroll debug.log if it's getting too big
-    fs::path pathLog = GetDebugLogPath();
-    FILE* file = fsbridge::fopen(pathLog, "r");
-    // If debug.log file is more than 10% bigger the RECENT_DEBUG_HISTORY_SIZE
-    // trim it down by saving only the last RECENT_DEBUG_HISTORY_SIZE bytes
-    if (file && fs::file_size(pathLog) > 11 * (RECENT_DEBUG_HISTORY_SIZE / 10))
-    {
-        // Restart the file with some of the end
-        std::vector<char> vch(RECENT_DEBUG_HISTORY_SIZE, 0);
-        fseek(file, -((long)vch.size()), SEEK_END);
-        int nBytes = fread(vch.data(), 1, vch.size(), file);
-        fclose(file);
-
-        file = fsbridge::fopen(pathLog, "w");
-        if (file)
-        {
-            fwrite(vch.data(), 1, nBytes, file);
-            fclose(file);
-        }
-    }
-    else if (file != nullptr)
-        fclose(file);
-}
-
 #ifdef WIN32
 fs::path GetSpecialFolderPath(int nFolder, bool fCreate)
 {
     char pszPath[MAX_PATH] = "";
 
-    if(SHGetSpecialFolderPathA(nullptr, pszPath, nFolder, fCreate))
-    {
+    if (SHGetSpecialFolderPathA(nullptr, pszPath, nFolder, fCreate)) {
         return fs::path(pszPath);
     }
 
@@ -1269,7 +1056,7 @@ std::string GetThreadName()
     pthread_getname_np(pthread_self(), name, 16);
 // #elif (defined(__FreeBSD__) || defined(__OpenBSD__) || defined(__DragonFly__))
 // #else
-    // no get_name here
+// no get_name here
 #endif
     return std::string(name);
 }
@@ -1279,7 +1066,7 @@ void RenameThreadPool(ctpl::thread_pool& tp, const char* baseName)
     auto cond = std::make_shared<std::condition_variable>();
     auto mutex = std::make_shared<std::mutex>();
     std::atomic<int> doneCnt(0);
-    std::map<int, std::future<void> > futures;
+    std::map<int, std::future<void>> futures;
 
     for (int i = 0; i < tp.size(); i++) {
         futures[i] = tp.push([baseName, i, cond, mutex, &doneCnt](int threadId) {
@@ -1346,8 +1133,8 @@ bool SetupNetworking()
 #ifdef WIN32
     // Initialize Windows Sockets
     WSADATA wsadata;
-    int ret = WSAStartup(MAKEWORD(2,2), &wsadata);
-    if (ret != NO_ERROR || LOBYTE(wsadata.wVersion ) != 2 || HIBYTE(wsadata.wVersion) != 2)
+    int ret = WSAStartup(MAKEWORD(2, 2), &wsadata);
+    if (ret != NO_ERROR || LOBYTE(wsadata.wVersion) != 2 || HIBYTE(wsadata.wVersion) != 2)
         return false;
 #endif
     return true;
@@ -1355,11 +1142,7 @@ bool SetupNetworking()
 
 int GetNumCores()
 {
-#if BOOST_VERSION >= 105600
-    return boost::thread::physical_concurrency();
-#else // Must fall back to hardware_concurrency, which unfortunately counts virtual cores
-    return boost::thread::hardware_concurrency();
-#endif
+    return std::thread::hardware_concurrency();
 }
 
 std::string CopyrightHolders(const std::string& strPrefix, unsigned int nStartYear, unsigned int nEndYear)
@@ -1368,69 +1151,14 @@ std::string CopyrightHolders(const std::string& strPrefix, unsigned int nStartYe
 
     // Check for untranslated substitution to make sure GoByte Core copyright is not removed by accident
     if (strprintf(COPYRIGHT_HOLDERS, COPYRIGHT_HOLDERS_SUBSTITUTION).find("GoByte Core") == std::string::npos) {
-        strCopyrightHolders += "\n" + strPrefix + strprintf(" %u-%u ", 2017, nEndYear) + "The GoByte Core developers";
+        strCopyrightHolders += "\n" + strPrefix + strprintf(" %u-%u ", 2014, nEndYear) + "The GoByte Core developers";
     }
-
-    // Check for untranslated substitution to make sure Dash Core copyright is not removed by accident
-    if (strprintf(COPYRIGHT_HOLDERS, COPYRIGHT_HOLDERS_SUBSTITUTION).find("Dash Core") == std::string::npos) {
-        strCopyrightHolders += "\n" + strPrefix + strprintf(" %u-%u ", 2014, nEndYear) + "The Dash Core developers";
-    }
-
     // Check for untranslated substitution to make sure Bitcoin Core copyright is not removed by accident
     if (strprintf(COPYRIGHT_HOLDERS, COPYRIGHT_HOLDERS_SUBSTITUTION).find("Bitcoin Core") == std::string::npos) {
         strCopyrightHolders += "\n" + strPrefix + strprintf(" %u-%u ", 2009, nEndYear) + "The Bitcoin Core developers";
     }
     return strCopyrightHolders;
 }
-
-uint32_t StringVersionToInt(const std::string& strVersion)
-{
-    std::vector<std::string> tokens;
-    boost::split(tokens, strVersion, boost::is_any_of("."));
-    if(tokens.size() != 3)
-        throw std::bad_cast();
-    uint32_t nVersion = 0;
-    for(unsigned idx = 0; idx < 3; idx++)
-    {
-        if(tokens[idx].length() == 0)
-            throw std::bad_cast();
-        uint32_t value = boost::lexical_cast<uint32_t>(tokens[idx]);
-        if(value > 255)
-            throw std::bad_cast();
-        nVersion <<= 8;
-        nVersion |= value;
-    }
-    return nVersion;
-}
-
-std::string IntVersionToString(uint32_t nVersion)
-{
-    if((nVersion >> 24) > 0) // MSB is always 0
-        throw std::bad_cast();
-    if(nVersion == 0)
-        throw std::bad_cast();
-    std::array<std::string, 3> tokens;
-    for(unsigned idx = 0; idx < 3; idx++)
-    {
-        unsigned shift = (2 - idx) * 8;
-        uint32_t byteValue = (nVersion >> shift) & 0xff;
-        tokens[idx] = boost::lexical_cast<std::string>(byteValue);
-    }
-    return boost::join(tokens, ".");
-}
-
-std::string SafeIntVersionToString(uint32_t nVersion)
-{
-    try
-    {
-        return IntVersionToString(nVersion);
-    }
-    catch(const std::bad_cast&)
-    {
-        return "invalid_version";
-    }
-}
-
 
 // Obtain the application startup time (used for uptime calculation)
 int64_t GetStartupTime()
@@ -1441,4 +1169,18 @@ int64_t GetStartupTime()
 fs::path AbsPathForConfigVal(const fs::path& path, bool net_specific)
 {
     return fs::absolute(path, GetDataDir(net_specific));
+}
+
+int ScheduleBatchPriority(void)
+{
+#ifdef SCHED_BATCH
+    const static sched_param param{0};
+    if (int ret = pthread_setschedparam(pthread_self(), SCHED_BATCH, &param)) {
+        LogPrintf("Failed to pthread_setschedparam: %s\n", strerror(errno));
+        return ret;
+    }
+    return 0;
+#else
+    return 1;
+#endif
 }

@@ -2,7 +2,7 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#define BOOST_TEST_MODULE Bitcoin Test Suite
+#define BOOST_TEST_MODULE GoByte Test Suite
 
 #include <net.h>
 #include <stacktraces.h>
@@ -16,27 +16,27 @@ std::unique_ptr<CConnman> g_connman;
 
 [[noreturn]] void Shutdown(void* parg)
 {
-  std::exit(EXIT_SUCCESS);
+    std::exit(EXIT_SUCCESS);
 }
 
 [[noreturn]] void StartShutdown()
 {
-  std::exit(EXIT_SUCCESS);
+    std::exit(EXIT_SUCCESS);
 }
 
 bool ShutdownRequested()
 {
-  return false;
+    return false;
 }
 
-template<typename T>
-void translate_exception(const T &e)
+template <typename T>
+void translate_exception(const T& e)
 {
     std::cerr << GetPrettyExceptionStr(std::current_exception()) << std::endl;
     throw;
 }
 
-template<typename T>
+template <typename T>
 void register_exception_translator()
 {
     boost::unit_test::unit_test_monitor.register_exception_translator<T>(&translate_exception<T>);

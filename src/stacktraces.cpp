@@ -1,35 +1,34 @@
-// Copyright (c) 2014-2019 The Dash Core developers
-// Copyright (c) 2017-2021 The GoByte Core developers
+// Copyright (c) 2014-2021 The GoByte Core developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include <stacktraces.h>
+#if defined(HAVE_CONFIG_H)
+#include <config/gobyte-config.h>
+#endif // HAVE_CONFIG_H
+
 #include <fs.h>
-#include <tinyformat.h>
+#include <logging.h>
 #include <random.h>
+#include <stacktraces.h>
 #include <streams.h>
-#include <util.h>
 #include <utilstrencodings.h>
 
-#include <gobyte-config.h>
-
-#include <mutex>
-#include <map>
-#include <string>
-#include <vector>
-#include <memory>
-#include <thread>
 #include <atomic>
-
-#include <cxxabi.h>
+#include <map>
+#include <memory>
+#include <mutex>
+#include <thread>
+#include <vector>
 
 #if WIN32
-#include <windows.h>
 #include <dbghelp.h>
+#include <windows.h>
 #else
+#ifdef ENABLE_STACKTRACES
 #include <execinfo.h>
-#include <unistd.h>
+#endif
 #include <signal.h>
+#include <unistd.h>
 #endif
 
 #if !WIN32
@@ -42,11 +41,14 @@
 #if __APPLE__
 #include <mach-o/dyld.h>
 #include <mach/mach_init.h>
-#include <sys/sysctl.h>
 #include <mach/mach_vm.h>
+#include <sys/sysctl.h>
 #endif
 
+#ifdef ENABLE_STACKTRACES
 #include <backtrace.h>
+#endif
+
 #include <string.h>
 
 std::string DemangleSymbol(const std::string& name)
@@ -118,8 +120,8 @@ static std::string GetExeFileName()
 static std::string g_exeFileName = GetExeFileName();
 static std::string g_exeFileBaseName = fs::path(g_exeFileName).filename().string();
 
-static void my_backtrace_error_callback (void *data, const char *msg,
-                                  int errnum)
+#ifdef ENABLE_STACKTRACES
+static void my_backtrace_error_callback(void* data, const char* msg, int errnum)
 {
 }
 
@@ -136,6 +138,7 @@ static backtrace_state* GetLibBacktraceState()
     static backtrace_state* st = backtrace_create_state(exeFileNamePtr, 1, my_backtrace_error_callback, nullptr);
     return st;
 }
+#endif // ENABLE_STACKTRACES
 
 #if WIN32
 static uint64_t GetBaseAddress()
@@ -161,6 +164,7 @@ static uint64_t ConvertAddress(uint64_t addr)
 
 static __attribute__((noinline)) std::vector<uint64_t> GetStackFrames(size_t skip, size_t max_frames, const CONTEXT* pContext = nullptr)
 {
+#ifdef ENABLE_STACKTRACES
     // We can't use libbacktrace for stack unwinding on Windows as it returns invalid addresses (like 0x1 or 0xffffffff)
     static BOOL symInitialized = SymInitialize(GetCurrentProcess(), nullptr, TRUE);
 
@@ -212,9 +216,9 @@ static __attribute__((noinline)) std::vector<uint64_t> GetStackFrames(size_t ski
     size_t i = 0;
     while (ret.size() < max_frames) {
         BOOL result = StackWalk64(
-                image, process, thread,
-                &stackframe, &context, nullptr,
-                SymFunctionTableAccess64, SymGetModuleBase64, nullptr);
+            image, process, thread,
+            &stackframe, &context, nullptr,
+            SymFunctionTableAccess64, SymGetModuleBase64, nullptr);
 
         if (!result) {
             break;
@@ -230,6 +234,9 @@ static __attribute__((noinline)) std::vector<uint64_t> GetStackFrames(size_t ski
     }
 
     return ret;
+#else
+    return {};
+#endif // ENABLE_STACKTRACES
 }
 #else
 
@@ -276,6 +283,7 @@ static uint64_t GetBaseAddress()
 
 static __attribute__((noinline)) std::vector<uint64_t> GetStackFrames(size_t skip, size_t max_frames)
 {
+#ifdef ENABLE_STACKTRACES
     // FYI, this is not using libbacktrace, but "backtrace()" from <execinfo.h>
     std::vector<void*> buf(max_frames);
     int count = backtrace(buf.data(), (int)buf.size());
@@ -287,9 +295,12 @@ static __attribute__((noinline)) std::vector<uint64_t> GetStackFrames(size_t ski
     std::vector<uint64_t> ret;
     ret.reserve(count);
     for (size_t i = skip + 1; i < buf.size(); i++) {
-        ret.emplace_back((uint64_t) buf[i]);
+        ret.emplace_back((uint64_t)buf[i]);
     }
     return ret;
+#else
+    return {};
+#endif // ENABLE_STACKTRACES
 }
 #endif
 
@@ -311,7 +322,8 @@ struct stackframe_info {
     }
 };
 
-static int my_backtrace_full_callback (void *data, uintptr_t pc, const char *filename, int lineno, const char *function)
+#ifdef ENABLE_STACKTRACES
+static int my_backtrace_full_callback(void* data, uintptr_t pc, const char* filename, int lineno, const char* function)
 {
     auto sis = (std::vector<stackframe_info>*)data;
     stackframe_info si;
@@ -351,9 +363,14 @@ static std::vector<stackframe_info> GetStackFrameInfos(const std::vector<uint64_
 
     return infos;
 }
-
-struct crash_info_header
+#else
+static std::vector<stackframe_info> GetStackFrameInfos(const std::vector<uint64_t>& stackframes)
 {
+    return {};
+}
+#endif // ENABLE_STACKTRACES
+
+struct crash_info_header {
     std::string magic;
     uint16_t version;
     std::string exeFileName;
@@ -369,8 +386,7 @@ struct crash_info_header
     }
 };
 
-struct crash_info
-{
+struct crash_info {
     std::string crashDescription;
     std::vector<uint64_t> stackframes;
     std::vector<stackframe_info> stackframeInfos;
@@ -414,7 +430,8 @@ static std::string GetCrashInfoStrNoDebugInfo(crash_info ci)
     auto ciStr = EncodeBase32((const unsigned char*)ds.data(), ds.size());
     std::string s = ci.crashDescription + "\n";
     s += strprintf("No debug information available for stacktrace. You should add debug information and then run:\n"
-                   "%s -printcrashinfo=%s\n", g_exeFileBaseName, ciStr);
+                   "%s -printcrashinfo=%s\n",
+        g_exeFileBaseName, ciStr);
     return s;
 }
 
@@ -538,40 +555,40 @@ static std::map<void*, std::shared_ptr<std::vector<uint64_t>>> g_stacktraces;
 // These come in through -Wl,-wrap
 // It only works on GCC
 extern "C" void* __real___cxa_allocate_exception(size_t thrown_size);
-extern "C" void __real___cxa_free_exception(void * thrown_exception);
+extern "C" void __real___cxa_free_exception(void* thrown_exception);
 #if __clang__
 #error not supported on WIN32 (no dlsym support)
 #elif WIN32
-extern "C" void __real__assert(const char *assertion, const char *file, unsigned int line);
-extern "C" void __real__wassert(const wchar_t *assertion, const wchar_t *file, unsigned int line);
+extern "C" void __real__assert(const char* assertion, const char* file, unsigned int line);
+extern "C" void __real__wassert(const wchar_t* assertion, const wchar_t* file, unsigned int line);
 #else
-extern "C" void __real___assert_fail(const char *assertion, const char *file, unsigned int line, const char *function);
+extern "C" void __real___assert_fail(const char* assertion, const char* file, unsigned int line, const char* function);
 #endif
 #else
 // Clang does not support -Wl,-wrap, so we must use dlsym
 // This is ok because at the same time Clang only supports dynamic linking to libc/libc++
 extern "C" void* __real___cxa_allocate_exception(size_t thrown_size)
 {
-    static auto f = (void*(*)(size_t))dlsym(RTLD_NEXT, "__cxa_allocate_exception");
+    static auto f = (void* (*)(size_t))dlsym(RTLD_NEXT, "__cxa_allocate_exception");
     return f(thrown_size);
 }
-extern "C" void __real___cxa_free_exception(void * thrown_exception)
+extern "C" void __real___cxa_free_exception(void* thrown_exception)
 {
-    static auto f = (void(*)(void*))dlsym(RTLD_NEXT, "__cxa_free_exception");
+    static auto f = (void (*)(void*))dlsym(RTLD_NEXT, "__cxa_free_exception");
     return f(thrown_exception);
 }
 #if __clang__
-extern "C" void __attribute__((noreturn)) __real___assert_rtn(const char *function, const char *file, int line, const char *assertion)
+extern "C" void __attribute__((noreturn)) __real___assert_rtn(const char* function, const char* file, int line, const char* assertion)
 {
-    static auto f = (void(__attribute__((noreturn)) *) (const char*, const char*, int, const char*))dlsym(RTLD_NEXT, "__assert_rtn");
+    static auto f = (void(__attribute__((noreturn))*)(const char*, const char*, int, const char*))dlsym(RTLD_NEXT, "__assert_rtn");
     f(function, file, line, assertion);
 }
 #elif WIN32
 #error not supported on WIN32 (no dlsym support)
 #else
-extern "C" void __real___assert_fail(const char *assertion, const char *file, unsigned int line, const char *function)
+extern "C" void __real___assert_fail(const char* assertion, const char* file, unsigned int line, const char* function)
 {
-    static auto f = (void(*)(const char*, const char*, unsigned int, const char*))dlsym(RTLD_NEXT, "__assert_fail");
+    static auto f = (void (*)(const char*, const char*, unsigned int, const char*))dlsym(RTLD_NEXT, "__assert_fail");
     f(assertion, file, line, function);
 }
 #endif
@@ -599,7 +616,7 @@ extern "C" void* __attribute__((noinline)) WRAPPED_NAME(__cxa_allocate_exception
     return p;
 }
 
-extern "C" void __attribute__((noinline)) WRAPPED_NAME(__cxa_free_exception)(void * thrown_exception)
+extern "C" void __attribute__((noinline)) WRAPPED_NAME(__cxa_free_exception)(void* thrown_exception)
 {
     __real___cxa_free_exception(thrown_exception);
 
@@ -626,7 +643,7 @@ static __attribute__((noinline)) crash_info GetCrashInfoFromAssertion(const char
 }
 
 #if __clang__
-extern "C" void __attribute__((noinline)) WRAPPED_NAME(__assert_rtn)(const char *function, const char *file, int line, const char *assertion)
+extern "C" void __attribute__((noinline)) WRAPPED_NAME(__assert_rtn)(const char* function, const char* file, int line, const char* assertion)
 {
     auto ci = GetCrashInfoFromAssertion(assertion, file, line, function);
     PrintCrashInfo(ci);
@@ -634,25 +651,25 @@ extern "C" void __attribute__((noinline)) WRAPPED_NAME(__assert_rtn)(const char 
     __real___assert_rtn(function, file, line, assertion);
 }
 #elif WIN32
-extern "C" void __attribute__((noinline)) WRAPPED_NAME(_assert)(const char *assertion, const char *file, unsigned int line)
+extern "C" void __attribute__((noinline)) WRAPPED_NAME(_assert)(const char* assertion, const char* file, unsigned int line)
 {
     auto ci = GetCrashInfoFromAssertion(assertion, file, line, nullptr);
     PrintCrashInfo(ci);
     skipAbortSignal = true;
     __real__assert(assertion, file, line);
 }
-extern "C" void __attribute__((noinline)) WRAPPED_NAME(_wassert)(const wchar_t *assertion, const wchar_t *file, unsigned int line)
+extern "C" void __attribute__((noinline)) WRAPPED_NAME(_wassert)(const wchar_t* assertion, const wchar_t* file, unsigned int line)
 {
     auto ci = GetCrashInfoFromAssertion(
-            assertion ?  std::string(assertion, assertion + wcslen(assertion)).c_str() : nullptr,
-            file ? std::string(file, file + wcslen(file)).c_str() : nullptr,
-            line, nullptr);
+        assertion ? std::string(assertion, assertion + wcslen(assertion)).c_str() : nullptr,
+        file ? std::string(file, file + wcslen(file)).c_str() : nullptr,
+        line, nullptr);
     PrintCrashInfo(ci);
     skipAbortSignal = true;
     __real__wassert(assertion, file, line);
 }
 #else
-extern "C" void __attribute__((noinline)) WRAPPED_NAME(__assert_fail)(const char *assertion, const char *file, unsigned int line, const char *function)
+extern "C" void __attribute__((noinline)) WRAPPED_NAME(__assert_fail)(const char* assertion, const char* file, unsigned int line, const char* function)
 {
     auto ci = GetCrashInfoFromAssertion(assertion, file, line, function);
     PrintCrashInfo(ci);
@@ -660,7 +677,7 @@ extern "C" void __attribute__((noinline)) WRAPPED_NAME(__assert_fail)(const char
     __real___assert_fail(assertion, file, line, function);
 }
 #endif
-#endif //ENABLE_CRASH_HOOKS
+#endif // ENABLE_CRASH_HOOKS
 
 static std::shared_ptr<std::vector<uint64_t>> GetExceptionStacktrace(const std::exception_ptr& e)
 {
@@ -788,32 +805,73 @@ static void HandlePosixSignal(int s)
     std::abort();
 }
 #else
-static void DoHandleWindowsException(EXCEPTION_POINTERS * ExceptionInfo)
+static void DoHandleWindowsException(EXCEPTION_POINTERS* ExceptionInfo)
 {
     std::string excType;
-    switch(ExceptionInfo->ExceptionRecord->ExceptionCode)
-    {
-    case EXCEPTION_ACCESS_VIOLATION: excType = "EXCEPTION_ACCESS_VIOLATION"; break;
-    case EXCEPTION_ARRAY_BOUNDS_EXCEEDED: excType = "EXCEPTION_ARRAY_BOUNDS_EXCEEDED"; break;
-    case EXCEPTION_BREAKPOINT: excType = "EXCEPTION_BREAKPOINT"; break;
-    case EXCEPTION_DATATYPE_MISALIGNMENT: excType = "EXCEPTION_DATATYPE_MISALIGNMENT"; break;
-    case EXCEPTION_FLT_DENORMAL_OPERAND: excType = "EXCEPTION_FLT_DENORMAL_OPERAND"; break;
-    case EXCEPTION_FLT_DIVIDE_BY_ZERO: excType = "EXCEPTION_FLT_DIVIDE_BY_ZERO"; break;
-    case EXCEPTION_FLT_INEXACT_RESULT: excType = "EXCEPTION_FLT_INEXACT_RESULT"; break;
-    case EXCEPTION_FLT_INVALID_OPERATION: excType = "EXCEPTION_FLT_INVALID_OPERATION"; break;
-    case EXCEPTION_FLT_OVERFLOW: excType = "EXCEPTION_FLT_OVERFLOW"; break;
-    case EXCEPTION_FLT_STACK_CHECK: excType = "EXCEPTION_FLT_STACK_CHECK"; break;
-    case EXCEPTION_FLT_UNDERFLOW: excType = "EXCEPTION_FLT_UNDERFLOW"; break;
-    case EXCEPTION_ILLEGAL_INSTRUCTION: excType = "EXCEPTION_ILLEGAL_INSTRUCTION"; break;
-    case EXCEPTION_IN_PAGE_ERROR: excType = "EXCEPTION_IN_PAGE_ERROR"; break;
-    case EXCEPTION_INT_DIVIDE_BY_ZERO: excType = "EXCEPTION_INT_DIVIDE_BY_ZERO"; break;
-    case EXCEPTION_INT_OVERFLOW: excType = "EXCEPTION_INT_OVERFLOW"; break;
-    case EXCEPTION_INVALID_DISPOSITION: excType = "EXCEPTION_INVALID_DISPOSITION"; break;
-    case EXCEPTION_NONCONTINUABLE_EXCEPTION: excType = "EXCEPTION_NONCONTINUABLE_EXCEPTION"; break;
-    case EXCEPTION_PRIV_INSTRUCTION: excType = "EXCEPTION_PRIV_INSTRUCTION"; break;
-    case EXCEPTION_SINGLE_STEP: excType = "EXCEPTION_SINGLE_STEP"; break;
-    case EXCEPTION_STACK_OVERFLOW: excType = "EXCEPTION_STACK_OVERFLOW"; break;
-    default: excType = "UNKNOWN"; break;
+    switch (ExceptionInfo->ExceptionRecord->ExceptionCode) {
+    case EXCEPTION_ACCESS_VIOLATION:
+        excType = "EXCEPTION_ACCESS_VIOLATION";
+        break;
+    case EXCEPTION_ARRAY_BOUNDS_EXCEEDED:
+        excType = "EXCEPTION_ARRAY_BOUNDS_EXCEEDED";
+        break;
+    case EXCEPTION_BREAKPOINT:
+        excType = "EXCEPTION_BREAKPOINT";
+        break;
+    case EXCEPTION_DATATYPE_MISALIGNMENT:
+        excType = "EXCEPTION_DATATYPE_MISALIGNMENT";
+        break;
+    case EXCEPTION_FLT_DENORMAL_OPERAND:
+        excType = "EXCEPTION_FLT_DENORMAL_OPERAND";
+        break;
+    case EXCEPTION_FLT_DIVIDE_BY_ZERO:
+        excType = "EXCEPTION_FLT_DIVIDE_BY_ZERO";
+        break;
+    case EXCEPTION_FLT_INEXACT_RESULT:
+        excType = "EXCEPTION_FLT_INEXACT_RESULT";
+        break;
+    case EXCEPTION_FLT_INVALID_OPERATION:
+        excType = "EXCEPTION_FLT_INVALID_OPERATION";
+        break;
+    case EXCEPTION_FLT_OVERFLOW:
+        excType = "EXCEPTION_FLT_OVERFLOW";
+        break;
+    case EXCEPTION_FLT_STACK_CHECK:
+        excType = "EXCEPTION_FLT_STACK_CHECK";
+        break;
+    case EXCEPTION_FLT_UNDERFLOW:
+        excType = "EXCEPTION_FLT_UNDERFLOW";
+        break;
+    case EXCEPTION_ILLEGAL_INSTRUCTION:
+        excType = "EXCEPTION_ILLEGAL_INSTRUCTION";
+        break;
+    case EXCEPTION_IN_PAGE_ERROR:
+        excType = "EXCEPTION_IN_PAGE_ERROR";
+        break;
+    case EXCEPTION_INT_DIVIDE_BY_ZERO:
+        excType = "EXCEPTION_INT_DIVIDE_BY_ZERO";
+        break;
+    case EXCEPTION_INT_OVERFLOW:
+        excType = "EXCEPTION_INT_OVERFLOW";
+        break;
+    case EXCEPTION_INVALID_DISPOSITION:
+        excType = "EXCEPTION_INVALID_DISPOSITION";
+        break;
+    case EXCEPTION_NONCONTINUABLE_EXCEPTION:
+        excType = "EXCEPTION_NONCONTINUABLE_EXCEPTION";
+        break;
+    case EXCEPTION_PRIV_INSTRUCTION:
+        excType = "EXCEPTION_PRIV_INSTRUCTION";
+        break;
+    case EXCEPTION_SINGLE_STEP:
+        excType = "EXCEPTION_SINGLE_STEP";
+        break;
+    case EXCEPTION_STACK_OVERFLOW:
+        excType = "EXCEPTION_STACK_OVERFLOW";
+        break;
+    default:
+        excType = "UNKNOWN";
+        break;
     }
 
     crash_info ci;
@@ -824,7 +882,7 @@ static void DoHandleWindowsException(EXCEPTION_POINTERS * ExceptionInfo)
     PrintCrashInfo(ci);
 }
 
-LONG WINAPI HandleWindowsException(EXCEPTION_POINTERS * ExceptionInfo)
+LONG WINAPI HandleWindowsException(EXCEPTION_POINTERS* ExceptionInfo)
 {
     if (ExceptionInfo->ExceptionRecord->ExceptionCode == EXCEPTION_STACK_OVERFLOW) {
         // We can't directly do the exception handling in this thread anymore as we need stack space for this
@@ -846,20 +904,20 @@ void RegisterPrettySignalHandlers()
     SetUnhandledExceptionFilter(HandleWindowsException);
 #else
     const std::vector<int> posix_signals = {
-            // Signals for which the default action is "Core".
-            SIGABRT,    // Abort signal from abort(3)
-            SIGBUS,     // Bus error (bad memory access)
-            SIGFPE,     // Floating point exception
-            SIGILL,     // Illegal Instruction
-            SIGIOT,     // IOT trap. A synonym for SIGABRT
-            SIGQUIT,    // Quit from keyboard
-            SIGSEGV,    // Invalid memory reference
-            SIGSYS,     // Bad argument to routine (SVr4)
-            SIGTRAP,    // Trace/breakpoint trap
-            SIGXCPU,    // CPU time limit exceeded (4.2BSD)
-            SIGXFSZ,    // File size limit exceeded (4.2BSD)
+        // Signals for which the default action is "Core".
+        SIGABRT, // Abort signal from abort(3)
+        SIGBUS,  // Bus error (bad memory access)
+        SIGFPE,  // Floating point exception
+        SIGILL,  // Illegal Instruction
+        SIGIOT,  // IOT trap. A synonym for SIGABRT
+        SIGQUIT, // Quit from keyboard
+        SIGSEGV, // Invalid memory reference
+        SIGSYS,  // Bad argument to routine (SVr4)
+        SIGTRAP, // Trace/breakpoint trap
+        SIGXCPU, // CPU time limit exceeded (4.2BSD)
+        SIGXFSZ, // File size limit exceeded (4.2BSD)
 #if __APPLE__
-            SIGEMT,     // emulation instruction executed
+        SIGEMT, // emulation instruction executed
 #endif
     };
 

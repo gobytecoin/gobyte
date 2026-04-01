@@ -1,10 +1,9 @@
-// Copyright (c) 2014-2020 The Dash Core developers
-// Copyright (c) 2017-2021 The GoByte Core developers
+// Copyright (c) 2014-2021 The GoByte Core developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef MASTERNODE_META_H
-#define MASTERNODE_META_H
+#ifndef BITCOIN_MASTERNODE_MASTERNODE_META_H
+#define BITCOIN_MASTERNODE_MASTERNODE_META_H
 
 #include <serialize.h>
 
@@ -16,7 +15,7 @@
 
 class CConnman;
 
-static const int MASTERNODE_MAX_MIXING_TXES             = 5;
+static const int MASTERNODE_MAX_MIXING_TXES = 5;
 
 // Holds extra (non-deterministic) information about masternodes
 // This is mostly local information, e.g. about mixing and governance
@@ -29,7 +28,7 @@ private:
 
     uint256 proTxHash;
 
-    //the dsq count from the last dsq broadcast of this node
+    // the dsq count from the last dsq broadcast of this node
     int64_t nLastDsq = 0;
     int nMixingTxCount = 0;
 
@@ -40,7 +39,7 @@ private:
     int64_t lastOutboundSuccess = 0;
 
 public:
-    CMasternodeMetaInfo() {}
+    CMasternodeMetaInfo() = default;
     explicit CMasternodeMetaInfo(const uint256& _proTxHash) : proTxHash(_proTxHash) {}
     CMasternodeMetaInfo(const CMasternodeMetaInfo& ref) :
         proTxHash(ref.proTxHash),
@@ -68,21 +67,49 @@ public:
     UniValue ToJson() const;
 
 public:
-    const uint256& GetProTxHash() const { LOCK(cs); return proTxHash; }
-    int64_t GetLastDsq() const { LOCK(cs); return nLastDsq; }
-    int GetMixingTxCount() const { LOCK(cs); return nMixingTxCount; }
+    const uint256& GetProTxHash() const
+    {
+        LOCK(cs);
+        return proTxHash;
+    }
+    int64_t GetLastDsq() const
+    {
+        LOCK(cs);
+        return nLastDsq;
+    }
+    int GetMixingTxCount() const
+    {
+        LOCK(cs);
+        return nMixingTxCount;
+    }
 
     bool IsValidForMixingTxes() const { return GetMixingTxCount() <= MASTERNODE_MAX_MIXING_TXES; }
 
-    // KEEP TRACK OF EACH GOVERNANCE ITEM INCASE THIS NODE GOES OFFLINE, SO WE CAN RECALC THEIR STATUS
+    // KEEP TRACK OF EACH GOVERNANCE ITEM IN CASE THIS NODE GOES OFFLINE, SO WE CAN RECALCULATE THEIR STATUS
     void AddGovernanceVote(const uint256& nGovernanceObjectHash);
 
     void RemoveGovernanceObject(const uint256& nGovernanceObjectHash);
 
-    void SetLastOutboundAttempt(int64_t t) { LOCK(cs); lastOutboundAttempt = t; }
-    int64_t GetLastOutboundAttempt() const { LOCK(cs); return lastOutboundAttempt; }
-    void SetLastOutboundSuccess(int64_t t) { LOCK(cs); lastOutboundSuccess = t; }
-    int64_t GetLastOutboundSuccess() const { LOCK(cs); return lastOutboundSuccess; }
+    void SetLastOutboundAttempt(int64_t t)
+    {
+        LOCK(cs);
+        lastOutboundAttempt = t;
+    }
+    int64_t GetLastOutboundAttempt() const
+    {
+        LOCK(cs);
+        return lastOutboundAttempt;
+    }
+    void SetLastOutboundSuccess(int64_t t)
+    {
+        LOCK(cs);
+        lastOutboundSuccess = t;
+    }
+    int64_t GetLastOutboundSuccess() const
+    {
+        LOCK(cs);
+        return lastOutboundSuccess;
+    }
 };
 typedef std::shared_ptr<CMasternodeMetaInfo> CMasternodeMetaInfoPtr;
 
@@ -96,7 +123,7 @@ private:
     std::map<uint256, CMasternodeMetaInfoPtr> metaInfos;
     std::vector<uint256> vecDirtyGovernanceObjectHashes;
 
-    // keep track of dsq count to prevent masternodes from gaming privatesend queue
+    // keep track of dsq count to prevent masternodes from gaming coinjoin queue
     int64_t nDsqCount = 0;
 
 public:
@@ -108,14 +135,13 @@ public:
         LOCK(cs);
 
         std::string strVersion;
-        if(ser_action.ForRead()) {
+        if (ser_action.ForRead()) {
             Clear();
             READWRITE(strVersion);
             if (strVersion != SERIALIZATION_VERSION_STRING) {
                 return;
             }
-        }
-        else {
+        } else {
             strVersion = SERIALIZATION_VERSION_STRING;
             READWRITE(strVersion);
         }
@@ -140,7 +166,11 @@ public:
 public:
     CMasternodeMetaInfoPtr GetMetaInfo(const uint256& proTxHash, bool fCreate = true);
 
-    int64_t GetDsqCount() { LOCK(cs); return nDsqCount; }
+    int64_t GetDsqCount()
+    {
+        LOCK(cs);
+        return nDsqCount;
+    }
     int64_t GetDsqThreshold(const uint256& proTxHash, int nMnCount);
 
     void AllowMixing(const uint256& proTxHash);
@@ -159,4 +189,4 @@ public:
 
 extern CMasternodeMetaMan mmetaman;
 
-#endif//MASTERNODE_META_H
+#endif // BITCOIN_MASTERNODE_MASTERNODE_META_H

@@ -1,11 +1,8 @@
-// Copyright (c) 2014-2020 The Dash Core developers
-// Copyright (c) 2017-2021 The GoByte Core developers
+// Copyright (c) 2014-2021 The GoByte Core developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include <masternode/activemasternode.h>
-#include <evo/deterministicmns.h>
-#include <init.h>
 #include <masternode/masternode-sync.h>
 #include <netbase.h>
 #include <protocol.h>
@@ -117,7 +114,7 @@ void CActiveMasternodeManager::Init(const CBlockIndex* pindex)
         LogPrintf("CActiveMasternodeManager::Init -- ERROR: %s\n", strError);
         return;
     }
-    bool fConnected = ConnectSocketDirectly(activeMasternodeInfo.service, hSocket, nConnectTimeout) && IsSelectableSocket(hSocket);
+    bool fConnected = ConnectSocketDirectly(activeMasternodeInfo.service, hSocket, nConnectTimeout, true) && IsSelectableSocket(hSocket);
     CloseSocket(hSocket);
 
     if (!fConnected && Params().RequireRoutableExternalIP()) {

@@ -1,6 +1,5 @@
 # Copyright (c) 2013-2016 The Bitcoin Core developers
-# Copyright (c) 2014-2018 The Dash Core developers
-# Copyright (c) 2017-2021 The GoByte Core developers
+# Copyright (c) 2014-2018 The GoByte Core developers
 # Distributed under the MIT software license, see the accompanying
 # file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -33,7 +32,6 @@ TEST_BITCOIN_CPP = \
 
 TEST_BITCOIN_H = \
   test/test_gobyte.h
-
 qt_test_test_gobyte_qt_CPPFLAGS = $(AM_CPPFLAGS) $(BITCOIN_INCLUDES) $(BITCOIN_QT_INCLUDES) \
   $(QT_INCLUDES) $(QT_TEST_INCLUDES) $(PROTOBUF_CFLAGS)
 
@@ -57,7 +55,7 @@ nodist_qt_test_test_gobyte_qt_SOURCES = $(TEST_QT_MOC_CPP)
 
 qt_test_test_gobyte_qt_LDADD = $(LIBBITCOINQT) $(LIBBITCOIN_SERVER)
 if ENABLE_WALLET
-qt_test_test_gobyte_qt_LDADD += $(LIBBITCOIN_WALLET)
+qt_test_test_gobyte_qt_LDADD += $(LIBBITCOIN_UTIL) $(LIBBITCOIN_WALLET)
 endif
 if ENABLE_ZMQ
 qt_test_test_gobyte_qt_LDADD += $(LIBBITCOIN_ZMQ) $(ZMQ_LIBS)

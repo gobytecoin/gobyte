@@ -19,6 +19,8 @@
 #include <QPushButton>
 #include <QSystemTrayIcon>
 
+#include <memory>
+
 #ifdef Q_OS_MAC
 #include <qt/macos_appnap.h>
 #endif
@@ -35,8 +37,15 @@ class WalletModel;
 class HelpMessageDialog;
 class ModalOverlay;
 
+namespace interfaces {
+class Handler;
+class Node;
+} // namespace interfaces
+
 QT_BEGIN_NAMESPACE
 class QAction;
+class QButtonGroup;
+class QComboBox;
 class QProgressBar;
 class QProgressDialog;
 class QToolButton;
@@ -51,95 +60,99 @@ class BitcoinGUI : public QMainWindow
     Q_OBJECT
 
 public:
-    static const QString DEFAULT_WALLET;
     static const std::string DEFAULT_UIPLATFORM;
 
-    explicit BitcoinGUI(const NetworkStyle* networkStyle, QWidget* parent = 0);
+    explicit BitcoinGUI(interfaces::Node& node, const NetworkStyle* networkStyle, QWidget* parent = 0);
     ~BitcoinGUI();
 
     /** Set the client model.
         The client model represents the part of the core that communicates with the P2P network, and is wallet-agnostic.
     */
-    void setClientModel(ClientModel *clientModel);
+    void setClientModel(ClientModel* clientModel);
 
 #ifdef ENABLE_WALLET
     /** Set the wallet model.
         The wallet model represents a bitcoin wallet, and offers access to the list of transactions, address book and sending
         functionality.
     */
-    bool addWallet(const QString& name, WalletModel *walletModel);
-    bool setCurrentWallet(const QString& name);
-    /** Set the UI status indicators based on the currently selected wallet.
-    */
-    void updateWalletStatus();
+    bool addWallet(WalletModel* walletModel);
+    bool removeWallet(WalletModel* walletModel);
     void removeAllWallets();
 #endif // ENABLE_WALLET
     bool enableWallet;
 
 protected:
-    void changeEvent(QEvent *e);
-    void closeEvent(QCloseEvent *event);
-    void showEvent(QShowEvent *event);
-    void dragEnterEvent(QDragEnterEvent *event);
-    void dropEvent(QDropEvent *event);
-    bool eventFilter(QObject *object, QEvent *event);
+    void changeEvent(QEvent* e);
+    void closeEvent(QCloseEvent* event);
+    void showEvent(QShowEvent* event);
+    void dragEnterEvent(QDragEnterEvent* event);
+    void dropEvent(QDropEvent* event);
+    bool eventFilter(QObject* object, QEvent* event);
 
 private:
-    ClientModel *clientModel;
-    WalletFrame *walletFrame;
+    interfaces::Node& m_node;
+    std::unique_ptr<interfaces::Handler> m_handler_message_box;
+    std::unique_ptr<interfaces::Handler> m_handler_question;
+    ClientModel* clientModel;
+    WalletFrame* walletFrame;
 
-    UnitDisplayStatusBarControl *unitDisplayControl;
-    QLabel *labelWalletEncryptionIcon;
-    QLabel *labelWalletHDStatusIcon;
-    QLabel *labelConnectionsIcon;
-    QLabel *labelBlocksIcon;
-    QLabel *progressBarLabel;
-    QProgressBar *progressBar;
-    QProgressDialog *progressDialog;
+    UnitDisplayStatusBarControl* unitDisplayControl;
+    QLabel* labelWalletEncryptionIcon;
+    QLabel* labelWalletHDStatusIcon;
+    QLabel* labelConnectionsIcon;
+    QLabel* labelBlocksIcon;
+    QLabel* progressBarLabel;
+    QProgressBar* progressBar;
+    QProgressDialog* progressDialog;
 
-    QMenuBar *appMenuBar;
-    QToolButton *overviewAction;
-    QToolButton *historyAction;
-    QToolButton *masternodeAction;
-    QAction *quitAction;
-    QToolButton *sendCoinsAction;
-    QAction *sendCoinsMenuAction;
-    QToolButton *privateSendCoinsAction;
-    QAction *privateSendCoinsMenuAction;
-    QAction *usedSendingAddressesAction;
-    QAction *usedReceivingAddressesAction;
-    QAction *signMessageAction;
-    QAction *verifyMessageAction;
-    QAction *aboutAction;
-    QToolButton *receiveCoinsAction;
-    QAction *receiveCoinsMenuAction;
-    QAction *optionsAction;
-    QAction *toggleHideAction;
-    QAction *encryptWalletAction;
-    QAction *backupWalletAction;
-    QAction *changePassphraseAction;
-    QAction *unlockWalletAction;
-    QAction *lockWalletAction;
-    QAction *aboutQtAction;
-    QAction *openInfoAction;
-    QAction *openRPCConsoleAction;
-    QAction *openGraphAction;
-    QAction *openPeersAction;
-    QAction *openRepairAction;
-    QAction *openConfEditorAction;
-    QAction *showBackupsAction;
-    QAction *openAction;
-    QAction *showHelpMessageAction;
-    QAction *showPrivateSendHelpAction;
+    QMenuBar* appMenuBar;
+    QToolBar* appToolBar;
+    QToolButton* overviewButton;
+    QToolButton* sendCoinsButton;
+    QToolButton* coinJoinCoinsButton;
+    QToolButton* receiveCoinsButton;
+    QToolButton* historyButton;
+    QToolButton* masternodeButton;
+    QAction* appToolBarLogoAction;
+    QAction* quitAction;
+    QAction* sendCoinsMenuAction;
+    QAction* coinJoinCoinsMenuAction;
+    QAction* usedSendingAddressesAction;
+    QAction* usedReceivingAddressesAction;
+    QAction* signMessageAction;
+    QAction* verifyMessageAction;
+    QAction* aboutAction;
+    QAction* receiveCoinsMenuAction;
+    QAction* optionsAction;
+    QAction* toggleHideAction;
+    QAction* encryptWalletAction;
+    QAction* backupWalletAction;
+    QAction* changePassphraseAction;
+    QAction* unlockWalletAction;
+    QAction* lockWalletAction;
+    QAction* aboutQtAction;
+    QAction* openInfoAction;
+    QAction* openRPCConsoleAction;
+    QAction* openGraphAction;
+    QAction* openPeersAction;
+    QAction* openRepairAction;
+    QAction* openConfEditorAction;
+    QAction* showBackupsAction;
+    QAction* openAction;
+    QAction* showHelpMessageAction;
+    QAction* showCoinJoinHelpAction;
+    QAction* m_wallet_selector_action = nullptr;
 
-    QSystemTrayIcon *trayIcon;
-    QMenu *trayIconMenu;
-    QMenu *dockIconMenu;
-    Notificator *notificator;
-    RPCConsole *rpcConsole;
-    HelpMessageDialog *helpMessageDialog;
-    ModalOverlay *modalOverlay;
-    QButtonGroup *tabGroup;
+    QComboBox* m_wallet_selector;
+
+    QSystemTrayIcon* trayIcon;
+    QMenu* trayIconMenu;
+    QMenu* dockIconMenu;
+    Notificator* notificator;
+    RPCConsole* rpcConsole;
+    HelpMessageDialog* helpMessageDialog;
+    ModalOverlay* modalOverlay;
+    QButtonGroup* tabGroup;
 
 #ifdef Q_OS_MAC
     CAppNapInhibitor* m_app_nap_inhibitor = nullptr;
@@ -166,9 +179,13 @@ private:
         QString type;
         QString address;
         QString label;
+        QString walletName;
     };
     std::list<IncomingTransactionMessage> incomingTransactions;
     QTimer* incomingTransactionsTimer;
+
+    /** Timer to update custom css styling in -debug-ui mode periodically */
+    QTimer* timerCustomCss;
 
     /** Create the main UI actions. */
     void createActions();
@@ -177,9 +194,9 @@ private:
     /** Create the toolbars */
     void createToolBars();
     /** Create system tray icon and notification */
-    void createTrayIcon(const NetworkStyle *networkStyle);
+    void createTrayIcon(const NetworkStyle* networkStyle);
     /** Create system tray menu (or setup the dock menu) */
-    void createIconMenu(QMenu *pmenu);
+    void createIconMenu(QMenu* pmenu);
 
     /** Enable or disable all wallet-related actions */
     void setWalletActionsEnabled(bool enabled);
@@ -196,11 +213,9 @@ private:
 
     void updateProgressBarVisibility();
 
-    void updateToolBarShortcuts();
-
 Q_SIGNALS:
     /** Signal raised when a URI was entered or dragged to the GUI */
-    void receivedURI(const QString &uri);
+    void receivedURI(const QString& uri);
     /** Restart handling */
     void requestedRestart(QStringList args);
 
@@ -223,25 +238,33 @@ public Q_SLOTS:
                             @see CClientUIInterface::MessageBoxFlags
        @param[in] ret       pointer to a bool that will be modified to whether Ok was clicked (modal only)
     */
-    void message(const QString &title, const QString &message, unsigned int style, bool *ret = nullptr);
+    void message(const QString& title, const QString& message, unsigned int style, bool* ret = nullptr);
 
 #ifdef ENABLE_WALLET
-    /** Set the hd-enabled status as shown in the UI.
-     @param[in] status            current hd enabled status
-     @see WalletModel::EncryptionStatus
+    bool setCurrentWallet(const QString& name);
+    bool setCurrentWalletBySelectorIndex(int index);
+    /** Set the UI status indicators based on the currently selected wallet.
      */
-    void setHDStatus(int hdEnabled);
+    void updateWalletStatus();
 
+private:
     /** Set the encryption status as shown in the UI.
        @param[in] status            current encryption status
        @see WalletModel::EncryptionStatus
     */
     void setEncryptionStatus(int status);
 
+    /** Set the hd-enabled status as shown in the UI.
+     @param[in] status            current hd enabled status
+     @see WalletModel::EncryptionStatus
+     */
+    void setHDStatus(int hdEnabled);
+
+public Q_SLOTS:
     bool handlePaymentRequest(const SendCoinsRecipient& recipient);
 
     /** Show incoming transaction notification for new transactions. */
-    void incomingTransaction(const QString& date, int unit, const CAmount& amount, const QString& type, const QString& address, const QString& label);
+    void incomingTransaction(const QString& date, int unit, const CAmount& amount, const QString& type, const QString& address, const QString& label, const QString& walletName);
     void showIncomingTransactions();
 #endif // ENABLE_WALLET
 
@@ -257,8 +280,8 @@ private Q_SLOTS:
     void gotoReceiveCoinsPage();
     /** Switch to send coins page */
     void gotoSendCoinsPage(QString addr = "");
-    /** Switch to PrivateSend coins page */
-    void gotoPrivateSendCoinsPage(QString addr = "");
+    /** Switch to CoinJoin coins page */
+    void gotoCoinJoinCoinsPage(QString addr = "");
 
     /** Show Sign/Verify Message dialog and switch to sign message tab */
     void gotoSignMessageTab(QString addr = "");
@@ -269,7 +292,7 @@ private Q_SLOTS:
     void openClicked();
 
     /** Highlight checked tab button */
-    void highlightTabButton(QAbstractButton *button, bool checked);
+    void highlightTabButton(QAbstractButton* button, bool checked);
 #endif // ENABLE_WALLET
     /** Show configuration dialog */
     void optionsClicked();
@@ -292,8 +315,8 @@ private Q_SLOTS:
 
     /** Show help message dialog */
     void showHelpMessageClicked();
-    /** Show PrivateSend help message dialog */
-    void showPrivateSendHelpClicked();
+    /** Show CoinJoin help message dialog */
+    void showCoinJoinHelpClicked();
 #ifndef Q_OS_MAC
     /** Handle tray icon clicked */
     void trayIconActivated(QSystemTrayIcon::ActivationReason reason);
@@ -311,8 +334,8 @@ private Q_SLOTS:
     void detectShutdown();
 
     /** Show progress dialog e.g. for verifychain */
-    void showProgress(const QString &title, int nProgress);
-    
+    void showProgress(const QString& title, int nProgress);
+
     /** When hideTrayIcon setting is changed in OptionsModel hide or show the icon accordingly. */
     void setTrayIconVisible(bool);
 
@@ -321,7 +344,7 @@ private Q_SLOTS:
 
     void showModalOverlay();
 
-    void updatePrivateSendVisibility();
+    void updateCoinJoinVisibility();
 
     void updateWidth();
 };
@@ -333,14 +356,14 @@ class UnitDisplayStatusBarControl : public QLabel
 public:
     explicit UnitDisplayStatusBarControl();
     /** Lets the control know about the Options Model (and its signals) */
-    void setOptionsModel(OptionsModel *optionsModel);
+    void setOptionsModel(OptionsModel* optionsModel);
 
 protected:
     /** So that it responds to left-button clicks */
-    void mousePressEvent(QMouseEvent *event);
+    void mousePressEvent(QMouseEvent* event);
 
 private:
-    OptionsModel *optionsModel;
+    OptionsModel* optionsModel;
     QMenu* menu;
 
     /** Shows context menu with Display Unit options by the mouse coordinates */

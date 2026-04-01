@@ -1,10 +1,9 @@
-// Copyright (c) 2017-2019 The Dash Core developers
 // Copyright (c) 2017-2021 The GoByte Core developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef GOBYTE_CBTX_H
-#define GOBYTE_CBTX_H
+#ifndef BITCOIN_EVO_CBTX_H
+#define BITCOIN_EVO_CBTX_H
 
 #include <consensus/validation.h>
 #include <primitives/transaction.h>
@@ -12,6 +11,7 @@
 
 class CBlock;
 class CBlockIndex;
+class CCoinsViewCache;
 
 // coinbase transaction
 class CCbTx
@@ -46,19 +46,19 @@ public:
     {
         obj.clear();
         obj.setObject();
-        obj.push_back(Pair("version", (int)nVersion));
-        obj.push_back(Pair("height", (int)nHeight));
-        obj.push_back(Pair("merkleRootMNList", merkleRootMNList.ToString()));
+        obj.pushKV("version", (int)nVersion);
+        obj.pushKV("height", (int)nHeight);
+        obj.pushKV("merkleRootMNList", merkleRootMNList.ToString());
         if (nVersion >= 2) {
-            obj.push_back(Pair("merkleRootQuorums", merkleRootQuorums.ToString()));
+            obj.pushKV("merkleRootQuorums", merkleRootQuorums.ToString());
         }
     }
 };
 
 bool CheckCbTx(const CTransaction& tx, const CBlockIndex* pindexPrev, CValidationState& state);
 
-bool CheckCbTxMerkleRoots(const CBlock& block, const CBlockIndex* pindex, CValidationState& state);
-bool CalcCbTxMerkleRootMNList(const CBlock& block, const CBlockIndex* pindexPrev, uint256& merkleRootRet, CValidationState& state);
+bool CheckCbTxMerkleRoots(const CBlock& block, const CBlockIndex* pindex, CValidationState& state, const CCoinsViewCache& view);
+bool CalcCbTxMerkleRootMNList(const CBlock& block, const CBlockIndex* pindexPrev, uint256& merkleRootRet, CValidationState& state, const CCoinsViewCache& view);
 bool CalcCbTxMerkleRootQuorums(const CBlock& block, const CBlockIndex* pindexPrev, uint256& merkleRootRet, CValidationState& state);
 
-#endif //GOBYTE_CBTX_H
+#endif // BITCOIN_EVO_CBTX_H

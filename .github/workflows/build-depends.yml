@@ -1,0 +1,235 @@
+name: Build depends
+
+on:
+  workflow_call:
+    inputs:
+      build-target:
+        description: "Target name as defined by matrix.sh"
+        required: true
+        type: string
+      container-path:
+        description: "Path to built container at registry"
+        required: true
+        type: string
+      runs-on:
+        description: "Runner label to use (e.g., ubuntu-24.04 or ubuntu-24.04-arm)"
+        required: true
+        type: string
+    outputs:
+      key:
+        description: "Key needed for restoring depends cache"
+        value: ${{ jobs.check-cache.outputs.cache-key }}
+      host:
+        description: "Host triplet for this build target"
+        value: ${{ jobs.check-cache.outputs.host }}
+      dep-opts:
+        description: "DEP_OPTS used to build depends"
+        value: ${{ jobs.check-cache.outputs.dep-opts }}
+
+jobs:
+  check-cache:
+    name: Check cache
+    runs-on: ${{ inputs.runs-on }}
+    outputs:
+      cache-hit: ${{ steps.cache-check.outputs.cache-hit }}
+      cache-key: ${{ steps.setup.outputs.cache-key }}
+      host: ${{ steps.setup.outputs.HOST }}
+      dep-opts: ${{ steps.setup.outputs.DEP_OPTS }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          sparse-checkout: |
+            ci/gobyte
+            ci/test
+            depends/Makefile
+            depends/packages
+            depends/hosts
+            contrib/containers/ci/ci.Dockerfile
+            contrib/containers/ci/ci-slim.Dockerfile
+            contrib/containers/guix/scripts/setup-sdk
+
+      - name: Compute cache key
+        id: setup
+        run: |
+          BUILD_TARGET="${{ inputs.build-target }}"
+          source ./ci/gobyte/matrix.sh
+          echo "DEP_OPTS=${DEP_OPTS}" >> "${GITHUB_OUTPUT}"
+          echo "HOST=${HOST}" >> "${GITHUB_OUTPUT}"
+          echo "RUNNER_ARCH=$(uname -m)" >> "${GITHUB_OUTPUT}"
+          DEP_HASH="$(echo -n "${BUILD_TARGET}" "${DEP_OPTS}" "${HOST}" | sha256sum | head -c 64)"
+          echo "DEP_HASH=${DEP_HASH}" >> "${GITHUB_OUTPUT}"
+          DOCKERFILE_HASH="${{ hashFiles('contrib/containers/ci/ci.Dockerfile', 'contrib/containers/ci/ci-slim.Dockerfile') }}"
+          PACKAGES_HASH="${{ hashFiles('depends/packages/*', 'depends/Makefile') }}"
+          CACHE_KEY="depends-${DOCKERFILE_HASH}-${{ inputs.runs-on }}-${{ inputs.build-target }}-${DEP_HASH}-${PACKAGES_HASH}"
+          echo "cache-key=${CACHE_KEY}" >> "${GITHUB_OUTPUT}"
+          echo "Cache key: ${CACHE_KEY}"
+        shell: bash
+
+      - name: Check for cached depends
+        id: cache-check
+        uses: actions/cache@v5
+        with:
+          path: depends/built/${{ steps.setup.outputs.HOST }}
+          key: ${{ steps.setup.outputs.cache-key }}
+          lookup-only: true
+
+      - name: Cache SDKs
+        id: cache-sdk-check
+        uses: actions/cache@v5
+        if: inputs.build-target == 'mac'
+        with:
+          path: depends/SDKs
+          key: depends-sdks-${{ hashFiles('depends/hosts/darwin.mk') }}
+          restore-keys: depends-sdks-
+
+      - name: Prepare SDKs
+        if: inputs.build-target == 'mac' && steps.cache-sdk-check.outputs.cache-hit != 'true'
+        run: ./contrib/containers/guix/scripts/setup-sdk
+
+  build:
+    name: Build depends
+    needs: [check-cache]
+    if: needs.check-cache.outputs.cache-hit != 'true'
+    runs-on: ${{ inputs.runs-on }}
+    container:
+      image: ${{ inputs.container-path }}
+      options: --user root
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Restore depends sources
+        uses: actions/cache/restore@v5
+        with:
+          path: depends/sources
+          key: depends-sources-${{ hashFiles('depends/packages/*') }}
+          restore-keys: depends-sources-
+
+      - name: Restore SDKs cache
+        uses: actions/cache/restore@v5
+        if: inputs.build-target == 'mac'
+        with:
+          path: depends/SDKs
+          key: depends-sdks-${{ hashFiles('depends/hosts/darwin.mk') }}
+          restore-keys: depends-sdks-
+          fail-on-cache-miss: true
+
+      - name: Restore cached depends
+        uses: actions/cache/restore@v5
+        with:
+          path: depends/built/${{ needs.check-cache.outputs.host }}
+          key: ${{ needs.check-cache.outputs.cache-key }}
+          restore-keys: |
+            depends-${{ hashFiles('contrib/containers/ci/ci.Dockerfile', 'contrib/containers/ci/ci-slim.Dockerfile') }}-${{ inputs.build-target }}-
+
+      - name: Build depends
+        run: |
+          export HOST="${{ needs.check-cache.outputs.host }}"
+          env ${{ needs.check-cache.outputs.dep-opts }} make -j$(nproc) -C depends
+
+      # -----------------------------------------------------------------------
+      # Failure diagnostics: collect all available evidence before the runner
+      # is torn down.  If "Build depends" fails, the depends Makefile leaves
+      # partial build artefacts in depends/work/build/<host>/<package>/.  That
+      # directory structure is the primary source of truth for identifying the
+      # failing package and the stage at which it stopped (fetch, extract,
+      # configure, build, or install).
+      #
+      # Layout of the staging directory (failure-diags-depends/):
+      #   config-logs/    -- every config.log under depends/work/
+      #   cmake/          -- CMakeError.log, CMakeOutput.log, CMakeCache.txt
+      #   make-logs/      -- remaining *.log files (<= 10 MB each, first 200)
+      #   environment.txt -- sorted env, df -h, and shallow work/built tree
+      #                      listing so the failing package is immediately
+      #                      visible without downloading individual log files.
+      #
+      # The collection step uses continue-on-error: true so that the upload
+      # step always fires even when the collection script hits a missing path
+      # (e.g., when the failure occurs before any work directory is created).
+      # -----------------------------------------------------------------------
+      - name: Collect failure diagnostics
+        if: failure()
+        continue-on-error: true
+        shell: bash
+        run: |
+          DIAG_DIR="failure-diags-depends"
+          mkdir -p \
+            "${DIAG_DIR}/config-logs" \
+            "${DIAG_DIR}/cmake" \
+            "${DIAG_DIR}/make-logs"
+
+          # --- autoconf config.log files --------------------------------------
+          # Preserving the relative path from depends/work/ lets reviewers
+          # identify the failing package and configure stage at a glance.
+          find depends/work -type f -name "config.log" 2>/dev/null \
+            | while IFS= read -r f; do
+                rel="${f#depends/work/}"
+                dest="${DIAG_DIR}/config-logs/${rel}"
+                mkdir -p "$(dirname "${dest}")"
+                cp -- "${f}" "${dest}" || true
+              done || true
+
+          # --- CMake diagnostics ----------------------------------------------
+          find depends/work -type f \( \
+              -name "CMakeError.log"  \
+              -o -name "CMakeOutput.log" \
+              -o -name "CMakeCache.txt"  \
+            \) 2>/dev/null \
+            | while IFS= read -r f; do
+                rel="${f#depends/work/}"
+                dest="${DIAG_DIR}/cmake/${rel}"
+                mkdir -p "$(dirname "${dest}")"
+                cp -- "${f}" "${dest}" || true
+              done || true
+
+          # --- All other *.log files (size- and count-capped) -----------------
+          # Excludes files already captured above.  Cap at 200 files and 10 MB
+          # per file to prevent runaway artifact sizes.
+          find depends/work -type f -name "*.log" \
+              -not -name "config.log" \
+              -not -name "CMakeError.log" \
+              -not -name "CMakeOutput.log" \
+              -size -10M 2>/dev/null \
+            | head -200 \
+            | while IFS= read -r f; do
+                rel="${f#depends/work/}"
+                dest="${DIAG_DIR}/make-logs/${rel}"
+                mkdir -p "$(dirname "${dest}")"
+                cp -- "${f}" "${dest}" || true
+              done || true
+
+          # --- Environment snapshot -------------------------------------------
+          # Written last so it is always present even when all find commands
+          # above return empty -- it still gives reviewers the runner context.
+          {
+            printf '=== Build target ===\n'
+            printf 'build-target: %s\n' "${{ inputs.build-target }}"
+            printf 'host:         %s\n' "${{ needs.check-cache.outputs.host }}"
+            printf 'dep-opts:     %s\n' "${{ needs.check-cache.outputs.dep-opts }}"
+            printf '\n=== Runner environment (sorted) ===\n'
+            env | sort
+            printf '\n=== Disk usage ===\n'
+            df -h
+            printf '\n=== depends/work tree (depth 6) ===\n'
+            find depends/work -maxdepth 6 -type f 2>/dev/null | sort || true
+            printf '\n=== depends/built tree (depth 3) ===\n'
+            find depends/built -maxdepth 3 2>/dev/null | sort || true
+          } > "${DIAG_DIR}/environment.txt" 2>&1 || true
+
+      - name: Upload failure diagnostics
+        if: failure()
+        uses: actions/upload-artifact@v6
+        with:
+          name: diags-depends-${{ inputs.build-target }}-${{ github.run_id }}
+          path: failure-diags-depends/
+          retention-days: 7
+
+      - name: Save depends cache
+        uses: actions/cache/save@v5
+        with:
+          path: depends/built/${{ needs.check-cache.outputs.host }}
+          key: ${{ needs.check-cache.outputs.cache-key }}
