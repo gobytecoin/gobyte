@@ -18,8 +18,7 @@ void* memcpy_int(void* a, const void* b, size_t c)
     return memcpy(a, b, c);
 }
 
-namespace
-{
+namespace {
 // trigger: Use the memcpy_int wrapper which calls our internal memcpy.
 //   A direct call to memcpy may be optimized away by the compiler.
 // test: Fill an array with a sequence of integers. memcpy to a new empty array.

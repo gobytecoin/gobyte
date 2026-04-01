@@ -12,13 +12,13 @@ jobs:
     name: Validate PR title
     runs-on: ubuntu-latest
     steps:
-      - uses: amannn/action-semantic-pull-request@v6
+      - uses: amannn/action-semantic-pull-request@v5
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           # Configure which types are allowed (newline delimited).
           # Default: https://github.com/commitizen/conventional-commit-types
-          # Our specific types/scopes (from https://github.com/gobytecoin/gobyte/blob/master/CONTRIBUTING.md#contributor-workflow)
+          # We follow Dash specific types/scopes (from https://github.com/dashpay/dash/blob/master/CONTRIBUTING.md#contributor-workflow)
           types: |
             feat
             fix
@@ -50,4 +50,3 @@ jobs:
             utils
             wallet
             zmq
-            guix

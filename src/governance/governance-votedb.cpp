@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021 The GoByte Core developers
+// Copyright (c) 2014-2021 The GoByte Core developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -38,7 +38,7 @@ bool CGovernanceObjectVoteFile::HasVote(const uint256& nHash) const
 
 bool CGovernanceObjectVoteFile::SerializeVoteToStream(const uint256& nHash, CDataStream& ss) const
 {
-    vote_m_cit it = mapVoteIndex.find(nHash);
+    auto it = mapVoteIndex.find(nHash);
     if (it == mapVoteIndex.end()) {
         return false;
     }
@@ -49,7 +49,7 @@ bool CGovernanceObjectVoteFile::SerializeVoteToStream(const uint256& nHash, CDat
 std::vector<CGovernanceVote> CGovernanceObjectVoteFile::GetVotes() const
 {
     std::vector<CGovernanceVote> vecResult;
-    for (vote_l_cit it = listVotes.begin(); it != listVotes.end(); ++it) {
+    for (auto it = listVotes.begin(); it != listVotes.end(); ++it) {
         vecResult.push_back(*it);
     }
     return vecResult;
@@ -57,7 +57,7 @@ std::vector<CGovernanceVote> CGovernanceObjectVoteFile::GetVotes() const
 
 void CGovernanceObjectVoteFile::RemoveVotesFromMasternode(const COutPoint& outpointMasternode)
 {
-    vote_l_it it = listVotes.begin();
+    auto it = listVotes.begin();
     while (it != listVotes.end()) {
         if (it->GetMasternodeOutpoint() == outpointMasternode) {
             --nMemoryVotes;
@@ -73,7 +73,7 @@ std::set<uint256> CGovernanceObjectVoteFile::RemoveInvalidVotes(const COutPoint&
 {
     std::set<uint256> removedVotes;
 
-    vote_l_it it = listVotes.begin();
+    auto it = listVotes.begin();
     while (it != listVotes.end()) {
         if (it->GetMasternodeOutpoint() == outpointMasternode) {
             bool useVotingKey = fProposal && (it->GetSignal() == VOTE_SIGNAL_FUNDING);
@@ -93,12 +93,12 @@ std::set<uint256> CGovernanceObjectVoteFile::RemoveInvalidVotes(const COutPoint&
 
 void CGovernanceObjectVoteFile::RemoveOldVotes(const CGovernanceVote& vote)
 {
-    vote_l_it it = listVotes.begin();
+    auto it = listVotes.begin();
     while (it != listVotes.end()) {
         if (it->GetMasternodeOutpoint() == vote.GetMasternodeOutpoint() // same masternode
-            && it->GetParentHash() == vote.GetParentHash() // same governance object (e.g. same proposal)
-            && it->GetSignal() == vote.GetSignal() // same signal (e.g. "funding", "delete", etc.)
-            && it->GetTimestamp() < vote.GetTimestamp()) // older than new vote
+            && it->GetParentHash() == vote.GetParentHash()              // same governance object (e.g. same proposal)
+            && it->GetSignal() == vote.GetSignal()                      // same signal (e.g. "funding", "delete", etc.)
+            && it->GetTimestamp() < vote.GetTimestamp())                // older than new vote
         {
             --nMemoryVotes;
             mapVoteIndex.erase(it->GetHash());
@@ -113,7 +113,7 @@ void CGovernanceObjectVoteFile::RebuildIndex()
 {
     mapVoteIndex.clear();
     nMemoryVotes = 0;
-    vote_l_it it = listVotes.begin();
+    auto it = listVotes.begin();
     while (it != listVotes.end()) {
         CGovernanceVote& vote = *it;
         uint256 nHash = vote.GetHash();

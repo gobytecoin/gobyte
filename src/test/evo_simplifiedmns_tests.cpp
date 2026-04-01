@@ -1,5 +1,4 @@
-// Copyright (c) 2018-2020 The Dash Core developers
-// Copyright (c) 2017-2021 The GoByte Core developers
+// Copyright (c) 2018-2020 The GoByte Core developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -24,13 +23,10 @@ BOOST_AUTO_TEST_CASE(simplifiedmns_merkleroots)
         std::string ip = strprintf("%d.%d.%d.%d", 0, 0, 0, i);
         Lookup(ip.c_str(), smle.service, i, false);
 
-        uint8_t skBuf[CBLSSecretKey::SerSize];
-        memset(skBuf, 0, sizeof(skBuf));
-        skBuf[0] = (uint8_t)i;
-        CBLSSecretKey sk;
-        sk.SetBuf(skBuf, sizeof(skBuf));
+        std::vector<unsigned char> vecBytes{static_cast<unsigned char>(i)};
+        vecBytes.resize(CBLSSecretKey::SerSize);
 
-        smle.pubKeyOperator.Set(sk.GetPublicKey());
+        smle.pubKeyOperator.Set(CBLSSecretKey(vecBytes).GetPublicKey());
         smle.keyIDVoting.SetHex(strprintf("%040x", i));
         smle.isValid = true;
 
@@ -58,7 +54,7 @@ BOOST_AUTO_TEST_CASE(simplifiedmns_merkleroots)
 
     for (auto& smle : entries) {
         calculatedHashes.emplace_back(smle.CalcHash().ToString());
-        //printf("\"%s\",\n", calculatedHashes.back().c_str());
+        // printf("\"%s\",\n", calculatedHashes.back().c_str());
     }
 
     BOOST_CHECK(expectedHashes == calculatedHashes);
@@ -67,7 +63,7 @@ BOOST_AUTO_TEST_CASE(simplifiedmns_merkleroots)
 
     std::string expectedMerkleRoot = "b2303aca677ae2091c882e44b58f57869fa88a6db1f4e1a5d71975e5387fa195";
     std::string calculatedMerkleRoot = sml.CalcMerkleRoot(nullptr).ToString();
-    //printf("merkleRoot=\"%s\",\n", calculatedMerkleRoot.c_str());
+    // printf("merkleRoot=\"%s\",\n", calculatedMerkleRoot.c_str());
 
     BOOST_CHECK(expectedMerkleRoot == calculatedMerkleRoot);
 }

@@ -24,17 +24,11 @@ Build Tools and Keys
 Contains files used to package gobyted/gobyte-qt
 for Debian-based Linux systems. If you compile gobyted/gobyte-qt yourself, there are some useful files here.
 
-### [Gitian-descriptors](/contrib/gitian-descriptors) ###
-Notes on getting Gitian builds up and running using KVM.
-
-### [Gitian-keys](/contrib/gitian-keys)
-PGP keys used for signing GoByte Core [Gitian release](/doc/release-process.md) results.
+### [Builder keys](/contrib/builder-keys)
+PGP keys used for signing GoByte Core [release](/doc/release-process.md) results.
 
 ### [MacDeploy](/contrib/macdeploy) ###
 Scripts and notes for Mac builds.
-
-### [Gitian-build](/contrib/gitian-build.py) ###
-Script for running full Gitian builds.
 
 Test and Verify Tools
 ---------------------
@@ -42,5 +36,5 @@ Test and Verify Tools
 ### [TestGen](/contrib/testgen) ###
 Utilities to generate test vectors for the data-driven GoByte tests.
 
-### [Verify Binaries](/contrib/verifybinaries) ###
+### [Verify-Binaries](/contrib/verify-binaries) ###
 This script attempts to download and verify the signature file SHA256SUMS.asc from bitcoin.org.

@@ -63,8 +63,6 @@ libconftest.dylib*
 *.pyc
 *.o
 *.o-*
-*.patch
-!depends/patches/*/*.patch
 *.a
 *.pb.cc
 *.pb.h
@@ -75,6 +73,10 @@ libconftest.dylib*
 
 *.json.h
 *.raw.h
+
+# Only ignore unexpected patches
+*.patch
+!depends/patches/**/*.patch
 
 #libtool object files
 *.lo
@@ -98,6 +100,7 @@ qrc_*.cpp
 # Mac specific
 .DS_Store
 build
+*.dSYM
 
 #lcov
 *.gcno
@@ -132,8 +135,10 @@ gobyted
 gobyte-qt
 make
 
+.clangd
 /docker/bin
 
 # CLion
 .idea
 cmake-build-debug
+.aider

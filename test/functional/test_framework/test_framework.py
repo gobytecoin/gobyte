@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 # Copyright (c) 2014-2016 The Bitcoin Core developers
-# Copyright (c) 2014-2020 The Dash Core developers
-# Copyright (c) 2017-2021 The GoByte Core developers
+# Copyright (c) 2014-2021 The GoByte Core developers
 # Distributed under the MIT software license, see the accompanying
 # file COPYING or http://www.opensource.org/licenses/mit-license.php.
 """Base class for RPC testing."""
+
+import configparser
 import copy
-from collections import deque
 from enum import Enum
 import logging
 import optparse
@@ -16,11 +16,18 @@ import shutil
 import sys
 import tempfile
 import time
-import traceback
 from concurrent.futures import ThreadPoolExecutor
 
 from .authproxy import JSONRPCException
 from . import coverage
+from .messages import (
+    CTransaction,
+    FromHex,
+    hash256,
+    msg_islock,
+    ser_compact_size,
+    ser_string,
+)
 from .test_node import TestNode
 from .util import (
     PortSeed,
@@ -33,13 +40,16 @@ from .util import (
     disconnect_nodes,
     force_finish_mnsync,
     get_datadir_path,
+    hex_str_to_bytes,
     initialize_datadir,
     p2p_port,
     set_node_times,
+    set_timeout_scale,
     satoshi_round,
     sync_blocks,
     sync_mempools,
     wait_until,
+    get_chain_folder,
 )
 
 class TestStatus(Enum):
@@ -51,7 +61,7 @@ TEST_EXIT_PASSED = 0
 TEST_EXIT_FAILED = 1
 TEST_EXIT_SKIPPED = 77
 
-GENESISTIME = 1510727100
+GENESISTIME = 1417713337
 
 class BitcoinTestFramework():
     """Base class for a bitcoin test script.
@@ -71,10 +81,12 @@ class BitcoinTestFramework():
 
     def __init__(self):
         """Sets test framework defaults. Do not override this method. Instead, override the set_test_params() method"""
+        self.chain = 'regtest'
         self.setup_clean_chain = False
         self.nodes = []
         self.mocktime = 0
         self.supports_cli = False
+        self.bind_to_localhost_only = True
         self.extra_args_from_options = []
         self.set_test_params()
 
@@ -88,10 +100,10 @@ class BitcoinTestFramework():
                           help="Leave gobyteds and test.* datadir on exit or error")
         parser.add_option("--noshutdown", dest="noshutdown", default=False, action="store_true",
                           help="Don't stop gobyteds after the test execution")
-        parser.add_option("--srcdir", dest="srcdir", default=os.path.normpath(os.path.dirname(os.path.realpath(__file__)) + "/../../../src"),
+        parser.add_option("--srcdir", dest="srcdir", default=os.path.abspath(os.path.dirname(os.path.realpath(__file__)) + "/../../../src"),
                           help="Source directory containing gobyted/gobyte-cli (default: %default)")
-        parser.add_option("--cachedir", dest="cachedir", default=os.path.normpath(os.path.dirname(os.path.realpath(__file__)) + "/../../cache"),
-                          help="Directory for caching pregenerated datadirs")
+        parser.add_option("--cachedir", dest="cachedir", default=os.path.abspath(os.path.dirname(os.path.realpath(__file__)) + "/../../cache"),
+                          help="Directory for caching pregenerated datadirs (default: %default)")
         parser.add_option("--tmpdir", dest="tmpdir", help="Root directory for datadirs")
         parser.add_option("-l", "--loglevel", dest="loglevel", default="INFO",
                           help="log events at this level and higher to the console. Can be set to DEBUG, INFO, WARNING, ERROR or CRITICAL. Passing --loglevel DEBUG will output all logs to console. Note that logs at all levels are always written to the test_framework.log file in the temporary test directory.")
@@ -102,23 +114,38 @@ class BitcoinTestFramework():
         parser.add_option("--coveragedir", dest="coveragedir",
                           help="Write tested RPC commands into this directory")
         parser.add_option("--configfile", dest="configfile",
-                          help="Location of the test framework config file")
+                          default=os.path.abspath(os.path.dirname(os.path.realpath(__file__)) + "/../../config.ini"),
+                          help="Location of the test framework config file (default: %default)")
         parser.add_option("--pdbonfailure", dest="pdbonfailure", default=False, action="store_true",
                           help="Attach a python debugger if test fails")
         parser.add_option("--usecli", dest="usecli", default=False, action="store_true",
                           help="use gobyte-cli instead of RPC for all commands")
         parser.add_option("--gobyted-arg", dest="gobyted_extra_args", default=[], type='string', action='append',
                           help="Pass extra args to all gobyted instances")
+        parser.add_option("--timeoutscale", dest="timeout_scale", default=1, type='int' ,
+                          help="Scale the test timeouts by multiplying them with the here provided value (defaul: 1)")
         self.add_options(parser)
         (self.options, self.args) = parser.parse_args()
 
+        if self.options.timeout_scale < 1:
+            raise RuntimeError("--timeoutscale can't be less than 1")
+
+        set_timeout_scale(self.options.timeout_scale)
+
         PortSeed.n = self.options.port_seed
 
-        os.environ['PATH'] = self.options.srcdir + ":" + self.options.srcdir + "/qt:" + os.environ['PATH']
+        os.environ['PATH'] = self.options.srcdir + os.pathsep + \
+                             self.options.srcdir + os.path.sep + "qt" + os.pathsep + \
+                             os.environ['PATH']
 
         check_json_precision()
 
         self.options.cachedir = os.path.abspath(self.options.cachedir)
+
+        config = configparser.ConfigParser()
+        config.read_file(open(self.options.configfile))
+        self.options.bitcoind = os.getenv("BITCOIND", default=config["environment"]["BUILDDIR"] + '/src/gobyted' + config["environment"]["EXEEXT"])
+        self.options.bitcoincli = os.getenv("BITCOINCLI", default=config["environment"]["BUILDDIR"] + '/src/gobyte-cli' + config["environment"]["EXEEXT"])
 
         self.extra_args_from_options = self.options.gobyted_extra_args
 
@@ -139,18 +166,18 @@ class BitcoinTestFramework():
             self.setup_network()
             self.run_test()
             success = TestStatus.PASSED
-        except JSONRPCException as e:
+        except JSONRPCException:
             self.log.exception("JSONRPC error")
         except SkipTest as e:
             self.log.warning("Test Skipped: %s" % e.message)
             success = TestStatus.SKIPPED
-        except AssertionError as e:
+        except AssertionError:
             self.log.exception("Assertion failed")
-        except KeyError as e:
+        except KeyError:
             self.log.exception("Key error")
-        except Exception as e:
+        except Exception:
             self.log.exception("Unexpected exception caught during testing")
-        except KeyboardInterrupt as e:
+        except KeyboardInterrupt:
             self.log.warning("Exiting after keyboard interrupt")
 
         if success == TestStatus.FAILED and self.options.pdbonfailure:
@@ -162,7 +189,7 @@ class BitcoinTestFramework():
             try:
                 if self.nodes:
                     self.stop_nodes()
-            except BaseException as e:
+            except BaseException:
                 success = False
                 self.log.exception("Unexpected exception caught during shutdown")
         else:
@@ -171,36 +198,26 @@ class BitcoinTestFramework():
             self.log.info("Note: gobyteds were not stopped and may still be running")
 
         if not self.options.nocleanup and not self.options.noshutdown and success != TestStatus.FAILED:
-            self.log.info("Cleaning up")
-            shutil.rmtree(self.options.tmpdir)
+            self.log.info("Cleaning up {} on exit".format(self.options.tmpdir))
+            cleanup_tree_on_exit = True
         else:
             self.log.warning("Not cleaning up dir %s" % self.options.tmpdir)
-            if os.getenv("PYTHON_DEBUG", ""):
-                # Dump the end of the debug logs, to aid in debugging rare
-                # travis failures.
-                import glob
-                filenames = [self.options.tmpdir + "/test_framework.log"]
-                filenames += glob.glob(self.options.tmpdir + "/node*/regtest/debug.log")
-                MAX_LINES_TO_PRINT = 1000
-                for fn in filenames:
-                    try:
-                        with open(fn, 'r') as f:
-                            print("From", fn, ":")
-                            print("".join(deque(f, MAX_LINES_TO_PRINT)))
-                    except OSError:
-                        print("Opening file %s failed." % fn)
-                        traceback.print_exc()
+            cleanup_tree_on_exit = False
 
         if success == TestStatus.PASSED:
             self.log.info("Tests successful")
-            sys.exit(TEST_EXIT_PASSED)
+            exit_code = TEST_EXIT_PASSED
         elif success == TestStatus.SKIPPED:
             self.log.info("Test skipped")
-            sys.exit(TEST_EXIT_SKIPPED)
+            exit_code = TEST_EXIT_SKIPPED
         else:
             self.log.error("Test failed. Test logging available at %s/test_framework.log", self.options.tmpdir)
-            logging.shutdown()
-            sys.exit(TEST_EXIT_FAILED)
+            self.log.error("Hint: Call {} '{}' to consolidate all logs".format(os.path.normpath(os.path.dirname(os.path.realpath(__file__)) + "/../combine_logs.py"), self.options.tmpdir))
+            exit_code = TEST_EXIT_FAILED
+        logging.shutdown()
+        if cleanup_tree_on_exit:
+            shutil.rmtree(self.options.tmpdir)
+        sys.exit(exit_code)
 
     # Methods to override in subclass test scripts.
     def set_test_params(self):
@@ -251,16 +268,20 @@ class BitcoinTestFramework():
 
     def add_nodes(self, num_nodes, extra_args=None, rpchost=None, timewait=None, binary=None, stderr=None):
         """Instantiate TestNode objects"""
-
+        if self.bind_to_localhost_only:
+            extra_confs = [["bind=127.0.0.1"]] * num_nodes
+        else:
+            extra_confs = [[]] * num_nodes
         if extra_args is None:
             extra_args = [[]] * num_nodes
         if binary is None:
-            binary = [None] * num_nodes
+            binary = [self.options.bitcoind] * num_nodes
+        assert_equal(len(extra_confs), num_nodes)
         assert_equal(len(extra_args), num_nodes)
         assert_equal(len(binary), num_nodes)
         old_num_nodes = len(self.nodes)
         for i in range(num_nodes):
-            self.nodes.append(TestNode(old_num_nodes + i, self.options.tmpdir, extra_args[i], self.extra_args_from_options, rpchost, timewait=timewait, binary=binary[i], stderr=stderr, mocktime=self.mocktime, coverage_dir=self.options.coveragedir, use_cli=self.options.usecli))
+            self.nodes.append(TestNode(old_num_nodes + i, get_datadir_path(self.options.tmpdir, old_num_nodes + i), self.extra_args_from_options, chain=self.chain, rpchost=rpchost, timewait=timewait, bitcoind=binary[i], bitcoin_cli=self.options.bitcoincli, stderr=stderr, mocktime=self.mocktime, coverage_dir=self.options.coveragedir, extra_conf=extra_confs[i], extra_args=extra_args[i], use_cli=self.options.usecli))
 
     def start_node(self, i, *args, **kwargs):
         """Start a gobyted"""
@@ -312,27 +333,6 @@ class BitcoinTestFramework():
         """Stop and start a test node"""
         self.stop_node(i)
         self.start_node(i, extra_args)
-
-    def assert_start_raises_init_error(self, i, extra_args=None, expected_msg=None, *args, **kwargs):
-        with tempfile.SpooledTemporaryFile(max_size=2**16) as log_stderr:
-            try:
-                self.start_node(i, extra_args, stderr=log_stderr, *args, **kwargs)
-                self.stop_node(i)
-            except Exception as e:
-                assert 'gobyted exited' in str(e)  # node must have shutdown
-                self.nodes[i].running = False
-                self.nodes[i].process = None
-                if expected_msg is not None:
-                    log_stderr.seek(0)
-                    stderr = log_stderr.read().decode('utf-8')
-                    if expected_msg not in stderr:
-                        raise AssertionError("Expected error \"" + expected_msg + "\" not found in:\n" + stderr)
-            else:
-                if expected_msg is None:
-                    assert_msg = "gobyted should have exited with an error"
-                else:
-                    assert_msg = "gobyted should have exited with expected error " + expected_msg
-                raise AssertionError(assert_msg)
 
     def wait_for_node_exit(self, i, timeout):
         self.nodes[i].process.wait(timeout)
@@ -399,7 +399,7 @@ class BitcoinTestFramework():
         self.log = logging.getLogger('TestFramework')
         self.log.setLevel(logging.DEBUG)
         # Create file handler to log all messages
-        fh = logging.FileHandler(self.options.tmpdir + '/test_framework.log')
+        fh = logging.FileHandler(self.options.tmpdir + '/test_framework.log', encoding='utf-8')
         fh.setLevel(logging.DEBUG)
         # Create console handler to log messages to stderr. By default this logs only error messages, but can be configured with --loglevel.
         ch = logging.StreamHandler(sys.stdout)
@@ -407,7 +407,7 @@ class BitcoinTestFramework():
         ll = int(self.options.loglevel) if self.options.loglevel.isdigit() else self.options.loglevel.upper()
         ch.setLevel(ll)
         # Format logs the same as gobyted's debug.log with microprecision (so log files can be concatenated and sorted)
-        formatter = logging.Formatter(fmt='%(asctime)s.%(msecs)03d000 %(name)s (%(levelname)s): %(message)s', datefmt='%Y-%m-%d %H:%M:%S')
+        formatter = logging.Formatter(fmt='%(asctime)s.%(msecs)03d000Z %(name)s (%(levelname)s): %(message)s', datefmt='%Y-%m-%dT%H:%M:%S')
         formatter.converter = time.gmtime
         fh.setFormatter(formatter)
         ch.setFormatter(formatter)
@@ -446,13 +446,13 @@ class BitcoinTestFramework():
             # Create cache directories, run gobyteds:
             self.set_genesis_mocktime()
             for i in range(MAX_NODES):
-                datadir = initialize_datadir(self.options.cachedir, i)
-                args = [os.getenv("GOBYTED", "gobyted"), "-server", "-keypool=1", "-datadir=" + datadir, "-discover=0", "-mocktime="+str(GENESISTIME)]
+                datadir = initialize_datadir(self.options.cachedir, i, self.chain)
+                args = [self.options.bitcoind, "-datadir=" + datadir, "-mocktime="+str(GENESISTIME)]
                 if i > 0:
                     args.append("-connect=127.0.0.1:" + str(p2p_port(0)))
                 if extra_args is not None:
                     args.extend(extra_args)
-                self.nodes.append(TestNode(i, self.options.cachedir, extra_args=[], extra_args_from_options=self.extra_args_from_options, rpchost=None, timewait=None, binary=None, stderr=stderr, mocktime=self.mocktime, coverage_dir=None))
+                self.nodes.append(TestNode(i, get_datadir_path(self.options.cachedir, i), chain=self.chain, extra_conf=["bind=127.0.0.1"], extra_args=[],extra_args_from_options=self.extra_args_from_options, rpchost=None, timewait=None, bitcoind=self.options.bitcoind, bitcoin_cli=self.options.bitcoincli, stderr=stderr, mocktime=self.mocktime, coverage_dir=None))
                 self.nodes[i].args = args
                 self.start_node(i)
 
@@ -483,7 +483,8 @@ class BitcoinTestFramework():
             self.disable_mocktime()
 
             def cache_path(n, *paths):
-                return os.path.join(get_datadir_path(self.options.cachedir, n), "regtest", *paths)
+                chain = get_chain_folder(get_datadir_path(self.options.cachedir, n), self.chain)
+                return os.path.join(get_datadir_path(self.options.cachedir, n), chain, *paths)
 
             for i in range(MAX_NODES):
                 for entry in os.listdir(cache_path(i)):
@@ -494,7 +495,7 @@ class BitcoinTestFramework():
             from_dir = get_datadir_path(self.options.cachedir, i)
             to_dir = get_datadir_path(self.options.tmpdir, i)
             shutil.copytree(from_dir, to_dir)
-            initialize_datadir(self.options.tmpdir, i)  # Overwrite port/rpcport in gobyte.conf
+            initialize_datadir(self.options.tmpdir, i, self.chain)  # Overwrite port/rpcport in gobyte.conf
 
     def _initialize_chain_clean(self):
         """Initialize empty blockchain for use by the test.
@@ -502,7 +503,7 @@ class BitcoinTestFramework():
         Create an empty blockchain and num_nodes wallets.
         Useful if a test case wants complete control over initialization."""
         for i in range(self.num_nodes):
-            initialize_datadir(self.options.tmpdir, i)
+            initialize_datadir(self.options.tmpdir, i, self.chain)
 
 MASTERNODE_COLLATERAL = 1000
 
@@ -531,21 +532,39 @@ class GoByteTestFramework(BitcoinTestFramework):
             extra_args = [[]] * num_nodes
         assert_equal(len(extra_args), num_nodes)
         self.extra_args = [copy.deepcopy(a) for a in extra_args]
-        self.extra_args[0] += ["-sporkkey=cYMtSnGZZKXEstrG9jqUw8TuKLPvK8ppMqfhw87ZPQzHGoMwnjuk"]
+        self.extra_args[0] += ["-sporkkey=cP4EKFyJsHT39LDqgdcB43Y3YXjNyjb5Fuas1GQSeAtjnZWmZEQK"]
         self.fast_dip3_enforcement = fast_dip3_enforcement
         if fast_dip3_enforcement:
             for i in range(0, num_nodes):
                 self.extra_args[i].append("-dip3params=30:50")
 
+        # make sure to activate dip8 after prepare_masternodes has finished its job already
+        self.set_gobyte_dip8_activation(200)
+
         # LLMQ default test params (no need to pass -llmqtestparams)
         self.llmq_size = 3
         self.llmq_threshold = 2
 
+        # This is nRequestTimeout in gobyte-q-recovery thread
+        self.quorum_data_thread_request_timeout_seconds = 10
+        # This is EXPIRATION_TIMEOUT in CQuorumDataRequest
+        self.quorum_data_request_expiration_timeout = 300
+
     def set_gobyte_dip8_activation(self, activate_after_block):
-        window = int((activate_after_block + 2) / 3)
-        threshold = int((window + 1) / 2)
+        self.dip8_activation_height = activate_after_block
         for i in range(0, self.num_nodes):
-            self.extra_args[i].append("-vbparams=dip0008:0:999999999999:%d:%d" % (window, threshold))
+            self.extra_args[i].append("-dip8params=%d" % (activate_after_block))
+
+    def activate_dip8(self, slow_mode=False):
+        # NOTE: set slow_mode=True if you are activating dip8 after a huge reorg
+        # or nodes might fail to catch up otherwise due to a large
+        # (MAX_BLOCKS_IN_TRANSIT_PER_PEER = 16 blocks) reorg error.
+        self.log.info("Wait for dip0008 activation")
+        while self.nodes[0].getblockcount() < self.dip8_activation_height:
+            self.nodes[0].generate(10)
+            if slow_mode:
+                self.sync_blocks()
+        self.sync_blocks()
 
     def set_gobyte_llmq_test_params(self, llmq_size, llmq_threshold):
         self.llmq_size = llmq_size
@@ -586,23 +605,38 @@ class GoByteTestFramework(BitcoinTestFramework):
         rewardsAddr = self.nodes[0].getnewaddress()
 
         port = p2p_port(len(self.nodes) + idx)
-        if (idx % 2) == 0:
+        ipAndPort = '127.0.0.1:%d' % port
+        operatorReward = idx
+        operatorPayoutAddress = self.nodes[0].getnewaddress()
+
+        submit = (idx % 4) < 2
+
+        if (idx % 2) == 0 :
             self.nodes[0].lockunspent(True, [{'txid': txid, 'vout': collateral_vout}])
-            proTxHash = self.nodes[0].protx('register_fund', address, '127.0.0.1:%d' % port, ownerAddr, bls['public'], votingAddr, 0, rewardsAddr, address)
+            protx_result = self.nodes[0].protx('register_fund', address, ipAndPort, ownerAddr, bls['public'], votingAddr, operatorReward, rewardsAddr, address, submit)
         else:
             self.nodes[0].generate(1)
-            proTxHash = self.nodes[0].protx('register', txid, collateral_vout, '127.0.0.1:%d' % port, ownerAddr, bls['public'], votingAddr, 0, rewardsAddr, address)
+            protx_result = self.nodes[0].protx('register', txid, collateral_vout, ipAndPort, ownerAddr, bls['public'], votingAddr, operatorReward, rewardsAddr, address, submit)
+
+        if submit:
+            proTxHash = protx_result
+        else:
+            proTxHash = self.nodes[0].sendrawtransaction(protx_result)
+
         self.nodes[0].generate(1)
+
+        if operatorReward > 0:
+            self.nodes[0].protx('update_service', proTxHash, ipAndPort, bls['secret'], operatorPayoutAddress, address)
 
         self.mninfo.append(MasternodeInfo(proTxHash, ownerAddr, votingAddr, bls['public'], bls['secret'], address, txid, collateral_vout))
         self.sync_all()
 
         self.log.info("Prepared masternode %d: collateral_txid=%s, collateral_vout=%d, protxHash=%s" % (idx, txid, collateral_vout, proTxHash))
 
-    def remove_mastermode(self, idx):
+    def remove_masternode(self, idx):
         mn = self.mninfo[idx]
         rawtx = self.nodes[0].createrawtransaction([{"txid": mn.collateral_txid, "vout": mn.collateral_vout}], {self.nodes[0].getnewaddress(): 999.9999})
-        rawtx = self.nodes[0].signrawtransaction(rawtx)
+        rawtx = self.nodes[0].signrawtransactionwithwallet(rawtx)
         self.nodes[0].sendrawtransaction(rawtx["hex"])
         self.nodes[0].generate(1)
         self.sync_all()
@@ -616,10 +650,11 @@ class GoByteTestFramework(BitcoinTestFramework):
 
         start_idx = len(self.nodes)
         for idx in range(0, self.mn_count):
-            copy_datadir(0, idx + start_idx, self.options.tmpdir)
+            copy_datadir(0, idx + start_idx, self.options.tmpdir, self.chain)
 
         # restart faucet node
         self.start_node(0)
+        force_finish_mnsync(self.nodes[0])
 
     def start_masternodes(self):
         self.log.info("Starting %d masternodes", self.mn_count)
@@ -698,6 +733,11 @@ class GoByteTestFramework(BitcoinTestFramework):
         self.nodes[0].generate(1)
         # sync nodes
         self.sync_all()
+        # Enable InstantSend (including block filtering) and ChainLocks by default
+        self.nodes[0].spork("SPORK_2_INSTANTSEND_ENABLED", 0)
+        self.nodes[0].spork("SPORK_3_INSTANTSEND_BLOCK_FILTERING", 0)
+        self.nodes[0].spork("SPORK_19_CHAINLOCKS_ENABLED", 0)
+        self.wait_for_sporks_same()
         self.bump_mocktime(1)
 
         mn_info = self.nodes[0].masternodelist("status")
@@ -747,7 +787,7 @@ class GoByteTestFramework(BitcoinTestFramework):
         outputs[receiver_address] = satoshi_round(amount)
         outputs[change_address] = satoshi_round(in_amount - amount - fee)
         rawtx = node_from.createrawtransaction(inputs, outputs)
-        ret = node_from.signrawtransaction(rawtx)
+        ret = node_from.signrawtransactionwithwallet(rawtx)
         decoded = node_from.decoderawtransaction(ret['hex'])
         ret = {**decoded, **ret}
         return ret
@@ -760,6 +800,28 @@ class GoByteTestFramework(BitcoinTestFramework):
                 return False
         if wait_until(check_tx, timeout=timeout, sleep=0.5, do_assert=expected) and not expected:
             raise AssertionError("waiting unexpectedly succeeded")
+
+    def create_islock(self, hextx):
+        tx = FromHex(CTransaction(), hextx)
+        tx.rehash()
+
+        request_id_buf = ser_string(b"islock") + ser_compact_size(len(tx.vin))
+        inputs = []
+        for txin in tx.vin:
+            request_id_buf += txin.prevout.serialize()
+            inputs.append(txin.prevout)
+        request_id = hash256(request_id_buf)[::-1].hex()
+        message_hash = tx.hash
+
+        quorum_member = None
+        for mn in self.mninfo:
+            res = mn.node.quorum('sign', 100, request_id, message_hash)
+            if (res and quorum_member is None):
+                quorum_member = mn
+
+        rec_sig = self.get_recovered_sig(request_id, message_hash, node=quorum_member.node)
+        islock = msg_islock(inputs, tx.sha256, hex_str_to_bytes(rec_sig['sig']))
+        return islock
 
     def wait_for_instantlock(self, txid, node, expected=True, timeout=15):
         def check_instantlock():
@@ -798,7 +860,7 @@ class GoByteTestFramework(BitcoinTestFramework):
             all_ok = True
             for node in nodes:
                 s = node.quorum("dkgstatus")
-                if s["session"] == {}:
+                if 'llmq_test' not in s["session"]:
                     continue
                 if "quorumConnections" not in s:
                     all_ok = False
@@ -828,7 +890,7 @@ class GoByteTestFramework(BitcoinTestFramework):
 
             for mn in mninfos:
                 s = mn.node.quorum('dkgstatus')
-                if s["session"] == {}:
+                if 'llmq_test' not in s["session"]:
                     continue
                 if "quorumConnections" not in s:
                     return ret()
@@ -902,23 +964,38 @@ class GoByteTestFramework(BitcoinTestFramework):
             return all_ok
         wait_until(check_dkg_comitments, timeout=timeout, sleep=0.1)
 
-    def mine_quorum(self, expected_members=None, expected_connections=2, expected_contributions=None, expected_complaints=0, expected_justifications=0, expected_commitments=None, mninfos=None):
+    def wait_for_quorum_list(self, quorum_hash, nodes, timeout=15, sleep=2):
+        def wait_func():
+            if quorum_hash in self.nodes[0].quorum("list")["llmq_test"]:
+                return True
+            self.bump_mocktime(sleep, nodes=nodes)
+            self.nodes[0].generate(1)
+            sync_blocks(nodes)
+            return False
+        wait_until(wait_func, timeout=timeout, sleep=sleep)
+
+    def mine_quorum(self, expected_connections=None, expected_members=None, expected_contributions=None, expected_complaints=0, expected_justifications=0, expected_commitments=None, mninfos_online=None, mninfos_valid=None):
+        spork21_active = self.nodes[0].spork('show')['SPORK_21_QUORUM_ALL_CONNECTED'] <= 1
+        spork23_active = self.nodes[0].spork('show')['SPORK_23_QUORUM_POSE'] <= 1
+
+        if expected_connections is None:
+            expected_connections = (self.llmq_size - 1) if spork21_active else 2
         if expected_members is None:
             expected_members = self.llmq_size
         if expected_contributions is None:
             expected_contributions = self.llmq_size
         if expected_commitments is None:
             expected_commitments = self.llmq_size
-        if mninfos is None:
-            mninfos = self.mninfo
+        if mninfos_online is None:
+            mninfos_online = self.mninfo.copy()
+        if mninfos_valid is None:
+            mninfos_valid = self.mninfo.copy()
 
         self.log.info("Mining quorum: expected_members=%d, expected_connections=%d, expected_contributions=%d, expected_complaints=%d, expected_justifications=%d, "
                       "expected_commitments=%d" % (expected_members, expected_connections, expected_contributions, expected_complaints,
                                                    expected_justifications, expected_commitments))
 
-        nodes = [self.nodes[0]] + [mn.node for mn in mninfos]
-
-        quorums = self.nodes[0].quorum("list")
+        nodes = [self.nodes[0]] + [mn.node for mn in mninfos_online]
 
         # move forward to next DKG
         skip_count = 24 - (self.nodes[0].getblockcount() % 24)
@@ -930,53 +1007,55 @@ class GoByteTestFramework(BitcoinTestFramework):
         q = self.nodes[0].getbestblockhash()
 
         self.log.info("Waiting for phase 1 (init)")
-        self.wait_for_quorum_phase(q, 1, expected_members, None, 0, mninfos)
+        self.wait_for_quorum_phase(q, 1, expected_members, None, 0, mninfos_online)
         self.wait_for_quorum_connections(expected_connections, nodes, wait_proc=lambda: self.bump_mocktime(1, nodes=nodes))
-        if self.nodes[0].spork('show')['SPORK_21_QUORUM_ALL_CONNECTED'] == 0:
-            self.wait_for_masternode_probes(mninfos, wait_proc=lambda: self.bump_mocktime(1, nodes=nodes))
+        if spork23_active:
+            self.wait_for_masternode_probes(mninfos_valid, wait_proc=lambda: self.bump_mocktime(1, nodes=nodes))
         self.bump_mocktime(1, nodes=nodes)
         self.nodes[0].generate(2)
         sync_blocks(nodes)
 
         self.log.info("Waiting for phase 2 (contribute)")
-        self.wait_for_quorum_phase(q, 2, expected_members, "receivedContributions", expected_contributions, mninfos)
+        self.wait_for_quorum_phase(q, 2, expected_members, "receivedContributions", expected_contributions, mninfos_online)
         self.bump_mocktime(1, nodes=nodes)
         self.nodes[0].generate(2)
         sync_blocks(nodes)
 
         self.log.info("Waiting for phase 3 (complain)")
-        self.wait_for_quorum_phase(q, 3, expected_members, "receivedComplaints", expected_complaints, mninfos)
+        self.wait_for_quorum_phase(q, 3, expected_members, "receivedComplaints", expected_complaints, mninfos_online)
         self.bump_mocktime(1, nodes=nodes)
         self.nodes[0].generate(2)
         sync_blocks(nodes)
 
         self.log.info("Waiting for phase 4 (justify)")
-        self.wait_for_quorum_phase(q, 4, expected_members, "receivedJustifications", expected_justifications, mninfos)
+        self.wait_for_quorum_phase(q, 4, expected_members, "receivedJustifications", expected_justifications, mninfos_online)
         self.bump_mocktime(1, nodes=nodes)
         self.nodes[0].generate(2)
         sync_blocks(nodes)
 
         self.log.info("Waiting for phase 5 (commit)")
-        self.wait_for_quorum_phase(q, 5, expected_members, "receivedPrematureCommitments", expected_commitments, mninfos)
+        self.wait_for_quorum_phase(q, 5, expected_members, "receivedPrematureCommitments", expected_commitments, mninfos_online)
         self.bump_mocktime(1, nodes=nodes)
         self.nodes[0].generate(2)
         sync_blocks(nodes)
 
         self.log.info("Waiting for phase 6 (mining)")
-        self.wait_for_quorum_phase(q, 6, expected_members, None, 0, mninfos)
+        self.wait_for_quorum_phase(q, 6, expected_members, None, 0, mninfos_online)
 
         self.log.info("Waiting final commitment")
         self.wait_for_quorum_commitment(q, nodes)
 
         self.log.info("Mining final commitment")
         self.bump_mocktime(1, nodes=nodes)
+        self.nodes[0].getblocktemplate() # this calls CreateNewBlock
         self.nodes[0].generate(1)
-        while quorums == self.nodes[0].quorum("list"):
-            time.sleep(2)
-            self.bump_mocktime(1, nodes=nodes)
-            self.nodes[0].generate(1)
-            sync_blocks(nodes)
+        sync_blocks(nodes)
+
+        self.log.info("Waiting for quorum to appear in the list")
+        self.wait_for_quorum_list(q, nodes)
+
         new_quorum = self.nodes[0].quorum("list", 1)["llmq_test"][0]
+        assert_equal(q, new_quorum)
         quorum_info = self.nodes[0].quorum("info", 100, new_quorum)
 
         # Mine 8 (SIGN_HEIGHT_OFFSET) more blocks to make sure that the new quorum gets eligable for signing sessions
@@ -987,6 +1066,18 @@ class GoByteTestFramework(BitcoinTestFramework):
         self.log.info("New quorum: height=%d, quorumHash=%s, minedBlock=%s" % (quorum_info["height"], new_quorum, quorum_info["minedBlock"]))
 
         return new_quorum
+
+    def get_recovered_sig(self, rec_sig_id, rec_sig_msg_hash, llmq_type=100, node=None):
+        # Note: recsigs aren't relayed to regular nodes by default,
+        # make sure to pick a mn as a node to query for recsigs.
+        node = self.mninfo[0].node if node is None else node
+        time_start = time.time()
+        while time.time() - time_start < 10:
+            try:
+                return node.quorum('getrecsig', llmq_type, rec_sig_id, rec_sig_msg_hash)
+            except JSONRPCException:
+                time.sleep(0.1)
+        assert False
 
     def get_quorum_masternodes(self, q):
         qi = self.nodes[0].quorum('info', 100, q)
@@ -1000,6 +1091,38 @@ class GoByteTestFramework(BitcoinTestFramework):
             if mn.proTxHash == proTxHash:
                 return mn
         return None
+
+    def test_mn_quorum_data(self, test_mn, quorum_type_in, quorum_hash_in, test_secret=True, expect_secret=True):
+        quorum_info = test_mn.node.quorum("info", quorum_type_in, quorum_hash_in, True)
+        if test_secret and expect_secret != ("secretKeyShare" in quorum_info):
+            return False
+        if "members" not in quorum_info or len(quorum_info["members"]) == 0:
+            return False
+        pubkey_count = 0
+        valid_count = 0
+        for quorum_member in quorum_info["members"]:
+            valid_count += quorum_member["valid"]
+            pubkey_count += "pubKeyShare" in quorum_member
+        return pubkey_count == valid_count
+
+    def wait_for_quorum_data(self, mns, quorum_type_in, quorum_hash_in, test_secret=True, expect_secret=True,
+                             recover=False, timeout=60):
+        def test_mns():
+            valid = 0
+            if recover:
+                if self.mocktime % 2:
+                    self.bump_mocktime(self.quorum_data_request_expiration_timeout + 1)
+                    self.nodes[0].generate(1)
+                else:
+                    self.bump_mocktime(self.quorum_data_thread_request_timeout_seconds + 1)
+
+            for test_mn in mns:
+                valid += self.test_mn_quorum_data(test_mn, quorum_type_in, quorum_hash_in, test_secret, expect_secret)
+            self.log.debug("wait_for_quorum_data: %d/%d - quorum_type=%d quorum_hash=%s" %
+                           (valid, len(mns), quorum_type_in, quorum_hash_in))
+            return valid == len(mns)
+
+        wait_until(test_mns, timeout=timeout, sleep=0.5)
 
     def wait_for_mnauth(self, node, count, timeout=10):
         def test():
@@ -1016,3 +1139,20 @@ class SkipTest(Exception):
     """This exception is raised to skip a test"""
     def __init__(self, message):
         self.message = message
+
+
+def skip_if_no_py3_zmq():
+    """Attempt to import the zmq package and skip the test if the import fails."""
+    try:
+        import zmq  # noqa
+    except ImportError:
+        raise SkipTest("python3-zmq module not available.")
+
+
+def skip_if_no_bitcoind_zmq(test_instance):
+    """Skip the running test if gobyted has not been compiled with zmq support."""
+    config = configparser.ConfigParser()
+    config.read_file(open(test_instance.options.configfile))
+
+    if not config["components"].getboolean("ENABLE_ZMQ"):
+        raise SkipTest("gobyted has not been built with zmq enabled.")

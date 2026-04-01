@@ -8,15 +8,15 @@
 
 #include <memory>
 #include <string>
+#include <util.h>
 
 class CScheduler;
 class CWallet;
 
 class WalletInitInterface;
-extern WalletInitInterface* const g_wallet_init_interface;
+extern const WalletInitInterface& g_wallet_init_interface;
 
-namespace boost
-{
+namespace boost {
 class thread_group;
 } // namespace boost
 
@@ -26,9 +26,9 @@ bool ShutdownRequested();
 /** Interrupt threads */
 void Interrupt();
 void Shutdown();
-//!Initialize the logging infrastructure
+//! Initialize the logging infrastructure
 void InitLogging();
-//!Parameter interaction: change current parameters depending on various rules
+//! Parameter interaction: change current parameters depending on various rules
 void InitParameterInteraction();
 
 /** Initialize GoByte Core: Basic context setup.
@@ -62,14 +62,11 @@ bool AppInitLockDataDirectory();
 bool AppInitMain();
 void PrepareShutdown();
 
-/** The help message mode determines what help message to show */
-enum HelpMessageMode {
-    HMM_BITCOIND,
-    HMM_BITCOIN_QT
-};
+/**
+ * Setup the arguments for gArgs
+ */
+void SetupServerArgs();
 
-/** Help for options shared between UI and daemon (for -help) */
-std::string HelpMessage(HelpMessageMode mode);
 /** Returns licensing information (for -version) */
 std::string LicenseInfo();
 

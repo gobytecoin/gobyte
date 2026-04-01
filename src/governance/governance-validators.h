@@ -1,9 +1,9 @@
-// Copyright (c) 2017-2021 The GoByte Core developers
+// Copyright (c) 2014-2021 The GoByte Core developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef GOVERNANCE_VALIDATORS_H
-#define GOVERNANCE_VALIDATORS_H
+#ifndef BITCOIN_GOVERNANCE_GOVERNANCE_VALIDATORS_H
+#define BITCOIN_GOVERNANCE_GOVERNANCE_VALIDATORS_H
 
 #include <string>
 
@@ -18,7 +18,7 @@ private:
     std::string strErrorMessages;
 
 public:
-    CProposalValidator(const std::string& strDataHexIn = std::string(), bool fAllowLegacyFormat = true);
+    explicit CProposalValidator(const std::string& strDataHexIn = std::string(), bool fAllowLegacyFormat = true);
 
     bool Validate(bool fCheckExpiration = true);
 
@@ -35,6 +35,7 @@ private:
     bool GetDataValue(const std::string& strKey, int64_t& nValueRet);
     bool GetDataValue(const std::string& strKey, double& dValueRet);
 
+    bool ValidateType();
     bool ValidateName();
     bool ValidateStartEndEpoch(bool fCheckExpiration = true);
     bool ValidatePaymentAmount();
@@ -44,4 +45,4 @@ private:
     bool CheckURL(const std::string& strURLIn);
 };
 
-#endif
+#endif // BITCOIN_GOVERNANCE_GOVERNANCE_VALIDATORS_H

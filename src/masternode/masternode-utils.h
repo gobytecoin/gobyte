@@ -1,10 +1,9 @@
-// Copyright (c) 2014-2019 The Dash Core developers
-// Copyright (c) 2017-2021 The GoByte Core developers
+// Copyright (c) 2014-2021 The GoByte Core developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef MASTERNODE_UTILS_H
-#define MASTERNODE_UTILS_H
+#ifndef BITCOIN_MASTERNODE_MASTERNODE_UTILS_H
+#define BITCOIN_MASTERNODE_MASTERNODE_UTILS_H
 
 #include <evo/deterministicmns.h>
 
@@ -14,7 +13,7 @@ class CMasternodeUtils
 {
 public:
     static void ProcessMasternodeConnections(CConnman& connman);
-    static void DoMaintenance(CConnman &connman);
+    static void DoMaintenance(CConnman& connman);
 };
 
-#endif//MASTERNODE_UTILS_H
+#endif // BITCOIN_MASTERNODE_MASTERNODE_UTILS_H

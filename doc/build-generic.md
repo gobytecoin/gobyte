@@ -32,7 +32,7 @@ not done, build failures might occur when building GoByte.
 
 Please read the [depends](../depends/README.md) documentation for more details on supported hosts and configuration
 options. If no host is specified (as in the above example) when calling `make`, the depends system will default to your
-local host system. 
+local host system.
 
 Building GoByte Core
 ---------------------
@@ -49,7 +49,7 @@ Please replace `<host>` with your local system's `host-platform-triplet`. The fo
 - `x86_64-pc-linux-gnu` for Linux64
 - `i686-w64-mingw32` for Win32
 - `x86_64-w64-mingw32` for Win64
-- `x86_64-apple-darwin11` for MacOSX
+- `x86_64-apple-darwin` for macOS
 - `arm-linux-gnueabihf` for Linux ARM 32 bit
 - `aarch64-linux-gnu` for Linux ARM 64 bit
 

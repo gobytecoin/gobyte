@@ -1,4 +1,4 @@
-# TOR SUPPORT IN GoByte Core
+# TOR SUPPORT IN GOBYTE CORE
 
 It is possible to run GoByte Core as a Tor hidden service, and connect to such services.
 
@@ -50,11 +50,11 @@ config file): *Needed for Tor version 0.2.7.0 and older versions of Tor only. Fo
 versions of Tor see [Section 4](#4-automatically-listen-on-tor).*
 
 	HiddenServiceDir /var/lib/tor/gobytecore-service/
-	HiddenServicePort 9999 127.0.0.1:9999
-	HiddenServicePort 19999 127.0.0.1:19999
+	HiddenServicePort 12455 127.0.0.1:12455
+	HiddenServicePort 13455 127.0.0.1:13455
 
 The directory can be different of course, but (both) port numbers should be equal to
-your gobyted's P2P listen port (9999 by default).
+your gobyted's P2P listen port (12455 by default).
 
 	-externalip=X   You can tell GoByte Core about its publicly reachable address using
 	                this option, and this can be a .onion address. Given the above
@@ -89,7 +89,7 @@ as well, use `discover` instead:
 
 	./gobyted ... -discover
 
-and open port 9999 on your firewall (or use -upnp).
+and open port 12455 on your firewall (or use -upnp).
 
 If you only want to use Tor to reach onion addresses, but not use it as a proxy
 for normal IPv4/IPv6 communication, use:
@@ -120,7 +120,7 @@ API, to create and destroy 'ephemeral' hidden services programmatically.
 GoByte Core has been updated to make use of this.
 
 This means that if Tor is running (and proper authentication has been configured),
-GoByte Core automatically creates a hidden service to listen on. This will positively 
+GoByte Core automatically creates a hidden service to listen on. This will positively
 affect the number of available .onion nodes.
 
 This new feature is enabled by default if GoByte Core is listening (`-listen`), and
@@ -128,15 +128,15 @@ requires a Tor connection to work. It can be explicitly disabled with `-listenon
 and, if not disabled, configured using the `-torcontrol` and `-torpassword` settings.
 To show verbose debugging information, pass `-debug=tor`.
 
-Connecting to Tor's control socket API requires one of two authentication methods to be 
-configured. For cookie authentication the user running gobyted must have write access 
-to the `CookieAuthFile` specified in Tor configuration. In some cases this is 
-preconfigured and the creation of a hidden service is automatic. If permission problems 
-are seen with `-debug=tor` they can be resolved by adding both the user running tor and 
-the user running gobyted to the same group and setting permissions appropriately. On 
-Debian-based systems the user running gobyted can be added to the debian-tor group, 
-which has the appropriate permissions. An alternative authentication method is the use 
-of the `-torpassword` flag and a `hash-password` which can be enabled and specified in 
+Connecting to Tor's control socket API requires one of two authentication methods to be
+configured. For cookie authentication the user running gobyted must have write access
+to the `CookieAuthFile` specified in Tor configuration. In some cases this is
+preconfigured and the creation of a hidden service is automatic. If permission problems
+are seen with `-debug=tor` they can be resolved by adding both the user running tor and
+the user running gobyted to the same group and setting permissions appropriately. On
+Debian-based systems the user running gobyted can be added to the debian-tor group,
+which has the appropriate permissions. An alternative authentication method is the use
+of the `-torpassword` flag and a `hash-password` which can be enabled and specified in
 Tor configuration.
 
 ## 5. Privacy recommendations

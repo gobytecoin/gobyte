@@ -1,5 +1,4 @@
-// Copyright (c) 2014-2019 The Dash Core developers
-// Copyright (c) 2017-2021 The GoByte Core developers
+// Copyright (c) 2014-2020 The GoByte Core developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -17,12 +16,12 @@ UniValue CMasternodeMetaInfo::ToJson() const
 
     auto now = GetAdjustedTime();
 
-    ret.push_back(Pair("lastDSQ", nLastDsq));
-    ret.push_back(Pair("mixingTxCount", nMixingTxCount));
-    ret.push_back(Pair("lastOutboundAttempt", lastOutboundAttempt));
-    ret.push_back(Pair("lastOutboundAttemptElapsed", now - lastOutboundAttempt));
-    ret.push_back(Pair("lastOutboundSuccess", lastOutboundSuccess));
-    ret.push_back(Pair("lastOutboundSuccessElapsed", now - lastOutboundSuccess));
+    ret.pushKV("lastDSQ", nLastDsq);
+    ret.pushKV("mixingTxCount", nMixingTxCount);
+    ret.pushKV("lastOutboundAttempt", lastOutboundAttempt);
+    ret.pushKV("lastOutboundAttemptElapsed", now - lastOutboundAttempt);
+    ret.pushKV("lastOutboundSuccess", lastOutboundSuccess);
+    ret.pushKV("lastOutboundSuccessElapsed", now - lastOutboundSuccess);
 
     return ret;
 }
@@ -60,7 +59,7 @@ CMasternodeMetaInfoPtr CMasternodeMetaMan::GetMetaInfo(const uint256& proTxHash,
 // We keep track of dsq (mixing queues) count to avoid using same masternodes for mixing too often.
 // This threshold is calculated as the last dsq count this specific masternode was used in a mixing
 // session plus a margin of 20% of masternode count. In other words we expect at least 20% of unique
-// masternodes before we ever see a masternode that we know already mixed someone's funds ealier.
+// masternodes before we ever see a masternode that we know already mixed someone's funds earlier.
 int64_t CMasternodeMetaMan::GetDsqThreshold(const uint256& proTxHash, int nMnCount)
 {
     LOCK(cs);
@@ -102,7 +101,7 @@ bool CMasternodeMetaMan::AddGovernanceVote(const uint256& proTxHash, const uint2
 void CMasternodeMetaMan::RemoveGovernanceObject(const uint256& nGovernanceObjectHash)
 {
     LOCK(cs);
-    for(auto& p : metaInfos) {
+    for (auto& p : metaInfos) {
         p.second->RemoveGovernanceObject(nGovernanceObjectHash);
     }
 }
@@ -124,14 +123,12 @@ void CMasternodeMetaMan::Clear()
 
 void CMasternodeMetaMan::CheckAndRemove()
 {
-
 }
 
 std::string CMasternodeMetaMan::ToString() const
 {
     std::ostringstream info;
 
-    info << "Masternodes: meta infos object count: " << (int)metaInfos.size() <<
-         ", nDsqCount: " << (int)nDsqCount;
+    info << "Masternodes: meta infos object count: " << (int)metaInfos.size() << ", nDsqCount: " << (int)nDsqCount;
     return info.str();
 }

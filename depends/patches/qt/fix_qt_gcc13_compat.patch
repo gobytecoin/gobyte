@@ -1,0 +1,25 @@
+From: GoByte Core Developers <dev@gobyte.network>
+Subject: [PATCH] qt 5.9.6: add missing <limits> include for GCC 13/libstdc++13
+
+GCC 13's libstdc++ (GCC PR 108527) removed many historically-transitive
+standard-header inclusions. Qt 5.9.6's QStaticByteArrayMatcherBase::generate()
+uses std::numeric_limits<uchar> but relies on it arriving transitively;
+that chain is now broken.
+
+The fix is the minimal standard-conformant solution: add the explicit
+#include <limits> to qbytearraymatcher.h. No Qt logic is altered;
+compiled output is functionally identical to prior GCC versions.
+
+Observed: Ubuntu 24.04 / GCC 13.x / x86_64-pc-linux-gnu
+          (GitHub Actions ubuntu-latest, 2026-Q1)
+---
+
+--- a/qtbase/src/corelib/tools/qbytearraymatcher.h
++++ b/qtbase/src/corelib/tools/qbytearraymatcher.h
+@@ -41,6 +41,7 @@
+ #define QBYTEARRAYMATCHER_H
+
+ #include <QtCore/qbytearray.h>
++#include <limits>
+
+ QT_BEGIN_NAMESPACE

@@ -1,7 +1,6 @@
 name: Check Merge Fast-Forward Only
 
 permissions:
-  contents: read
   pull-requests: write
 
 on:
@@ -50,7 +49,7 @@ jobs:
             needs rebase
 
       - name: comment
-        uses: mshick/add-pr-comment@v3
+        uses: mshick/add-pr-comment@v2
         if: failure()
         with:
           message: |

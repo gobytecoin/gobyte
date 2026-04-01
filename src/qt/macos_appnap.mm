@@ -5,67 +5,58 @@
 #include "macos_appnap.h"
 
 #include <AvailabilityMacros.h>
-#include <Foundation/NSProcessInfo.h>
 #include <Foundation/Foundation.h>
+#include <Foundation/NSProcessInfo.h>
 
-class CAppNapInhibitor::CAppNapImpl
-{
+class CAppNapInhibitor::CAppNapImpl {
 public:
-    ~CAppNapImpl()
-    {
-        if(activityId)
-            enableAppNap();
-    }
+  ~CAppNapImpl() {
+    if (activityId)
+      enableAppNap();
+  }
 
-    void disableAppNap()
-    {
-        if (!activityId)
-        {
-            @autoreleasepool {
-                const NSActivityOptions activityOptions =
-                NSActivityUserInitiatedAllowingIdleSystemSleep &
-                ~(NSActivitySuddenTerminationDisabled |
-                NSActivityAutomaticTerminationDisabled);
+  void disableAppNap() {
+    if (!activityId) {
+      @autoreleasepool {
+        const NSActivityOptions activityOptions =
+            NSActivityUserInitiatedAllowingIdleSystemSleep &
+            ~(NSActivitySuddenTerminationDisabled |
+              NSActivityAutomaticTerminationDisabled);
 
-                id processInfo = [NSProcessInfo processInfo];
-                if ([processInfo respondsToSelector:@selector(beginActivityWithOptions:reason:)])
-                {
-                    activityId = [processInfo beginActivityWithOptions: activityOptions reason:@"Temporarily disable App Nap for gobyte-qt."];
-                    [activityId retain];
-                }
-            }
+        id processInfo = [NSProcessInfo processInfo];
+        if ([processInfo respondsToSelector:@selector
+                         (beginActivityWithOptions:reason:)]) {
+          activityId =
+              [processInfo beginActivityWithOptions:activityOptions
+                                             reason:@"Temporarily disable App "
+                                                    @"Nap for gobyte-qt."];
+          [activityId retain];
         }
+      }
     }
+  }
 
-    void enableAppNap()
-    {
-        if(activityId)
-        {
-            @autoreleasepool {
-                id processInfo = [NSProcessInfo processInfo];
-                if ([processInfo respondsToSelector:@selector(endActivity:)])
-                    [processInfo endActivity:activityId];
+  void enableAppNap() {
+    if (activityId) {
+      @autoreleasepool {
+        id processInfo = [NSProcessInfo processInfo];
+        if ([processInfo respondsToSelector:@selector(endActivity:)])
+          [processInfo endActivity:activityId];
 
-                [activityId release];
-                activityId = nil;
-            }
-        }
+        [activityId release];
+        activityId = nil;
+      }
     }
+  }
 
 private:
-    NSObject* activityId;
+  NSObject *activityId;
 };
 
 CAppNapInhibitor::CAppNapInhibitor() : impl(new CAppNapImpl()) {}
 
 CAppNapInhibitor::~CAppNapInhibitor() = default;
 
-void CAppNapInhibitor::disableAppNap()
-{
-    impl->disableAppNap();
-}
+void CAppNapInhibitor::disableAppNap() { impl->disableAppNap(); }
 
-void CAppNapInhibitor::enableAppNap()
-{
-    impl->enableAppNap();
-}
+void CAppNapInhibitor::enableAppNap() { impl->enableAppNap(); }

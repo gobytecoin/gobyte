@@ -1,6 +1,5 @@
 // Copyright (c) 2009-2016 The Bitcoin Core developers
-// Copyright (c) 2014-2017 The Dash Core developers
-// Copyright (c) 2017-2021 The GoByte Core developers
+// Copyright (c) 2014-2020 The GoByte Core developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -9,11 +8,11 @@
 #endif
 
 #include <chainparams.h>
-#include <qt/test/rpcnestedtests.h>
-#include <util.h>
-#include <qt/test/uritests.h>
 #include <qt/test/compattests.h>
+#include <qt/test/rpcnestedtests.h>
 #include <qt/test/trafficgraphdatatests.h>
+#include <qt/test/uritests.h>
+#include <util.h>
 
 #ifdef ENABLE_WALLET
 #include <qt/test/paymentservertests.h>
@@ -28,12 +27,6 @@
 
 #if defined(QT_STATICPLUGIN)
 #include <QtPlugin>
-#if QT_VERSION < 0x050000
-Q_IMPORT_PLUGIN(qcncodecs)
-Q_IMPORT_PLUGIN(qjpcodecs)
-Q_IMPORT_PLUGIN(qtwcodecs)
-Q_IMPORT_PLUGIN(qkrcodecs)
-#else
 #if defined(QT_QPA_PLATFORM_MINIMAL)
 Q_IMPORT_PLUGIN(QMinimalIntegrationPlugin);
 #endif
@@ -45,16 +38,15 @@ Q_IMPORT_PLUGIN(QWindowsIntegrationPlugin);
 Q_IMPORT_PLUGIN(QCocoaIntegrationPlugin);
 #endif
 #endif
-#endif
 
 extern void noui_connect();
 
 // This is all you need to run all the tests
-int main(int argc, char *argv[])
+int main(int argc, char* argv[])
 {
     SetupEnvironment();
     SetupNetworking();
-    SelectParams(CBaseChainParams::REGTEST);
+    SelectParams(CBaseChainParams::MAIN);
     noui_connect();
     ClearDatadirCache();
     fs::path pathTemp = fs::temp_directory_path() / strprintf("test_gobyte-qt_%lu_%i", (unsigned long)GetTime(), (int)GetRand(100000));
@@ -63,14 +55,14 @@ int main(int argc, char *argv[])
 
     bool fInvalid = false;
 
-    // Prefer the "minimal" platform for the test instead of the normal default
-    // platform ("xcb", "windows", or "cocoa") so tests can't unintentionally
-    // interfere with any background GUIs and don't require extra resources.
-    #if defined(WIN32)
-        _putenv_s("QT_QPA_PLATFORM", "minimal");
-    #else
-        setenv("QT_QPA_PLATFORM", "minimal", 0);
-    #endif
+// Prefer the "minimal" platform for the test instead of the normal default
+// platform ("xcb", "windows", or "cocoa") so tests can't unintentionally
+// interfere with any background GUIs and don't require extra resources.
+#if defined(WIN32)
+    _putenv_s("QT_QPA_PLATFORM", "minimal");
+#else
+    setenv("QT_QPA_PLATFORM", "minimal", 0);
+#endif
 
     // Don't remove this, it's needed to access
     // QApplication:: and QCoreApplication:: in the tests

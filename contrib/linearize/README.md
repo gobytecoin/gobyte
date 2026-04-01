@@ -1,6 +1,5 @@
 # Linearize
-Construct a linear, no-fork, best version of the GoByte blockchain. The scripts
-run using Python 3 but are compatible with Python 2.
+Construct a linear, no-fork, best version of the GoByte blockchain.
 
 ## Step 0: Install gobyte_hash
 
@@ -48,7 +47,7 @@ written to the script's blockchain.
 linearize-hashes.py.
 * `max_out_sz`: Maximum size for files created by the `output_file` option.
 (Default: `1000*1000*1000 bytes`)
-* `netmagic`: Network magic number. (default is '1ab2c3d4', mainnet)
+* `netmagic`: Network magic number. (default is 'bf0c6bbd', mainnet)
 * `out_of_order_cache_sz`: If out-of-order blocks are being read, the block can
 be written to a cache so that the blockchain doesn't have to be sought again.
 This option specifies the cache size. (Default: `100*1000*1000 bytes`)

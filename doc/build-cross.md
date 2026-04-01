@@ -1,38 +1,38 @@
-Cross-compiliation of GoByte Core
+Cross-compilation of GoByte Core
 ===============================
 
 GoByte Core can be cross-compiled on Linux to all other supported host systems. This is done by changing
 the `HOST` parameter when building the dependencies and then specifying another `--prefix` directory when building GoByte.
 
-The following instructions are only tested on Debian Stretch and Ubuntu Bionic.
+The following instructions are tested on Ubuntu 20.04+ and Debian Trixie.
 
-MacOSX Cross-compilation
+macOS Cross-compilation
 ------------------------
-Cross-compiling to MacOSX requires a few additional packages to be installed:
+Cross-compiling to macOS requires a few additional packages to be installed:
 
 ```bash
-$ sudo apt-get install python3-setuptools libcap-dev zlib1g-dev libbz2-dev
+$ sudo apt-get install python3-setuptools libcap-dev zlib1g-dev libbz2-dev clang llvm lld
 ```
 
-Additionally, the Mac OSX SDK must be downloaded and extracted manually:
+Additionally, the macOS SDK must be downloaded and extracted manually:
 
 ```bash
 $ mkdir -p depends/sdk-sources
 $ mkdir -p depends/SDKs
-$ curl https://bitcoincore.org/depends-sources/sdks/MacOSX10.11.sdk.tar.gz -o depends/sdk-sources/MacOSX10.11.sdk.tar.gz
-$ tar -C depends/SDKs -xf depends/sdk-sources/MacOSX10.11.sdk.tar.gz
+$ curl https://bitcoincore.org/depends-sources/sdks/Xcode-26.1.1-17B100-extracted-SDK-with-libcxx-headers.tar.gz -o depends/sdk-sources/Xcode-26.1.1-17B100-extracted-SDK-with-libcxx-headers.tar.gz
+$ tar -C depends/SDKs -xf depends/sdk-sources/Xcode-26.1.1-17B100-extracted-SDK-with-libcxx-headers.tar.gz
 ```
 
 When building the dependencies, as described in [build-generic](build-generic.md), use
 
 ```bash
-$ make HOST=x86_64-apple-darwin11 -j4
+$ make HOST=x86_64-apple-darwin -j4
 ```
 
 When building GoByte Core, use
 
 ```bash
-$ ./configure --prefix=`pwd`/depends/x86_64-apple-darwin11
+$ ./configure --prefix=`pwd`/depends/x86_64-apple-darwin
 ```
 
 Windows 64bit Cross-compilation
@@ -45,7 +45,7 @@ First, install the general dependencies:
 
     sudo apt update
     sudo apt upgrade
-    sudo apt install build-essential libtool autotools-dev automake pkg-config bsdmainutils curl git python3 cmake
+    sudo apt install build-essential libtool autotools-dev automake pkg-config bsdmainutils curl git python3
 
 A host toolchain (`build-essential`) is necessary because some dependency
 packages need to build host utilities that are used in the build process.

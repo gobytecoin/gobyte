@@ -7,8 +7,8 @@
 #include <qt/bitcoinunits.h>
 #include <qt/guiutil.h>
 
-#include <QApplication>
 #include <QAbstractSpinBox>
+#include <QApplication>
 #include <QHBoxLayout>
 #include <QKeyEvent>
 #include <QLineEdit>
@@ -18,16 +18,15 @@
  * return validity.
  * @note Must return 0 if !valid.
  */
-static CAmount parse(const QString &text, int nUnit, bool *valid_out=0)
+static CAmount parse(const QString& text, int nUnit, bool* valid_out = 0)
 {
     CAmount val = 0;
     bool valid = BitcoinUnits::parse(nUnit, text, &val);
-    if(valid)
-    {
-        if(val < 0 || val > BitcoinUnits::maxMoney())
+    if (valid) {
+        if (val < 0 || val > BitcoinUnits::maxMoney())
             valid = false;
     }
-    if(valid_out)
+    if (valid_out)
         *valid_out = valid;
     return valid ? val : 0;
 }
@@ -38,14 +37,15 @@ class AmountValidator : public QValidator
 {
     Q_OBJECT
     int currentUnit;
+
 public:
-    explicit AmountValidator(QObject *parent) :
+    explicit AmountValidator(QObject* parent) :
         QValidator(parent),
         currentUnit(BitcoinUnits::GBX) {}
 
-    State validate(QString &input, int &pos) const
+    State validate(QString& input, int& pos) const
     {
-        if(input.isEmpty())
+        if (input.isEmpty())
             return QValidator::Intermediate;
         bool valid = false;
         parse(input, currentUnit, &valid);
@@ -62,12 +62,13 @@ public:
 /** QLineEdit that uses fixed-point numbers internally and uses our own
  * formatting/parsing functions.
  */
-class AmountLineEdit: public QLineEdit
+class AmountLineEdit : public QLineEdit
 {
     Q_OBJECT
     AmountValidator* amountValidator;
+
 public:
-    explicit AmountLineEdit(QWidget *parent):
+    explicit AmountLineEdit(QWidget* parent) :
         QLineEdit(parent),
         currentUnit(BitcoinUnits::GBX)
     {
@@ -77,17 +78,16 @@ public:
         connect(this, SIGNAL(textEdited(QString)), this, SIGNAL(valueChanged()));
     }
 
-    void fixup(const QString &input)
+    void fixup(const QString& input)
     {
         bool valid = false;
         CAmount val = parse(input, currentUnit, &valid);
-        if(valid)
-        {
+        if (valid) {
             setText(BitcoinUnits::format(currentUnit, val, false, BitcoinUnits::separatorAlways));
         }
     }
 
-    CAmount value(bool *valid_out=0) const
+    CAmount value(bool* valid_out = 0) const
     {
         return parse(text(), currentUnit, valid_out);
     }
@@ -106,7 +106,7 @@ public:
         currentUnit = unit;
         amountValidator->updateUnit(unit);
 
-        if(valid)
+        if (valid)
             setValue(val);
         else
             clear();
@@ -118,7 +118,7 @@ public:
         const QFontMetrics fm(fontMetrics());
         int h = 0;
         int w = fm.width(BitcoinUnits::format(BitcoinUnits::GBX, BitcoinUnits::maxMoney(), false, BitcoinUnits::separatorAlways));
-        w += 2; // cursor blinking space
+        w += 2;                                     // cursor blinking space
         w += GUIUtil::gobyteThemeActive() ? 24 : 0; // counteract padding from css
         return QSize(w, h);
     }
@@ -127,24 +127,20 @@ private:
     int currentUnit;
 
 protected:
-    bool event(QEvent *event)
+    bool event(QEvent* event)
     {
-        if (event->type() == QEvent::KeyPress || event->type() == QEvent::KeyRelease)
-        {
-            QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
-            if (keyEvent->key() == Qt::Key_Comma)
-            {
+        if (event->type() == QEvent::KeyPress || event->type() == QEvent::KeyRelease) {
+            QKeyEvent* keyEvent = static_cast<QKeyEvent*>(event);
+            if (keyEvent->key() == Qt::Key_Comma) {
                 // Translate a comma into a period
                 QKeyEvent periodKeyEvent(event->type(), Qt::Key_Period, keyEvent->modifiers(), ".", keyEvent->isAutoRepeat(), keyEvent->count());
                 return QLineEdit::event(&periodKeyEvent);
             }
-            if(keyEvent->key() == Qt::Key_Enter || keyEvent->key() == Qt::Key_Return)
-            {
+            if (keyEvent->key() == Qt::Key_Enter || keyEvent->key() == Qt::Key_Return) {
                 clearFocus();
             }
         }
-        if (event->type() == QEvent::FocusOut)
-        {
+        if (event->type() == QEvent::FocusOut) {
             fixup(text());
         }
         return QLineEdit::event(event);
@@ -156,7 +152,7 @@ Q_SIGNALS:
 
 #include <qt/bitcoinamountfield.moc>
 
-BitcoinAmountField::BitcoinAmountField(QWidget *parent) :
+BitcoinAmountField::BitcoinAmountField(QWidget* parent) :
     QWidget(parent),
     amount(0)
 {
@@ -167,7 +163,7 @@ BitcoinAmountField::BitcoinAmountField(QWidget *parent) :
 
     units = new BitcoinUnits(this);
 
-    QHBoxLayout *layout = new QHBoxLayout(this);
+    QHBoxLayout* layout = new QHBoxLayout(this);
     layout->setSpacing(0);
     layout->setMargin(0);
     layout->addWidget(amount);
@@ -207,23 +203,22 @@ void BitcoinAmountField::setValid(bool valid)
         amount->setStyleSheet(GUIUtil::getThemedStyleQString(GUIUtil::ThemedStyle::TS_INVALID));
 }
 
-bool BitcoinAmountField::eventFilter(QObject *object, QEvent *event)
+bool BitcoinAmountField::eventFilter(QObject* object, QEvent* event)
 {
-    if (event->type() == QEvent::FocusIn)
-    {
+    if (event->type() == QEvent::FocusIn) {
         // Clear invalid flag on focus
         setValid(true);
     }
     return QWidget::eventFilter(object, event);
 }
 
-QWidget *BitcoinAmountField::setupTabChain(QWidget *prev)
+QWidget* BitcoinAmountField::setupTabChain(QWidget* prev)
 {
     QWidget::setTabOrder(prev, amount);
     return amount;
 }
 
-CAmount BitcoinAmountField::value(bool *valid_out) const
+CAmount BitcoinAmountField::value(bool* valid_out) const
 {
     return amount->value(valid_out);
 }
@@ -246,7 +241,7 @@ void BitcoinAmountField::unitChanged(int idx)
     // Determine new unit ID
     int newUnit = units->data(idx, BitcoinUnits::UnitRole).toInt();
 
-    amount->setPlaceholderText(tr("Amount in %1").arg(units->data(idx,Qt::DisplayRole).toString()));
+    amount->setPlaceholderText(tr("Amount in %1").arg(units->data(idx, Qt::DisplayRole).toString()));
 
     amount->setDisplayUnit(newUnit);
 }

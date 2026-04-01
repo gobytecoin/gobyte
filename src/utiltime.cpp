@@ -15,8 +15,6 @@
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/thread.hpp>
 
-#include <chrono>
-
 static std::atomic<int64_t> nMockTime(0); //!< For unit testing
 
 int64_t GetTime()
@@ -35,9 +33,7 @@ T GetTime()
     const std::chrono::seconds mocktime{nMockTime.load(std::memory_order_relaxed)};
 
     return std::chrono::duration_cast<T>(
-        mocktime.count() ?
-            mocktime :
-            std::chrono::microseconds{GetTimeMicros()});
+        mocktime.count() ? mocktime : std::chrono::microseconds{GetTimeMicros()});
 }
 template std::chrono::seconds GetTime();
 template std::chrono::milliseconds GetTime();
@@ -69,12 +65,11 @@ int64_t GetTimeMicros()
 
 int64_t GetSystemTimeInSeconds()
 {
-    return GetTimeMicros()/1000000;
+    return GetTimeMicros() / 1000000;
 }
 
 void MilliSleep(int64_t n)
 {
-
 /**
  * Boost's sleep_for was uninterruptible when backed by nanosleep from 1.50
  * until fixed in 1.52. Use the deprecated sleep method for the broken case.
@@ -85,7 +80,7 @@ void MilliSleep(int64_t n)
 #elif defined(HAVE_WORKING_BOOST_SLEEP)
     boost::this_thread::sleep(boost::posix_time::milliseconds(n));
 #else
-//should never get here
+// should never get here
 #error missing boost sleep implementation
 #endif
 }
@@ -99,4 +94,19 @@ std::string DateTimeStrFormat(const char* pszFormat, int64_t nTime)
     ss.imbue(loc);
     ss << boost::posix_time::from_time_t(nTime);
     return ss.str();
+}
+
+std::string FormatISO8601DateTime(int64_t nTime)
+{
+    return DateTimeStrFormat("%Y-%m-%dT%H:%M:%SZ", nTime);
+}
+
+std::string FormatISO8601Date(int64_t nTime)
+{
+    return DateTimeStrFormat("%Y-%m-%d", nTime);
+}
+
+std::string FormatISO8601Time(int64_t nTime)
+{
+    return DateTimeStrFormat("%H:%M:%SZ", nTime);
 }

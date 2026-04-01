@@ -1,10 +1,9 @@
-// Copyright (c) 2019 The Dash Core developers
-// Copyright (c) 2021 The GoByte Core developers
+// Copyright (c) 2019-2020 The GoByte Core developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include <saltedhasher.h>
 #include <random.h>
+#include <saltedhasher.h>
 
 #include <limits>
 

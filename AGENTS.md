@@ -4,7 +4,7 @@ This file provides development guidelines for AI agents working on the GoByte Co
 
 ## Project Overview
 
-GoByte is a cryptocurrency node implementation and direct fork of Dash (which itself is a fork of Bitcoin Core), written primarily in C++ with Python functional tests. The codebase uses autotools for building. It includes masternode features, LLMQ (Long Living Masternode Quorums), InstantSend, ChainLocks, and uses the NeoScrypt algorithm for PoW mining (unlike Dash's X11).
+GoByte is a cryptocurrency node implementation and direct fork of Dash (which itself is a fork of Bitcoin Core), written primarily in C++ with Python functional tests. The codebase uses autotools for building. It includes masternode features, LLMQ (Long Living Masternode Quorums), InstantSend, ChainLocks, and uses the **NeoScrypt** algorithm for PoW mining (unlike Dash's X11).
 
 ## Directory Structure
 
@@ -12,18 +12,19 @@ GoByte is a cryptocurrency node implementation and direct fork of Dash (which it
 src/
 ├── bench/              # Performance benchmarks
 ├── bls/                # BLS cryptographic operations
+├── coinjoin/          # CoinJoin mixing (replaces PrivateSend)
 ├── compat/             # Compatibility layer
 ├── consensus/         # Consensus rules (merkle, tx_verify)
-├── crypto/            # Cryptographic primitives (sha256, etc)
+├── crypto/            # Cryptographic primitives (sha256, neoscrypt)
 ├── evo/               # Evolution/deterministic masternode data
 ├── governance/        # Governance system (proposals, voting)
 ├── immer/             # Immutable data structures
+├── interfaces/        # Wallet/node interfaces
 ├── leveldb/           # LevelDB database
 ├── llmq/              # LLMQ (Long Living Masternode Quorums)
 ├── masternode/        # Masternode infrastructure
 ├── policy/            # Policy (fees, policy.cpp)
 ├── primitives/        # Transaction/block primitives
-├── privatesend/       # PrivateSend mixing
 ├── qt/                # GUI implementation (Qt 5)
 ├── rpc/               # JSON-RPC server and endpoints
 ├── script/            # Script interpreter
@@ -42,7 +43,7 @@ src/
 - `releases` - Release artifacts
 - Vendored dependencies:
   - `src/{leveldb,secp256k1,univalue,bls,immer}`
-  - `src/crypto/{ctaes,x11}`
+  - `src/crypto/ctaes` - AES encryption
 
 **Unless specifically prompted**, avoid:
 - `.github` - GitHub workflows and configs
@@ -90,10 +91,10 @@ test/functional/test_runner.py -j$(nproc)  # Parallel execution
 
 ### Linting
 ```bash
-contrib/devtools/lint-all.sh             # Run all lint checks
-contrib/devtools/lint-whitespace.sh     # Whitespace checks
+test/lint/lint-all.sh             # Run all lint checks
+test/lint/lint-whitespace.sh     # Whitespace checks
 contrib/devtools/clang-format-diff.py   # Check formatting
-contrib/devtools/check-rpc-mappings.py  # RPC consistency
+test/lint/check-rpc-mappings.py  # RPC consistency
 ```
 
 ## C++ Code Style
@@ -141,10 +142,8 @@ contrib/devtools/check-rpc-mappings.py  # RPC consistency
 - `static_assert` preferred over `assert` where possible
 
 ### Logging
-- `LogInfo()`: startup/important events
-- `LogDebug(CATEGORY, ...)`: debug messages
-- `LogError()`: severe problems requiring shutdown
-- `LogWarning()`: issues the admin should address
+- `LogPrintf(...)`: Direct printf-style logging (use instead of printf/printf)
+- `LogPrint(category, ...)`: Category-based debug logging (e.g., `LogPrint(BCLog::MEMPOOL, "msg")`)
 
 ### Doxygen Comments
 ```cpp
@@ -163,12 +162,11 @@ int var2;
 
 ## Important Global Variables
 ```cpp
-extern CCriticalSection cs_main;    // validation.cpp - Main chain state
-extern CChainState& g_chainstate;   // validation.cpp
-extern CConnman* g_connman;         // net.h - Network manager
-extern BanMan* g_banman;            // net.h - Ban manager
-extern CAddrMan g_addrman;          // addrman.h - Address manager
-extern CTxMemPool& g_mempool;       // txmempool.h - Mempool
+extern CCriticalSection cs_main;    // validation.h - Main chain state
+extern CTxMemPool mempool;          // validation.h - Transaction mempool
+extern std::unique_ptr<CConnman> g_connman;  // net.h - Network manager
+extern std::atomic_bool g_is_mempool_loaded; // validation.h - Mempool loaded state
+extern BlockMap& mapBlockIndex;     // validation.h - Block index map
 ```
 
 ## Locking Model
@@ -187,12 +185,14 @@ GoByte extends Dash through composition:
 
 ```
 GoByte Components
+├── NeoScrypt (PoW - replaces Dash's X11)
 ├── Dash Foundation
 │   ├── Masternodes (Infrastructure)
 │   │   ├── LLMQ (Quorum infrastructure)
 │   │   │   ├── InstantSend (Transaction locking)
-│   │   │   └── ChainLocks (Block finality)
-│   │   ├── PrivateSend (Coin mixing)
+│   │   │   ├── ChainLocks (Block finality)
+│   │   │   └── Platform (GoByte Platform support via LLMQ_100_67)
+│   │   ├── CoinJoin (Coin mixing)
 │   │   └── Governance Voting
 │   └── Spork System (Feature control)
 └── Bitcoin Core Foundation (Blockchain, consensus, networking)
@@ -201,9 +201,10 @@ GoByte Components
 ### Key Components
 
 - **Masternodes** (`src/masternode/`, `src/evo/`): Deterministic masternode lists, special transactions (ProRegTx, ProUpServTx, etc.)
-- **LLMQ** (`src/llmq/`): Long Living Masternode Quorums for ChainLocks, InstantSend, governance
-- **PrivateSend** (`src/privatesend/`): Coin mixing for privacy
+- **LLMQ** (`src/llmq/`): Long Living Masternode Quorums for ChainLocks, InstantSend, governance, and Platform
+- **CoinJoin** (`src/coinjoin/`): Coin mixing for privacy
 - **Governance** (`src/governance/`): Proposals, voting, treasury
+- **NeoScrypt** (`src/crypto/neoscrypt.cpp`): GoByte's PoW mining algorithm
 
 ### GoByte-Specific Databases
 

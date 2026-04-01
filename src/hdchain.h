@@ -1,7 +1,7 @@
-// Copyright (c) 2017-2021 The GoByte Core developers
+// Copyright (c) 2014-2020 The GoByte Core developers
 // Distributed under the MIT software license, see the accompanying
-#ifndef GOBYTE_HDCHAIN_H
-#define GOBYTE_HDCHAIN_H
+#ifndef BITCOIN_HDCHAIN_H
+#define BITCOIN_HDCHAIN_H
 
 #include <key.h>
 #include <sync.h>
@@ -44,7 +44,6 @@ private:
     mutable CCriticalSection cs_accounts;
 
 public:
-
     CHDChain() { SetNull(); }
     CHDChain(const CHDChain& other) :
         nVersion(other.nVersion),
@@ -54,7 +53,8 @@ public:
         vchMnemonic(other.vchMnemonic),
         vchMnemonicPassphrase(other.vchMnemonicPassphrase),
         mapAccounts(other.mapAccounts)
-        {}
+    {
+    }
 
     ADD_SERIALIZE_METHODS;
     template <typename Stream, typename Operation>
@@ -147,4 +147,4 @@ public:
     std::string GetKeyPath() const;
 };
 
-#endif // GOBYTE_HDCHAIN_H
+#endif // BITCOIN_HDCHAIN_H

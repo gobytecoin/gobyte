@@ -1,8 +1,8 @@
 Source: gobyte
 Section: utils
 Priority: optional
-Maintainer: Holger Schinzel <holger@gobyte.network>
-Uploaders: Holger Schinzel <holger@gobyte.network>
+Maintainer: GoByte Core Dev <dev@gobyte.network>
+Uploaders: GoByte Core Dev <dev@gobyte.network>
 Build-Depends: debhelper,
  devscripts,
  automake,

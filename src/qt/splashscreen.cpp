@@ -1,6 +1,5 @@
 // Copyright (c) 2011-2015 The Bitcoin Core developers
-// Copyright (c) 2014-2019 The Dash Core developers
-// Copyright (c) 2017-2021 The GoByte Core developers
+// Copyright (c) 2014-2020 The GoByte Core developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -16,22 +15,27 @@
 #include <chainparams.h>
 #include <clientversion.h>
 #include <init.h>
-#include <util.h>
+#include <interfaces/handler.h>
+#include <interfaces/node.h>
+#include <interfaces/wallet.h>
 #include <ui_interface.h>
+#include <util.h>
 #include <version.h>
-#ifdef ENABLE_WALLET
-#include <wallet/wallet.h>
-#endif
 
 #include <QApplication>
 #include <QCloseEvent>
 #include <QDesktopWidget>
 #include <QPainter>
 
-SplashScreen::SplashScreen(Qt::WindowFlags f, const NetworkStyle *networkStyle) :
-    QWidget(0, f), curAlignment(0)
-{
+#include <boost/bind/bind.hpp>
 
+using boost::placeholders::_1;
+using boost::placeholders::_2;
+using boost::placeholders::_3;
+
+SplashScreen::SplashScreen(interfaces::Node& node, Qt::WindowFlags f, const NetworkStyle* networkStyle) :
+    QWidget(0, f), curAlignment(0), m_node(node)
+{
     // transparent background
     setAttribute(Qt::WA_TranslucentBackground);
     setStyleSheet("background:transparent;");
@@ -49,13 +53,13 @@ SplashScreen::SplashScreen(Qt::WindowFlags f, const NetworkStyle *networkStyle) 
     int paddingTop = 10;
     int titleVersionVSpace = 25;
 
-    float fontFactor            = 1.0;
+    float fontFactor = 1.0;
     float scale = qApp->devicePixelRatio();
 
     // define text to place
-    QString titleText       = tr(PACKAGE_NAME);
+    QString titleText = tr(PACKAGE_NAME);
     QString versionText = QString::fromStdString(FormatFullVersion()).remove(0, 1);
-    QString titleAddText    = networkStyle->getTitleAddText();
+    QString titleAddText = networkStyle->getTitleAddText();
 
     QFont fontNormal = GUIUtil::getFontNormal();
     QFont fontBold = GUIUtil::getFontBold();
@@ -98,7 +102,7 @@ SplashScreen::SplashScreen(Qt::WindowFlags f, const NetworkStyle *networkStyle) 
     fontBold.setPointSize(50 * fontFactor);
     pixPaint.setFont(fontBold);
     fm = pixPaint.fontMetrics();
-    titleTextWidth  = fm.width(titleText);
+    titleTextWidth = fm.width(titleText);
     int titleTextHeight = fm.height();
     pixPaint.drawText((width / 2) - (titleTextWidth / 2), titleTextHeight + paddingTop, titleText);
 
@@ -109,7 +113,7 @@ SplashScreen::SplashScreen(Qt::WindowFlags f, const NetworkStyle *networkStyle) 
     pixPaint.drawText((width / 2) - (versionTextWidth / 2), titleTextHeight + paddingTop + titleVersionVSpace, versionText);
 
     // draw additional text if special network
-    if(!titleAddText.isEmpty()) {
+    if (!titleAddText.isEmpty()) {
         fontBold.setPointSize(10 * fontFactor);
         pixPaint.setFont(fontBold);
         fm = pixPaint.fontMetrics();
@@ -140,17 +144,18 @@ SplashScreen::~SplashScreen()
     unsubscribeFromCoreSignals();
 }
 
-bool SplashScreen::eventFilter(QObject * obj, QEvent * ev) {
+bool SplashScreen::eventFilter(QObject* obj, QEvent* ev)
+{
     if (ev->type() == QEvent::KeyPress) {
-        QKeyEvent *keyEvent = static_cast<QKeyEvent *>(ev);
-        if(keyEvent->text()[0] == 'q') {
-            StartShutdown();
+        QKeyEvent* keyEvent = static_cast<QKeyEvent*>(ev);
+        if (keyEvent->text()[0] == 'q') {
+            m_node.startShutdown();
         }
     }
     return QObject::eventFilter(obj, ev);
 }
 
-void SplashScreen::slotFinish(QWidget *mainWin)
+void SplashScreen::slotFinish(QWidget* mainWin)
 {
     Q_UNUSED(mainWin);
 
@@ -162,7 +167,7 @@ void SplashScreen::slotFinish(QWidget *mainWin)
     deleteLater(); // No more need for this
 }
 
-static void InitMessage(SplashScreen *splash, const std::string &message)
+static void InitMessage(SplashScreen* splash, const std::string& message)
 {
     QMetaObject::invokeMethod(splash, "showMessage",
         Qt::QueuedConnection,
@@ -171,46 +176,47 @@ static void InitMessage(SplashScreen *splash, const std::string &message)
         Q_ARG(QColor, GUIUtil::getThemedQColor(GUIUtil::ThemedColor::DEFAULT)));
 }
 
-static void ShowProgress(SplashScreen *splash, const std::string &title, int nProgress, bool resume_possible)
+static void ShowProgress(SplashScreen* splash, const std::string& title, int nProgress, bool resume_possible)
 {
     InitMessage(splash, title + std::string("\n") +
-            (resume_possible ? _("(press q to shutdown and continue later)")
-                                : _("press q to shutdown")) +
-            strprintf("\n%d", nProgress) + "%");
+                            (resume_possible ? _("(press q to shutdown and continue later)")
+                                             : _("press q to shutdown")) +
+                            strprintf("\n%d", nProgress) + "%");
 }
-
 #ifdef ENABLE_WALLET
-void SplashScreen::ConnectWallet(CWallet* wallet)
+void SplashScreen::ConnectWallet(std::unique_ptr<interfaces::Wallet> wallet)
 {
-    wallet->ShowProgress.connect(boost::bind(ShowProgress, this, _1, _2, false));
-    connectedWallets.push_back(wallet);
+    m_connected_wallet_handlers.emplace_back(wallet->handleShowProgress(boost::bind(ShowProgress, this, _1, _2, false)));
+    m_connected_wallets.emplace_back(std::move(wallet));
 }
 #endif
 
 void SplashScreen::subscribeToCoreSignals()
 {
     // Connect signals to client
-    uiInterface.InitMessage.connect(boost::bind(InitMessage, this, _1));
-    uiInterface.ShowProgress.connect(boost::bind(ShowProgress, this, _1, _2, _3));
+    m_handler_init_message = m_node.handleInitMessage(boost::bind(InitMessage, this, _1));
+    m_handler_show_progress = m_node.handleShowProgress(boost::bind(ShowProgress, this, _1, _2, _3));
 #ifdef ENABLE_WALLET
-    uiInterface.LoadWallet.connect(boost::bind(&SplashScreen::ConnectWallet, this, _1));
+    m_handler_load_wallet = m_node.handleLoadWallet([this](std::unique_ptr<interfaces::Wallet> wallet) { ConnectWallet(std::move(wallet)); });
 #endif
 }
 
 void SplashScreen::unsubscribeFromCoreSignals()
 {
     // Disconnect signals from client
-    uiInterface.InitMessage.disconnect(boost::bind(InitMessage, this, _1));
-    uiInterface.ShowProgress.disconnect(boost::bind(ShowProgress, this, _1, _2, _3));
+    m_handler_init_message->disconnect();
+    m_handler_show_progress->disconnect();
 #ifdef ENABLE_WALLET
-    uiInterface.LoadWallet.disconnect(boost::bind(&SplashScreen::ConnectWallet, this, _1));
-    for (CWallet* const & pwallet : connectedWallets) {
-        pwallet->ShowProgress.disconnect(boost::bind(ShowProgress, this, _1, _2, false));
+    m_handler_load_wallet->disconnect();
+#endif // ENABLE_WALLET
+    for (auto& handler : m_connected_wallet_handlers) {
+        handler->disconnect();
     }
-#endif
+    m_connected_wallet_handlers.clear();
+    m_connected_wallets.clear();
 }
 
-void SplashScreen::showMessage(const QString &message, int alignment, const QColor &color)
+void SplashScreen::showMessage(const QString& message, int alignment, const QColor& color)
 {
     curMessage = message;
     curAlignment = alignment;
@@ -218,7 +224,7 @@ void SplashScreen::showMessage(const QString &message, int alignment, const QCol
     update();
 }
 
-void SplashScreen::paintEvent(QPaintEvent *event)
+void SplashScreen::paintEvent(QPaintEvent* event)
 {
     QPainter painter(this);
     QFont messageFont = GUIUtil::getFontNormal();
@@ -230,8 +236,8 @@ void SplashScreen::paintEvent(QPaintEvent *event)
     painter.drawText(r, curAlignment, curMessage);
 }
 
-void SplashScreen::closeEvent(QCloseEvent *event)
+void SplashScreen::closeEvent(QCloseEvent* event)
 {
-    StartShutdown(); // allows an "emergency" shutdown during startup
+    m_node.startShutdown(); // allows an "emergency" shutdown during startup
     event->ignore();
 }

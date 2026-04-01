@@ -1,10 +1,9 @@
-// Copyright (c) 2018-2020 The Dash Core developers
-// Copyright (c) 2017-2021 The GoByte Core developers
+// Copyright (c) 2018-2021 The GoByte Core developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef GOBYTE_QUORUMS_DKGSESSIONHANDLER_H
-#define GOBYTE_QUORUMS_DKGSESSIONHANDLER_H
+#ifndef BITCOIN_LLMQ_QUORUMS_DKGSESSIONHANDLER_H
+#define BITCOIN_LLMQ_QUORUMS_DKGSESSIONHANDLER_H
 
 #include <llmq/quorums_dkgsession.h>
 
@@ -12,8 +11,7 @@
 
 #include <ctpl.h>
 
-namespace llmq
-{
+namespace llmq {
 
 enum QuorumPhase {
     QuorumPhase_None = -1,
@@ -55,7 +53,7 @@ public:
     bool HasSeen(const uint256& hash) const;
     void Clear();
 
-    template<typename Message>
+    template <typename Message>
     void PushPendingMessage(NodeId from, Message& msg)
     {
         CDataStream ds(SER_NETWORK, PROTOCOL_VERSION);
@@ -64,7 +62,7 @@ public:
     }
 
     // Might return nullptr messages, which indicates that deserialization failed for some reason
-    template<typename Message>
+    template <typename Message>
     std::vector<std::pair<NodeId, std::shared_ptr<Message>>> PopAndDeserializeMessages(size_t maxCount)
     {
         auto binaryMessages = PopPendingMessages(maxCount);
@@ -123,8 +121,8 @@ public:
     CDKGSessionHandler(const Consensus::LLMQParams& _params, CBLSWorker& blsWorker, CDKGSessionManager& _dkgManager);
     ~CDKGSessionHandler();
 
-    void UpdatedBlockTip(const CBlockIndex *pindexNew);
-    void ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStream& vRecv, CConnman& connman);
+    void UpdatedBlockTip(const CBlockIndex* pindexNew);
+    void ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStream& vRecv);
 
     void StartThread();
     void StopThread();
@@ -146,4 +144,4 @@ private:
 
 } // namespace llmq
 
-#endif //GOBYTE_QUORUMS_DKGSESSIONHANDLER_H
+#endif // BITCOIN_LLMQ_QUORUMS_DKGSESSIONHANDLER_H

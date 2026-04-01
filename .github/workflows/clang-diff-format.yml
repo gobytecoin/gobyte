@@ -1,0 +1,24 @@
+name: Clang Diff Format Check
+
+on:
+  pull_request:
+    branches:
+      - develop
+jobs:
+  ClangFormat:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+      - name: Fetch git
+        run: git fetch --no-tags -fu origin ${{ github.ref_name }}:${{ github.ref_name }}
+      - name: Run Clang-Format-Diff.py
+        run: |
+          git diff -U0 origin/develop -- $(git ls-files -- $(cat test/util/data/non-backported.txt)) | ./contrib/devtools/clang-format-diff.py -p1 > diff_output.txt
+          if [ -s diff_output.txt ]; then
+              echo "Clang format differences found:"
+              cat diff_output.txt
+              exit 1
+          else
+              echo "No Clang format differences found."
+          fi

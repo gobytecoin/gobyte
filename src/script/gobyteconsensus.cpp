@@ -40,7 +40,7 @@ public:
     }
 
     template<typename T>
-    TxInputStream& operator>>(T& obj)
+    TxInputStream& operator>>(T&& obj)
     {
         ::Unserialize(*this, obj);
         return *this;
@@ -55,10 +55,10 @@ private:
     size_t m_remaining;
 };
 
-inline int set_error(gobyteconsensus_error* ret, gobyteconsensus_error serror)
+inline int set_error(gobyteconsensus_error* err, gobyteconsensus_error serror)
 {
-    if (ret)
-        *ret = serror;
+    if (err)
+        *err = serror;
     return 0;
 }
 

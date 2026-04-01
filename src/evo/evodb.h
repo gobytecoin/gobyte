@@ -1,10 +1,9 @@
-// Copyright (c) 2018-2020 The Dash Core developers
-// Copyright (c) 2017-2021 The GoByte Core developers
+// Copyright (c) 2018-2020 The GoByte Core developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef GOBYTE_EVODB_H
-#define GOBYTE_EVODB_H
+#ifndef BITCOIN_EVO_EVODB_H
+#define BITCOIN_EVO_EVODB_H
 
 #include <dbwrapper.h>
 #include <sync.h>
@@ -34,6 +33,7 @@ class CEvoDB
 {
 public:
     CCriticalSection cs;
+
 private:
     CDBWrapper db;
 
@@ -99,6 +99,8 @@ public:
 
     bool CommitRootTransaction();
 
+    bool IsEmpty() { return db.IsEmpty(); }
+
     bool VerifyBestBlock(const uint256& hash);
     void WriteBestBlock(const uint256& hash);
 
@@ -111,4 +113,4 @@ private:
 
 extern std::unique_ptr<CEvoDB> evoDb;
 
-#endif //GOBYTE_EVODB_H
+#endif // BITCOIN_EVO_EVODB_H

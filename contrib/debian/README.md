@@ -18,4 +18,3 @@ the .desktop file or copy or symlink your gobyte-qt binary to `/usr/bin`
 and the `../../share/pixmaps/gobyte128.png` to `/usr/share/pixmaps`
 
 gobyte-qt.protocol (KDE)
-

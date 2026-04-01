@@ -1,14 +1,13 @@
-// Copyright (c) 2014-2019 The Dash Core developers
-// Copyright (c) 2017-2021 The GoByte Core developers
+// Copyright (c) 2014-2020 The GoByte Core developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef CACHEMULTIMAP_H_
-#define CACHEMULTIMAP_H_
+#ifndef BITCOIN_CACHEMULTIMAP_H
+#define BITCOIN_CACHEMULTIMAP_H
 
 #include <cstddef>
-#include <map>
 #include <list>
+#include <map>
 #include <set>
 
 #include <serialize.h>
@@ -18,13 +17,13 @@
 /**
  * Map like container that keeps the N most recently added items
  */
-template<typename K, typename V, typename Size = uint32_t>
+template <typename K, typename V, typename Size = uint32_t>
 class CacheMultiMap
 {
 public:
     typedef Size size_type;
 
-    typedef CacheItem<K,V> item_t;
+    typedef CacheItem<K, V> item_t;
 
     typedef std::list<item_t> list_t;
 
@@ -32,7 +31,7 @@ public:
 
     typedef typename list_t::const_iterator list_cit;
 
-    typedef std::map<V,list_it> it_map_t;
+    typedef std::map<V, list_it> it_map_t;
 
     typedef typename it_map_t::iterator it_map_it;
 
@@ -52,16 +51,15 @@ private:
     map_t mapIndex;
 
 public:
-    CacheMultiMap(size_type nMaxSizeIn = 0)
-        : nMaxSize(nMaxSizeIn),
-          listItems(),
-          mapIndex()
-    {}
+    CacheMultiMap(size_type nMaxSizeIn = 0) : nMaxSize(nMaxSizeIn),
+                                              listItems(),
+                                              mapIndex()
+    {
+    }
 
-    CacheMultiMap(const CacheMap<K,V>& other)
-        : nMaxSize(other.nMaxSize),
-          listItems(other.listItems),
-          mapIndex()
+    CacheMultiMap(const CacheMap<K, V>& other) : nMaxSize(other.nMaxSize),
+                                                 listItems(other.listItems),
+                                                 mapIndex()
     {
         RebuildIndex();
     }
@@ -77,28 +75,30 @@ public:
         nMaxSize = nMaxSizeIn;
     }
 
-    size_type GetMaxSize() const {
+    size_type GetMaxSize() const
+    {
         return nMaxSize;
     }
 
-    size_type GetSize() const {
+    size_type GetSize() const
+    {
         return listItems.size();
     }
 
     bool Insert(const K& key, const V& value)
     {
         map_it mit = mapIndex.find(key);
-        if(mit == mapIndex.end()) {
+        if (mit == mapIndex.end()) {
             mit = mapIndex.emplace(key, it_map_t()).first;
         }
         it_map_t& mapIt = mit->second;
 
-        if(mapIt.count(value) > 0) {
+        if (mapIt.count(value) > 0) {
             // Don't insert duplicates
             return false;
         }
 
-        if(listItems.size() == nMaxSize) {
+        if (listItems.size() == nMaxSize) {
             PruneLast();
         }
         listItems.push_front(item_t(key, value));
@@ -114,7 +114,7 @@ public:
     bool Get(const K& key, V& value) const
     {
         map_cit it = mapIndex.find(key);
-        if(it == mapIndex.end()) {
+        if (it == mapIndex.end()) {
             return false;
         }
         const it_map_t& mapIt = it->second;
@@ -126,12 +126,12 @@ public:
     bool GetAll(const K& key, std::vector<V>& vecValues)
     {
         map_cit mit = mapIndex.find(key);
-        if(mit == mapIndex.end()) {
+        if (mit == mapIndex.end()) {
             return false;
         }
         const it_map_t& mapIt = mit->second;
 
-        for(it_map_cit it = mapIt.begin(); it != mapIt.end(); ++it) {
+        for (it_map_cit it = mapIt.begin(); it != mapIt.end(); ++it) {
             const item_t& item = *(it->second);
             vecValues.push_back(item.value);
         }
@@ -140,7 +140,7 @@ public:
 
     void GetKeys(std::vector<K>& vecKeys)
     {
-        for(map_cit it = mapIndex.begin(); it != mapIndex.end(); ++it) {
+        for (map_cit it = mapIndex.begin(); it != mapIndex.end(); ++it) {
             vecKeys.push_back(it->first);
         }
     }
@@ -148,12 +148,12 @@ public:
     void Erase(const K& key)
     {
         map_it mit = mapIndex.find(key);
-        if(mit == mapIndex.end()) {
+        if (mit == mapIndex.end()) {
             return;
         }
         it_map_t& mapIt = mit->second;
 
-        for(it_map_it it = mapIt.begin(); it != mapIt.end(); ++it) {
+        for (it_map_it it = mapIt.begin(); it != mapIt.end(); ++it) {
             listItems.erase(it->second);
         }
 
@@ -163,29 +163,30 @@ public:
     void Erase(const K& key, const V& value)
     {
         map_it mit = mapIndex.find(key);
-        if(mit == mapIndex.end()) {
+        if (mit == mapIndex.end()) {
             return;
         }
         it_map_t& mapIt = mit->second;
 
         it_map_it it = mapIt.find(value);
-        if(it == mapIt.end()) {
+        if (it == mapIt.end()) {
             return;
         }
 
         listItems.erase(it->second);
         mapIt.erase(it);
 
-        if(mapIt.empty()) {
+        if (mapIt.empty()) {
             mapIndex.erase(mit);
         }
     }
 
-    const list_t& GetItemList() const {
+    const list_t& GetItemList() const
+    {
         return listItems;
     }
 
-    CacheMap<K,V>& operator=(const CacheMap<K,V>& other)
+    CacheMap<K, V>& operator=(const CacheMap<K, V>& other)
     {
         nMaxSize = other.nMaxSize;
         listItems = other.listItems;
@@ -200,7 +201,7 @@ public:
     {
         READWRITE(nMaxSize);
         READWRITE(listItems);
-        if(ser_action.ForRead()) {
+        if (ser_action.ForRead()) {
             RebuildIndex();
         }
     }
@@ -208,7 +209,7 @@ public:
 private:
     void PruneLast()
     {
-        if(listItems.empty()) {
+        if (listItems.empty()) {
             return;
         }
 
@@ -218,12 +219,12 @@ private:
 
         map_it mit = mapIndex.find(item.key);
 
-        if(mit != mapIndex.end()) {
+        if (mit != mapIndex.end()) {
             it_map_t& mapIt = mit->second;
 
             mapIt.erase(item.value);
 
-            if(mapIt.empty()) {
+            if (mapIt.empty()) {
                 mapIndex.erase(item.key);
             }
         }
@@ -234,10 +235,10 @@ private:
     void RebuildIndex()
     {
         mapIndex.clear();
-        for(list_it lit = listItems.begin(); lit != listItems.end(); ++lit) {
+        for (list_it lit = listItems.begin(); lit != listItems.end(); ++lit) {
             item_t& item = *lit;
             map_it mit = mapIndex.find(item.key);
-            if(mit == mapIndex.end()) {
+            if (mit == mapIndex.end()) {
                 mit = mapIndex.emplace(item.key, it_map_t()).first;
             }
             it_map_t& mapIt = mit->second;
@@ -246,4 +247,4 @@ private:
     }
 };
 
-#endif /* CACHEMULTIMAP_H_ */
+#endif // BITCOIN_CACHEMULTIMAP_H

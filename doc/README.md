@@ -26,10 +26,10 @@ Drag GoByte-Qt to your applications folder, and then run GoByte-Qt.
 
 * See the [GoByte documentation](https://docs.gobyte.network)
 for help and more information.
-* See the [GoByte Developer Documentation](https://gobyte-docs.github.io/) 
+* See the [GoByte Developer Documentation](https://gobyte-docs.github.io/)
 for technical specifications and implementation details.
-* Ask for help on [GoByte Nation Discord](http://gobytechat.org)
-* Ask for help on the [GoByte Forum](https://gobyte.org/forum)
+* Ask for help on [GoByte Discord](http://discord.gobyte.network)
+* Ask for help on the [GoByte Forum](https://gobyte.network/forum)
 
 Building
 ---------------------
@@ -51,7 +51,6 @@ The GoByte Core repo's [root README](/README.md) contains relevant information o
 - Source Code Documentation ***TODO***
 - [Translation Process](translation_process.md)
 - [Translation Strings Policy](translation_strings_policy.md)
-- [Travis CI](travis-ci.md)
 - [Unauthenticated REST Interface](REST-interface.md)
 - [Shared Libraries](shared-libraries.md)
 - [BIPS](bips.md)
@@ -59,8 +58,8 @@ The GoByte Core repo's [root README](/README.md) contains relevant information o
 - [Benchmarking](benchmarking.md)
 
 ### Resources
-* Discuss on the [GoByte Forum](https://gobyte.org/forum), in the Development & Technical Discussion board.
-* Discuss on [GoByte Nation Discord](http://gobytechat.org)
+* Discuss on the [GoByte Forum](https://gobyte.network/forum), in the Development & Technical Discussion board.
+* Discuss on [GoByte Discord](http://discord.gobyte.network)
 
 ### Miscellaneous
 - [Assets Attribution](assets-attribution.md)

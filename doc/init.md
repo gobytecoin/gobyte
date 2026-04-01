@@ -53,11 +53,11 @@ Paths
 
 All three configurations assume several paths that might need to be adjusted.
 
-Binary:              `/usr/bin/gobyted`  
-Configuration file:  `/etc/gobytecore/gobyte.conf`  
-Data directory:      `/var/lib/gobyted`  
-PID file:            `/var/run/gobyted/gobyted.pid` (OpenRC and Upstart) or `/var/lib/gobyted/gobyted.pid` (systemd)  
-Lock file:           `/var/lock/subsys/gobyted` (CentOS)  
+Binary:              `/usr/bin/gobyted`
+Configuration file:  `/etc/gobytecore/gobyte.conf`
+Data directory:      `/var/lib/gobyted`
+PID file:            `/var/run/gobyted/gobyted.pid` (OpenRC and Upstart) or `/var/lib/gobyted/gobyted.pid` (systemd)
+Lock file:           `/var/lock/subsys/gobyted` (CentOS)
 
 The configuration file, PID directory (if applicable) and data directory
 should all be owned by the gobytecore user and group.  It is advised for security
@@ -67,10 +67,10 @@ can then be controlled by group membership.
 
 ### Mac OS X
 
-Binary:              `/usr/local/bin/gobyted`  
-Configuration file:  `~/Library/Application Support/GoByteCore/gobyte.conf`  
-Data directory:      `~/Library/Application Support/GoByteCore`  
-Lock file:           `~/Library/Application Support/GoByteCore/.lock`  
+Binary:              `/usr/local/bin/gobyted`
+Configuration file:  `~/Library/Application Support/GoByteCore/gobyte.conf`
+Data directory:      `~/Library/Application Support/GoByteCore`
+Lock file:           `~/Library/Application Support/GoByteCore/.lock`
 
 Installing Service Configuration
 -----------------------------------
@@ -84,6 +84,8 @@ Installing this .service file consists of just copying it to
 To test, run `systemctl start gobyted` and to enable for system startup run
 `systemctl enable gobyted`
 
+NOTE: When installing for systemd in Debian/Ubuntu the .service file needs to be copied to the /lib/systemd/system directory instead.
+
 ### OpenRC
 
 Rename gobyted.openrc to gobyted and drop it in /etc/init.d.  Double
@@ -92,6 +94,8 @@ check ownership and permissions and make it executable.  Test it with
 `rc-update add gobyted`
 
 ### Upstart (for Debian/Ubuntu based distributions)
+
+Upstart is the default init system for Debian/Ubuntu versions older than 15.04. If you are using version 15.04 or newer and haven't manually configured upstart you should follow the systemd instructions instead.
 
 Drop gobyted.conf in /etc/init.  Test by running `service gobyted start`
 it will automatically start on reboot.

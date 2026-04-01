@@ -1,6 +1,5 @@
 // Copyright (c) 2014 The Bitcoin Core developers
-// Copyright (c) 2014-2020 The Dash Core developers
-// Copyright (c) 2017-2021 The GoByte Core developers
+// Copyright (c) 2014-2020 The GoByte Core developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -16,8 +15,8 @@
 #include <QApplication>
 
 static const struct {
-    const char *networkId;
-    const char *appName;
+    const char* networkId;
+    const char* appName;
     const int iconColorHueShift;
     const int iconColorSaturationReduction;
     const std::string titleAddText;
@@ -25,9 +24,8 @@ static const struct {
     {"main", QAPP_APP_NAME_DEFAULT, 0, 0, ""},
     {"test", QAPP_APP_NAME_TESTNET, 190, 20, QT_TRANSLATE_NOOP("SplashScreen", "[testnet]")},
     {"devnet", QAPP_APP_NAME_DEVNET, 190, 20, "[devnet: %s]"},
-    {"regtest", QAPP_APP_NAME_REGTEST, 160, 30, "[regtest]"}
-};
-static const unsigned network_styles_count = sizeof(network_styles)/sizeof(*network_styles);
+    {"regtest", QAPP_APP_NAME_REGTEST, 160, 30, "[regtest]"}};
+static const unsigned network_styles_count = sizeof(network_styles) / sizeof(*network_styles);
 
 void NetworkStyle::rotateColor(QColor& col, const int iconColorHueShift, const int iconColorSaturationReduction)
 {
@@ -40,20 +38,19 @@ void NetworkStyle::rotateColor(QColor& col, const int iconColorHueShift, const i
     s -= iconColorSaturationReduction;
     s = std::max(s, 0);
 
-    col.setHsl(h,s,l,a);
+    col.setHsl(h, s, l, a);
 }
 
-void NetworkStyle::rotateColors(QImage& img, const int iconColorHueShift, const int iconColorSaturationReduction) {
-    int h,s,l,a;
+void NetworkStyle::rotateColors(QImage& img, const int iconColorHueShift, const int iconColorSaturationReduction)
+{
+    int h, s, l, a;
 
     // traverse though lines
-    for(int y=0;y<img.height();y++)
-    {
-        QRgb *scL = reinterpret_cast< QRgb *>( img.scanLine( y ) );
+    for (int y = 0; y < img.height(); y++) {
+        QRgb* scL = reinterpret_cast<QRgb*>(img.scanLine(y));
 
         // loop through pixels
-        for(int x=0;x<img.width();x++)
-        {
+        for (int x = 0; x < img.width(); x++) {
             QColor col;
             col.setRgba(scL[x]);
             rotateColor(col, iconColorHueShift, iconColorSaturationReduction);
@@ -63,44 +60,35 @@ void NetworkStyle::rotateColors(QImage& img, const int iconColorHueShift, const 
 }
 
 // titleAddText needs to be const char* for tr()
-NetworkStyle::NetworkStyle(const QString &_appName, const int iconColorHueShift, const int iconColorSaturationReduction, const char *_titleAddText):
+NetworkStyle::NetworkStyle(const QString& _appName, const int iconColorHueShift, const int iconColorSaturationReduction, const char* _titleAddText) :
     appName(_appName),
     titleAddText(qApp->translate("SplashScreen", _titleAddText)),
     badgeColor(QColor(0, 141, 228)) // default badge color is the original GoByte's blue, regardless of the current theme
 {
     // Allow for separate UI settings for testnets
     QApplication::setApplicationName(appName);
-    // Make sure settings migrated properly
-    GUIUtil::migrateQtSettings();
     // load pixmap
-    QPixmap appIconPixmap(":/icons/bitcoin");
+    QPixmap appIconPixmap(":/icons/gobyte");
 
-    if(iconColorHueShift != 0 && iconColorSaturationReduction != 0)
-    {
+    if (iconColorHueShift != 0 && iconColorSaturationReduction != 0) {
         // generate QImage from QPixmap
         QImage appIconImg = appIconPixmap.toImage();
         rotateColors(appIconImg, iconColorHueShift, iconColorSaturationReduction);
-        //convert back to QPixmap
-#if QT_VERSION >= 0x040700
+        // convert back to QPixmap
         appIconPixmap.convertFromImage(appIconImg);
-#else
-        appIconPixmap = QPixmap::fromImage(appIconImg);
-#endif
         // tweak badge color
         rotateColor(badgeColor, iconColorHueShift, iconColorSaturationReduction);
     }
 
-    appIcon             = QIcon(appIconPixmap);
-    trayAndWindowIcon   = QIcon(appIconPixmap.scaled(QSize(256,256)));
-    splashImage         = QPixmap(":/images/splash");
+    appIcon = QIcon(appIconPixmap);
+    trayAndWindowIcon = QIcon(appIconPixmap.scaled(QSize(256, 256)));
+    splashImage = QPixmap(":/images/splash");
 }
 
-const NetworkStyle *NetworkStyle::instantiate(const QString &networkId)
+const NetworkStyle* NetworkStyle::instantiate(const QString& networkId)
 {
-    for (unsigned x=0; x<network_styles_count; ++x)
-    {
-        if (networkId == network_styles[x].networkId)
-        {
+    for (unsigned x = 0; x < network_styles_count; ++x) {
+        if (networkId == network_styles[x].networkId) {
             std::string appName = network_styles[x].appName;
             std::string titleAddText = network_styles[x].titleAddText;
 
@@ -110,10 +98,10 @@ const NetworkStyle *NetworkStyle::instantiate(const QString &networkId)
             }
 
             return new NetworkStyle(
-                    appName.c_str(),
-                    network_styles[x].iconColorHueShift,
-                    network_styles[x].iconColorSaturationReduction,
-                    titleAddText.c_str());
+                appName.c_str(),
+                network_styles[x].iconColorHueShift,
+                network_styles[x].iconColorSaturationReduction,
+                titleAddText.c_str());
         }
     }
     return 0;

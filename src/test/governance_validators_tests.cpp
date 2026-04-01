@@ -1,16 +1,15 @@
-// Copyright (c) 2014-2019 The Dash Core developers
-// Copyright (c) 2017-2021 The GoByte Core developers
+// Copyright (c) 2014-2020 The GoByte Core developers
 
 #include <governance/governance-validators.h>
 #include <utilstrencodings.h>
 
-#include <test/data/proposals_valid.json.h>
 #include <test/data/proposals_invalid.json.h>
+#include <test/data/proposals_valid.json.h>
 
 #include <test/test_gobyte.h>
 
-#include <iostream>
 #include <fstream>
+#include <iostream>
 #include <string>
 
 #include <boost/test/unit_test.hpp>
@@ -41,7 +40,7 @@ BOOST_AUTO_TEST_CASE(valid_proposals_test)
     UniValue tests = read_json(std::string(json_tests::proposals_valid, json_tests::proposals_valid + sizeof(json_tests::proposals_valid)));
 
     BOOST_CHECK_MESSAGE(tests.size(), "Empty `tests`");
-    for(size_t i = 0; i < tests.size(); ++i) {
+    for (size_t i = 0; i < tests.size(); ++i) {
         const UniValue& objProposal = tests[i];
 
         // legacy format
@@ -70,7 +69,7 @@ BOOST_AUTO_TEST_CASE(invalid_proposals_test)
     UniValue tests = read_json(std::string(json_tests::proposals_invalid, json_tests::proposals_invalid + sizeof(json_tests::proposals_invalid)));
 
     BOOST_CHECK_MESSAGE(tests.size(), "Empty `tests`");
-    for(size_t i = 0; i < tests.size(); ++i) {
+    for (size_t i = 0; i < tests.size(); ++i) {
         const UniValue& objProposal = tests[i];
 
         // legacy format
