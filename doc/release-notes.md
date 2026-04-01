@@ -1,121 +1,87 @@
-GoByte Core version 0.16.1.1
-==========================
+# GoByte Core version 0.16.2.2
+===============================
 
-Release is now available from:
+This is a new minor version release, bringing various bugfixes and performance improvements.
+This release is **optional** for all nodes, although recommended.
 
-  <https://www.gobyte.network/downloads/#wallets>
-
-This is a new hotfix release.
-
-Please report bugs using the issue tracker at github:
+Please report bugs using the issue tracker at GitHub:
 
   <https://github.com/gobytecoin/gobyte/issues>
 
 
-Upgrading and downgrading
-=========================
+# Upgrading and downgrading
 
-How to Upgrade
---------------
+## How to Upgrade
 
 If you are running an older version, shut it down. Wait until it has completely
-shut down (which might take a few minutes for older versions), then run the
-installer (on Windows) or just copy over /Applications/GoByte-Qt (on Mac) or
-gobyted/gobyte-qt (on Linux). If you upgrade after DIP0003 activation and you were
-using version < 0.13 you will have to reindex (start with -reindex-chainstate
-or -reindex) to make sure your wallet has all the new data synced. Upgrading
-from version 0.13 should not require any additional actions.
+shut down (which might take a few minutes in some cases), then run the
+installer (on Windows) or just copy over `/Applications/GoByte-Qt` (on macOS) or
+`gobyted`/`gobyte-cli`/`gobyte-qt` (on Linux).
 
-When upgrading from a version prior to 0.14.0.3, the
-first startup of GoByte Core will run a migration process which can take a few
-minutes to finish. After the migration, a downgrade to an older version is only
-possible with a reindex (or reindex-chainstate).
+## Downgrade warning
 
-Downgrade warning
------------------
+### Downgrade to a version < **0.16.2.X**
 
-### Downgrade to a version < 0.14.0.3
+Downgrading to a version older than **0.16.2.X** may not be supported, and will
+likely require a reindex.
 
-Downgrading to a version older than 0.14.0.3 is no longer supported due to
-changes in the "evodb" database format. If you need to use an older version,
-you must either reindex or re-sync the whole chain.
+# Compatibility
 
-### Downgrade of masternodes to < 0.16
+GoByte Core is supported and tested on operating systems using the
+Linux Kernel 3.17+, macOS 14+, and Windows 10+. GoByte Core
+should also work on most other Unix-like systems but is not as
+frequently tested on them. It is not recommended to use GoByte Core on
+unsupported systems.
 
-Starting with this release, masternodes will verify the protocol version of other
-masternodes. This will result in PoSe punishment/banning for outdated masternodes,
-so downgrading is not recommended.
+# Release Notes
 
 Notable changes
 ===============
 
-There was an unexpected behaviour of the "Encrypt wallet" menu item for unencrypted wallets
-which was showing users the "Decrypt wallet" dialog instead. This was a GUI only issue,
-internal encryption logic and RPC behaviour were not affected.
+- Fixed a critical bug that caused testnet nodes to permanently stall at block 87682. The issue was that null quorum commitments (harmless zero-value commitments) referencing unregistered LLMQ types (like type 102 from v0.17 dev builds) were incorrectly rejected. The fix reorders validation checks so null commitments are validated before checking if the LLMQ type is registered - since null commitments commit no quorum state, they are safe to accept regardless of type registration. (gobyte#49)
 
-0.16.1.1 Change log
-===================
+- Removed the unused `LLMQ_5_60` quorum type (which conflicted with `LLMQ_TEST`) and updated testnet to use `LLMQ_50_60` (50 members, 30 threshold) instead. This aligns testnet with mainnet and upstream Dash configuration, and prepares for a testnet restart with standardized LLMQ parameters. (gobyte#50)
 
-See detailed [set of changes](https://github.com/gobytecoin/gobyte/compare/v0.16.1.0...gobytecoin:v0.16.1.1).
+- Complete testnet reset due to incompatible blocks containing LLMQ types (102, 130) that v0.16.x nodes cannot validate. Changes include: new genesis block (hash: `0x00000488...`), all deployments set to activate April 1st, 2026 with infinite timeout, cleared old checkpoints, updated spork keys. All existing testnet data becomes invalid - nodes must resync from genesis. (gobyte#52)
 
-- [`ccef3b4836`](https://github.com/gobytecoin/gobyte/commit/ccef3b48363d8bff4b919d9119355182e3902ef3) qt: Fix wallet encryption dialog (#3816)
+- Re-enabled BIP34 coinbase height validation (previously commented out) and corrected `BIP34Height` from 1 to 17. This strengthens block validation by ensuring coinbase transactions contain the correct block height encoding, aligning the codebase with upstream Dash and reducing technical debt. Only affects pre-DIP0003 blocks. (gobyte#47)
 
-Credits
-=======
+- Removed a hardcoded version check in `net_processing.cpp` that automatically disconnected any peer not running version 0.16.x. This check was overly restrictive and prevented network interoperability with nodes running different (compatible) versions. (gobyte#44)
+
+
+Low-level changes
+=================
+
+- [263a25a86] chore: update copyright year in configure.ac
+- [7b1833001] chore(depends): update dependency download mirrors to reliable sources
+- [4bd9935b8] chore: update GPG key
+- [534be8a33] chore: update testnet seeds
+- [b6e1a708b] chore: Add issues templates
+- [9e69306ef] chore: Add SECURITY.md
+- [bde5c7d3d] chore: add release nodes template
+- [4e0dc56cf] chore: update docs inside /doc/
+
+
+See detailed [set of changes][set-of-changes].
+
+# Credits
 
 Thanks to everyone who directly contributed to this release:
 
-- UdjinM6
+- D0WN3D
+- sirbond
+- The Bitcoin Core Developers
+- The Dash Core Developers
 
-As well as everyone that submitted issues and reviewed pull requests.
+As well as everyone that submitted issues, reviewed pull requests and helped
+debug the release candidates.
 
-Older releases
-==============
+# Older releases
 
-GoByte was previously known as Darkcoin.
+These releases are considered obsolete. Old release notes can be found here:
 
-Darkcoin tree 0.8.x was a fork of Litecoin tree 0.8, original name was XCoin
-which was first released on Jan/18/2014.
+- [v16.2.1](https://github.com/gobytecoin/gobyte/blob/master/doc/release-notes/gobyte/release-notes-0-16.2.1.md) released Dec/06/2021
+- [v16.1.1](https://github.com/gobytecoin/gobyte/blob/master/doc/release-notes/gobyte/release-notes-0-16.1.1.md) released Oct/05/2021
+- [v12.2.4](https://github.com/gobytecoin/gobyte/blob/master/doc/release-notes/gobyte/release-notes-0-12.2.4.md) released Jun/18/2018
 
-Darkcoin tree 0.9.x was the open source implementation of masternodes based on
-the 0.8.x tree and was first released on Mar/13/2014.
-
-Darkcoin tree 0.10.x used to be the closed source implementation of Darksend
-which was released open source on Sep/25/2014.
-
-GoByte Core tree 0.11.x was a fork of Bitcoin Core tree 0.9,
-Darkcoin was rebranded to GoByte.
-
-GoByte Core tree 0.12.0.x was a fork of Bitcoin Core tree 0.10.
-
-GoByte Core tree 0.12.1.x was a fork of Bitcoin Core tree 0.12.
-
-These release are considered obsolete. Old release notes can be found here:
-
-- [v0.16.1.0](https://github.com/gobytecoin/gobyte/blob/master/doc/release-notes/gobyte/release-notes-0.16.1.0.md) released November/14/2020
-- [v0.16.0.1](https://github.com/gobytecoin/gobyte/blob/master/doc/release-notes/gobyte/release-notes-0.16.0.1.md) released September/30/2020
-- [v0.15.0.0](https://github.com/gobytecoin/gobyte/blob/master/doc/release-notes/gobyte/release-notes-0.15.0.0.md) released Febrary/18/2020
-- [v0.14.0.5](https://github.com/gobytecoin/gobyte/blob/master/doc/release-notes/gobyte/release-notes-0.14.0.5.md) released December/08/2019
-- [v0.14.0.4](https://github.com/gobytecoin/gobyte/blob/master/doc/release-notes/gobyte/release-notes-0.14.0.4.md) released November/22/2019
-- [v0.14.0.3](https://github.com/gobytecoin/gobyte/blob/master/doc/release-notes/gobyte/release-notes-0.14.0.3.md) released August/15/2019
-- [v0.14.0.2](https://github.com/gobytecoin/gobyte/blob/master/doc/release-notes/gobyte/release-notes-0.14.0.2.md) released July/4/2019
-- [v0.14.0.1](https://github.com/gobytecoin/gobyte/blob/master/doc/release-notes/gobyte/release-notes-0.14.0.1.md) released May/31/2019
-- [v0.14.0](https://github.com/gobytecoin/gobyte/blob/master/doc/release-notes/gobyte/release-notes-0.14.0.md) released May/22/2019
-- [v0.13.3](https://github.com/gobytecoin/gobyte/blob/master/doc/release-notes/gobyte/release-notes-0.13.3.md) released Apr/04/2019
-- [v0.13.2](https://github.com/gobytecoin/gobyte/blob/master/doc/release-notes/gobyte/release-notes-0.13.2.md) released Mar/15/2019
-- [v0.13.1](https://github.com/gobytecoin/gobyte/blob/master/doc/release-notes/gobyte/release-notes-0.13.1.md) released Feb/9/2019
-- [v0.13.0](https://github.com/gobytecoin/gobyte/blob/master/doc/release-notes/gobyte/release-notes-0.13.0.md) released Jan/14/2019
-- [v0.12.3.4](https://github.com/gobytecoin/gobyte/blob/master/doc/release-notes/gobyte/release-notes-0.12.3.4.md) released Dec/14/2018
-- [v0.12.3.3](https://github.com/gobytecoin/gobyte/blob/master/doc/release-notes/gobyte/release-notes-0.12.3.3.md) released Sep/19/2018
-- [v0.12.3.2](https://github.com/gobytecoin/gobyte/blob/master/doc/release-notes/gobyte/release-notes-0.12.3.2.md) released Jul/09/2018
-- [v0.12.3.1](https://github.com/gobytecoin/gobyte/blob/master/doc/release-notes/gobyte/release-notes-0.12.3.1.md) released Jul/03/2018
-- [v0.12.2.3](https://github.com/gobytecoin/gobyte/blob/master/doc/release-notes/gobyte/release-notes-0.12.2.3.md) released Jan/12/2018
-- [v0.12.2.2](https://github.com/gobytecoin/gobyte/blob/master/doc/release-notes/gobyte/release-notes-0.12.2.2.md) released Dec/17/2017
-- [v0.12.2](https://github.com/gobytecoin/gobyte/blob/master/doc/release-notes/gobyte/release-notes-0.12.2.md) released Nov/08/2017
-- [v0.12.1](https://github.com/gobytecoin/gobyte/blob/master/doc/release-notes/gobyte/release-notes-0.12.1.md) released Feb/06/2017
-- [v0.12.0](https://github.com/gobytecoin/gobyte/blob/master/doc/release-notes/gobyte/release-notes-0.12.0.md) released Aug/15/2015
-- [v0.11.2](https://github.com/gobytecoin/gobyte/blob/master/doc/release-notes/gobyte/release-notes-0.11.2.md) released Mar/04/2015
-- [v0.11.1](https://github.com/gobytecoin/gobyte/blob/master/doc/release-notes/gobyte/release-notes-0.11.1.md) released Feb/10/2015
-- [v0.11.0](https://github.com/gobytecoin/gobyte/blob/master/doc/release-notes/gobyte/release-notes-0.11.0.md) released Jan/15/2015
-- [v0.10.x](https://github.com/gobytecoin/gobyte/blob/master/doc/release-notes/gobyte/release-notes-0.10.0.md) released Sep/25/2014
-- [v0.9.x](https://github.com/gobytecoin/gobyte/blob/master/doc/release-notes/gobyte/release-notes-0.9.0.md) released Mar/13/2014
+[set-of-changes]: https://github.com/gobytecoin/gobyte/compare/0.16.2.1...gobytecoin:0.16.2.2

@@ -5,6 +5,7 @@ suites:
 - "bionic"
 architectures:
 - "amd64"
+- "arm64"
 packages:
 - "curl"
 - "g++-aarch64-linux-gnu"
