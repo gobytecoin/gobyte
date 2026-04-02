@@ -136,6 +136,7 @@ gobyte-qt
 make
 
 .clangd
+test/lint/.cppcheck
 /docker/bin
 
 # CLion
