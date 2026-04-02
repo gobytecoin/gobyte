@@ -13,7 +13,7 @@
 
 export LC_ALL=C
 function clean_up {
-   for file in $*
+   for file in "$@"
    do
       rm "$file" 2> /dev/null
    done
@@ -36,10 +36,7 @@ fi
 
 cd "$WORKINGDIR" || exit 1
 
-#test if a version number has been passed as an argument
 if [ -n "$1" ]; then
-   #let's also check if the version number includes the prefix 'bitcoin-',
-   #  and add this prefix if it doesn't
    if [[ $1 == "$VERSIONPREFIX"* ]]; then
       VERSION="$1"
    else
@@ -48,11 +45,9 @@ if [ -n "$1" ]; then
 
    STRIPPEDLAST="${VERSION%-*}"
 
-   #now let's see if the version string contains "rc" or a platform name (e.g. "osx")
    if [[ "$STRIPPEDLAST-" == "$VERSIONPREFIX" ]]; then
       BASEDIR="$BASEDIR$VERSION/"
    else
-      # let's examine the last part to see if it's rc and/or platform name
       STRIPPEDNEXTTOLAST="${STRIPPEDLAST%-*}"
       if [[ "$STRIPPEDNEXTTOLAST-" == "$VERSIONPREFIX" ]]; then
 
@@ -82,78 +77,66 @@ else
    exit 2
 fi
 
-#first we fetch the file containing the signature
 WGETOUT=$(wget -N "$HOST1$BASEDIR$SIGNATUREFILENAME" 2>&1)
 
-#and then see if wget completed successfully
-if [ $? -ne 0 ]; then
+if ! wget -N "$HOST1$BASEDIR$SIGNATUREFILENAME" 2>&1; then
    echo "Error: couldn't fetch signature file. Have you specified the version number in the following format?"
-   echo "[$VERSIONPREFIX]<version>-[$RCVERSIONSTRING[0-9]] (example: ${VERSIONPREFIX}0.10.4-${RCVERSIONSTRING}1)"
+   echo "[$VERSIONPREFIX]<version>-[${RCVERSIONSTRING}[0-9]] (example: ${VERSIONPREFIX}0.10.4-${RCVERSIONSTRING}1)"
    echo "wget output:"
-   echo "$WGETOUT"|sed 's/^/\t/g'
+   echo -e "\t${WGETOUT}"
    exit 2
 fi
 
 WGETOUT=$(wget -N -O "$SIGNATUREFILENAME.2" "$HOST2$BASEDIR$SIGNATUREFILENAME" 2>&1)
-if [ $? -ne 0 ]; then
+if ! wget -N -O "$SIGNATUREFILENAME.2" "$HOST2$BASEDIR$SIGNATUREFILENAME" 2>&1; then
    echo "bitcoin.org failed to provide signature file, but bitcoincore.org did?"
    echo "wget output:"
-   echo "$WGETOUT"|sed 's/^/\t/g'
-   clean_up $SIGNATUREFILENAME
+   echo -e "\t${WGETOUT}"
+   clean_up "$SIGNATUREFILENAME"
    exit 3
 fi
 
-SIGFILEDIFFS="$(diff $SIGNATUREFILENAME $SIGNATUREFILENAME.2)"
+SIGFILEDIFFS="$(diff "$SIGNATUREFILENAME" "$SIGNATUREFILENAME.2")"
 if [ "$SIGFILEDIFFS" != "" ]; then
    echo "bitcoin.org and bitcoincore.org signature files were not equal?"
-   clean_up $SIGNATUREFILENAME $SIGNATUREFILENAME.2
+   clean_up "$SIGNATUREFILENAME" "$SIGNATUREFILENAME.2"
    exit 4
 fi
 
-#then we check it
 GPGOUT=$(gpg --yes --decrypt --output "$TMPFILE" "$SIGNATUREFILENAME" 2>&1)
-
-#return value 0: good signature
-#return value 1: bad signature
-#return value 2: gpg error
 
 RET="$?"
 if [ $RET -ne 0 ]; then
    if [ $RET -eq 1 ]; then
-      #and notify the user if it's bad
       echo "Bad signature."
    elif [ $RET -eq 2 ]; then
-      #or if a gpg error has occurred
       echo "gpg error. Do you have the Bitcoin Core binary release signing key installed?"
    fi
 
    echo "gpg output:"
-   echo "$GPGOUT"|sed 's/^/\t/g'
-   clean_up $SIGNATUREFILENAME $SIGNATUREFILENAME.2 $TMPFILE
+   echo -e "\t${GPGOUT}"
+   clean_up "$SIGNATUREFILENAME" "$SIGNATUREFILENAME.2" "$TMPFILE"
    exit "$RET"
 fi
 
 if [ -n "$PLATFORM" ]; then
-   grep $PLATFORM $TMPFILE > "$TMPFILE-plat"
+   grep "$PLATFORM" "$TMPFILE" > "$TMPFILE-plat"
    TMPFILESIZE=$(stat -c%s "$TMPFILE-plat")
-   if [ $TMPFILESIZE -eq 0 ]; then
+   if [ "$TMPFILESIZE" -eq 0 ]; then
       echo "error: no files matched the platform specified" && exit 3
    fi
-   mv "$TMPFILE-plat" $TMPFILE
+   mv "$TMPFILE-plat" "$TMPFILE"
 fi
 
-#here we extract the filenames from the signature file
 FILES=$(awk '{print $2}' "$TMPFILE")
 
-#and download these one by one
 for file in $FILES
 do
    echo "Downloading $file"
    wget --quiet -N "$HOST1$BASEDIR$file"
 done
 
-#check hashes
-DIFF=$(diff <(sha256sum $FILES) "$TMPFILE")
+DIFF=$(diff <(sha256sum "$FILES") "$TMPFILE")
 
 if [ $? -eq 1 ]; then
    echo "Hashes don't match."
@@ -167,10 +150,10 @@ fi
 
 if [ -n "$2" ]; then
    echo "Clean up the binaries"
-   clean_up $FILES $SIGNATUREFILENAME $SIGNATUREFILENAME.2 $TMPFILE
+   clean_up "$FILES" "$SIGNATUREFILENAME" "$SIGNATUREFILENAME.2" "$TMPFILE"
 else
    echo "Keep the binaries in $WORKINGDIR"
-   clean_up $TMPFILE
+   clean_up "$TMPFILE"
 fi
 
 echo -e "Verified hashes of \n$FILES"

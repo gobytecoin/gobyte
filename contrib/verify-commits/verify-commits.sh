@@ -17,7 +17,7 @@ REVSIG_ALLOWED=$(cat "${DIR}/allow-revsig-commits")
 HAVE_GNU_SHA512=1
 [ ! -x "$(which sha512sum)" ] && HAVE_GNU_SHA512=0
 
-if [ x"$1" = "x" ]; then
+if [ "$1" = "" ]; then
 	CURRENT_COMMIT="HEAD"
 else
 	CURRENT_COMMIT="$1"
@@ -29,7 +29,7 @@ if [ "${CURRENT_COMMIT#* }" != "$CURRENT_COMMIT" ]; then
 fi
 
 VERIFY_TREE=0
-if [ x"$2" = "x--tree-checks" ]; then
+if [ "$2" = "--tree-checks" ]; then
 	VERIFY_TREE=1
 fi
 
@@ -38,12 +38,12 @@ PREV_COMMIT=""
 INITIAL_COMMIT="${CURRENT_COMMIT}"
 
 while true; do
-	if [ "$CURRENT_COMMIT" = $VERIFIED_ROOT ]; then
-		echo "There is a valid path from \"$INITIAL_COMMIT\" to $VERIFIED_ROOT where all commits are signed!"
+	if [ "$CURRENT_COMMIT" = "$VERIFIED_ROOT" ]; then
+		echo "There is a valid path from $INITIAL_COMMIT to $VERIFIED_ROOT where all commits are signed!"
 		exit 0
 	fi
 
-	if [ "$CURRENT_COMMIT" = $VERIFIED_SHA512_ROOT ]; then
+	if [ "$CURRENT_COMMIT" = "$VERIFIED_SHA512_ROOT" ]; then
 		if [ "$VERIFY_TREE" = "1" ]; then
 			echo "All Tree-SHA512s matched up to $VERIFIED_SHA512_ROOT" > /dev/stderr
 		fi
@@ -57,7 +57,7 @@ while true; do
 		export BITCOIN_VERIFY_COMMITS_ALLOW_SHA1=1
 	fi
 
-	if [ "${REVSIG_ALLOWED#*$CURRENT_COMMIT}" != "$REVSIG_ALLOWED" ]; then
+	if [ "${REVSIG_ALLOWED#*"$CURRENT_COMMIT"}" != "$REVSIG_ALLOWED" ]; then
 		export BITCOIN_VERIFY_COMMITS_ALLOW_REVSIG=1
 	else
 		export BITCOIN_VERIFY_COMMITS_ALLOW_REVSIG=0
@@ -67,9 +67,9 @@ while true; do
 		if [ "$PREV_COMMIT" != "" ]; then
 			echo "No parent of $PREV_COMMIT was signed with a trusted key!" > /dev/stderr
 			echo "Parents are:" > /dev/stderr
-			PARENTS=$(git show -s --format=format:%P $PREV_COMMIT)
+			PARENTS=$(git show -s --format=format:%P "$PREV_COMMIT")
 			for PARENT in $PARENTS; do
-				git show -s $PARENT > /dev/stderr
+				git show -s "$PARENT" > /dev/stderr
 			done
 		else
 			echo "$CURRENT_COMMIT was not signed with a trusted key!" > /dev/stderr
@@ -77,8 +77,7 @@ while true; do
 		exit 1
 	fi
 
-	# We always verify the top of the tree
-	if [ "$VERIFY_TREE" = 1 -o "$PREV_COMMIT" = "" ]; then
+	if [ "$VERIFY_TREE" = 1 ] || [ "$PREV_COMMIT" = "" ]; then
 		IFS_CACHE="$IFS"
 		IFS='
 '
@@ -96,9 +95,9 @@ while true; do
 		FILE_HASHES=""
 		for FILE in $(git ls-tree --full-tree -r --name-only "$CURRENT_COMMIT" | LC_ALL=C sort); do
 			if [ "$HAVE_GNU_SHA512" = 1 ]; then
-				HASH=$(git cat-file blob "$CURRENT_COMMIT":"$FILE" | sha512sum | { read FIRST _; echo $FIRST; } )
+				HASH=$(git cat-file blob "$CURRENT_COMMIT":"$FILE" | sha512sum | { read -r FIRST _; echo "$FIRST"; } )
 			else
-				HASH=$(git cat-file blob "$CURRENT_COMMIT":"$FILE" | shasum -a 512 | { read FIRST _; echo $FIRST; } )
+				HASH=$(git cat-file blob "$CURRENT_COMMIT":"$FILE" | shasum -a 512 | { read -r FIRST _; echo "$FIRST"; } )
 			fi
 			[ "$FILE_HASHES" != "" ] && FILE_HASHES="$FILE_HASHES"'
 '
