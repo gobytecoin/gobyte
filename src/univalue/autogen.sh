@@ -1,4 +1,7 @@
 #!/bin/sh
+
+export LC_ALL=C
+
 set -e
 srcdir="$(dirname $0)"
 cd "$srcdir"
