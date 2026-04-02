@@ -24,7 +24,7 @@ std::atomic<bool> fReopenDebugLog(false);
 /** Log categories bitfield. */
 std::atomic<uint64_t> logCategories(0);
 /**
- * LogPrintf() has been broken a couple of times now
+ * LogPrintf () has been broken a couple of times now
  * by well-meaning people adding mutexes in the most straightforward way.
  * It breaks because it may be called by global destructors during shutdown.
  * Since the order of destruction of static/global objects is undefined,

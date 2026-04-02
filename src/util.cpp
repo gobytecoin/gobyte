@@ -703,7 +703,7 @@ const fs::path& GetBlocksDir(bool fNetSpecific)
 
     fs::path& path = fNetSpecific ? g_blocks_path_cache_net_specific : g_blocks_path_cached;
 
-    // This can be called during exceptions by LogPrintf(), so we cache the
+    // This can be called during exceptions by LogPrintf (), so we cache the
     // value so we don't have to do memory allocations after that.
     if (!path.empty())
         return path;
@@ -731,7 +731,7 @@ const fs::path& GetDataDir(bool fNetSpecific)
 
     fs::path& path = fNetSpecific ? pathCachedNetSpecific : pathCached;
 
-    // This can be called during exceptions by LogPrintf(), so we cache the
+    // This can be called during exceptions by LogPrintf (), so we cache the
     // value so we don't have to do memory allocations after that.
     if (!path.empty())
         return path;
