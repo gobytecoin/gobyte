@@ -3,8 +3,8 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#ifndef __UNIVALUE_H__
-#define __UNIVALUE_H__
+#ifndef BITCOIN_UNIVALUE_INCLUDE_UNIVALUE_H
+#define BITCOIN_UNIVALUE_INCLUDE_UNIVALUE_H
 
 #include <stdint.h>
 #include <string.h>
@@ -303,4 +303,4 @@ extern const UniValue NullUniValue;
 
 const UniValue& find_value( const UniValue& obj, const std::string& name);
 
-#endif // __UNIVALUE_H__
+#endif // BITCOIN_UNIVALUE_INCLUDE_UNIVALUE_H

@@ -18,8 +18,8 @@
  *********************************************************/
 
 
-#ifndef __ctpl_thread_pool_H__
-#define __ctpl_thread_pool_H__
+#ifndef BITCOIN_CTPL_H
+#define BITCOIN_CTPL_H
 
 #include <functional>
 #include <thread>
@@ -236,5 +236,5 @@ namespace ctpl {
 
 }
 
-#endif // __ctpl_thread_pool_H__
+#endif // BITCOIN_CTPL_H
 

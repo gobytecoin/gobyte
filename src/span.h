@@ -37,4 +37,4 @@ public:
 template<typename V>
 constexpr Span<typename std::remove_pointer<decltype(std::declval<V>().data())>::type> MakeSpan(V& v) { return Span<typename std::remove_pointer<decltype(std::declval<V>().data())>::type>(v.data(), v.size()); }
 
-#endif
+#endif // BITCOIN_SPAN_H

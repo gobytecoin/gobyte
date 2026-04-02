@@ -33,4 +33,4 @@ UniValue mempoolToJSON(bool fVerbose = false);
 /** Block header to JSON */
 UniValue blockheaderToJSON(const CBlockIndex* blockindex);
 
-#endif
+#endif // BITCOIN_RPC_BLOCKCHAIN_H
