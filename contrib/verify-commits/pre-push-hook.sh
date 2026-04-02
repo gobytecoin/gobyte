@@ -8,6 +8,7 @@ if ! [[ "$2" =~ ^(git@)?(www.)?github.com(:|/)gobytecoin/gobyte(.git)?$ ]]; then
     exit 0
 fi
 
+# shellcheck disable=SC2034
 while read -r local_ref local_oid remote_ref remote_oid; do
     if [ "$remote_ref" != "refs/heads/master" ]; then
         continue
