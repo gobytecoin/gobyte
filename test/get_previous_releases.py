@@ -25,12 +25,12 @@ SHA256_SUMS = {
     "2375d00eb6cb422ca7fbff3fa833150df55457d45913a1f225f57087fd85933c": {"tag": "v0.16.2.2", "tarball": "gobyte-0.16.2.2-win64.zip"},
     "519b271482f2526172ac3d3249fbc7c0ae311ec478e918a35e2bb6ea4cf67e5b": {"tag": "v0.16.2.2", "tarball": "gobyte-0.16.2.2-x86_64-linux-gnu.tar.xz"},
     #
-    "4735be7e362058a2ef2a80e7cc3511766b8f40133a6af6f185974ddee6e5e66b": {"tag": "v0.16.2.1", "tarball": "gobytecore-0.16.2-aarch64-linux-gnu.tar.gz"},
-    "d5decf9539f31a2c3af8c3d20a832858981d0be3a66648c2ece0c4ff6d27a139": {"tag": "v0.16.2.1", "tarball": "gobytecore-0.16.2-arm-linux-gnueabihf.tar.gz"},
-    "dd907af326b0cfe604adae1ee82274a03b528f81a7e507da7a71c407ea44ca3b": {"tag": "v0.16.2.1", "tarball": "gobytecore-0.16.2-osx-unsigned.dmg"},
-    "78ab9e3eccdd732d01f1455481338928068511af9d9e8ffa13fd93338fe6d19b": {"tag": "v0.16.2.1", "tarball": "gobytecore-0.16.2-osx64.tar.gz"},
-    "3d957ba9db141e0274b2889d4094014ebdf237a4776a56b1b9ac707e4a46a76a": {"tag": "v0.16.2.1", "tarball": "gobytecore-0.16.2-win64.zip"},
-    "acb1cf006a5a575598a6ee64c7a50ef342bb1c8d9f92c76cc6387eb6e0cc0f1a": {"tag": "v0.16.2.1", "tarball": "gobytecore-0.16.2-x86_64-linux-gnu.tar.gz"},
+    "4735be7e362058a2ef2a80e7cc3511766b8f40133a6af6f185974ddee6e5e66b": {"tag": "v0.16.2.1", "tarball": "gobytecore-0.16.2.1-aarch64-linux-gnu.tar.gz"},
+    "d5decf9539f31a2c3af8c3d20a832858981d0be3a66648c2ece0c4ff6d27a139": {"tag": "v0.16.2.1", "tarball": "gobytecore-0.16.2.1-arm-linux-gnueabihf.tar.gz"},
+    "dd907af326b0cfe604adae1ee82274a03b528f81a7e507da7a71c407ea44ca3b": {"tag": "v0.16.2.1", "tarball": "gobytecore-0.16.2.1-osx-unsigned.dmg"},
+    "78ab9e3eccdd732d01f1455481338928068511af9d9e8ffa13fd93338fe6d19b": {"tag": "v0.16.2.1", "tarball": "gobytecore-0.16.2.1-osx64.tar.gz"},
+    "3d957ba9db141e0274b2889d4094014ebdf237a4776a56b1b9ac707e4a46a76a": {"tag": "v0.16.2.1", "tarball": "gobytecore-0.16.2.1-win64.zip"},
+    "acb1cf006a5a575598a6ee64c7a50ef342bb1c8d9f92c76cc6387eb6e0cc0f1a": {"tag": "v0.16.2.1", "tarball": "gobytecore-0.16.2.1-x86_64-linux-gnu.tar.gz"},
 }
 
 
