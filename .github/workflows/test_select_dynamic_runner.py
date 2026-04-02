@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import importlib.util
 import pathlib
 import unittest
@@ -12,7 +13,7 @@ SPEC.loader.exec_module(MODULE)
 
 class SelectDynamicRunnerTest(unittest.TestCase):
     def test_count_queued_jobs_deduplicates_runs_across_status_queries(self):
-        repo = "d0wn3d/gobyte"
+        repo = "gobytecoin/gobyte"
         queued_url = (
             "https://api.github.com/repos/{}/actions/runs?status=queued&per_page=100"
         ).format(repo)
@@ -51,7 +52,7 @@ class SelectDynamicRunnerTest(unittest.TestCase):
             runner_amd64_var="blacksmith-amd64",
             runner_arm64_var="blacksmith-arm64",
             fetch_json=lambda _url: ({"workflow_runs": []}, {}),
-            repos=["d0wn3d/gobyte"],
+            repos=["gobytecoin/gobyte"],
         )
 
         self.assertEqual(outputs["use_blacksmith"], "true")
@@ -60,7 +61,7 @@ class SelectDynamicRunnerTest(unittest.TestCase):
         self.assertIn("label:blacksmith-ci", outputs["decision_reason"])
 
     def test_backlog_threshold_selects_blacksmith(self):
-        repo = "d0wn3d/gobyte"
+        repo = "gobytecoin/gobyte"
         queued_url = (
             "https://api.github.com/repos/{}/actions/runs?status=queued&per_page=100"
         ).format(repo)
@@ -102,7 +103,7 @@ class SelectDynamicRunnerTest(unittest.TestCase):
             runner_amd64_var="blacksmith-amd64",
             runner_arm64_var="blacksmith-arm64",
             fetch_json=fetch_json,
-            repos=["d0wn3d/gobyte"],
+            repos=["gobytecoin/gobyte"],
         )
 
         self.assertEqual(outputs["use_blacksmith"], "false")
@@ -119,7 +120,7 @@ class SelectDynamicRunnerTest(unittest.TestCase):
             runner_amd64_var="",
             runner_arm64_var="blacksmith-arm64",
             fetch_json=lambda _url: ({"workflow_runs": []}, {}),
-            repos=["d0wn3d/gobyte"],
+            repos=["gobytecoin/gobyte"],
         )
 
         self.assertEqual(outputs["runner_amd64"], MODULE.DEFAULT_RUNNER_AMD64)

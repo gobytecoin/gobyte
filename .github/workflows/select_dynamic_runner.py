@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 # Copyright (c) 2026 The Dash Core developers
 # Copyright (c) 2026 The GoByte Core developers
 # Distributed under the MIT software license, see the accompanying
@@ -14,10 +15,10 @@ from typing import Callable, Dict, Iterable, List, Optional, Sequence, Tuple
 
 
 DEFAULT_REPOS = (
-    "d0wn3d/gobyte",
-    "d0wn3d/platform",
-    "d0wn3d/grovedb",
-    "d0wn3d/rust-gobytecore",
+    "gobytecoin/gobyte",
+    "gobytecoin/platform",
+    "gobytecoin/grovedb",
+    "gobytecoin/rust-gobytecore",
 )
 DEFAULT_STATUSES = ("queued", "in_progress")
 DEFAULT_RUNNER_AMD64 = "ubuntu-24.04"

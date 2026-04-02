@@ -34,7 +34,7 @@ except ImportError:
 
 def get_pr_json(pr_num):
     # Get repository from environment or default to gobytecoin/gobyte
-    repo = os.environ.get('GITHUB_REPOSITORY', 'd0wn3d/gobyte')
+    repo = os.environ.get('GITHUB_REPOSITORY', 'gobytecoin/gobyte')
 
     try:
         response = requests.get(f'https://api.github.com/repos/{repo}/pulls/{pr_num}')
@@ -138,7 +138,7 @@ def main():
             continue
 
         # Get repository from environment
-        repo = os.environ.get('GITHUB_REPOSITORY', 'd0wn3d/gobyte')
+        repo = os.environ.get('GITHUB_REPOSITORY', 'gobytecoin/gobyte')
         merge_check_url = f'https://github.com/{repo}/branches/pre_mergeable/{our_pr_label}...{conflict_pr_label}'
 
         try:
