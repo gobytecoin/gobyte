@@ -8,14 +8,15 @@ $(package)_dependencies=openssl zlib
 $(package)_linux_dependencies=freetype fontconfig libxcb
 $(package)_build_subdir=qtbase
 $(package)_qt_libs=corelib network widgets gui plugins testlib
-$(package)_patches=fix_qt_pkgconfig.patch mac-qmake.conf fix_configure_mac.patch fix_no_printer.patch fix_rcc_determinism.patch xkb-default.patch no-xlib.patch fix_qt_configure.patch fix_qt_gcc13_compat.patch fix_qt_mingw_touchinput.patch
+$(package)_patches=fix_qt_pkgconfig.patch mac-qmake.conf fix_configure_mac.patch fix_no_printer.patch fix_rcc_determinism.patch xkb-default.patch no-xlib.patch fix_qt_gcc13_compat.patch fix_qt_mingw_touchinput.patch
 
 # fix_qt_configure.patch targets a macOS/Xcode-only block in qtbase/configure
-# (xcrun + CLANGVERSION detection). That block does not exist in the Linux or
-# MinGW configure script, so patch(1) fails with a context mismatch on those
-# hosts. Apply it only when the build target is darwin.
+# (xcrun + CLANGVERSION detection). Replacing the patch file with a targeted
+# sed avoids line-number drift caused by preceding patches shifting the file.
+# The sed is idempotent: if the fix is already present it silently does nothing.
+# Restrict to darwin: the CLANGVERSION block is macOS-only.
 ifeq ($(host_os),darwin)
-$(package)_patch_qt_configure=patch -p1 -i $($(package)_patch_dir)/fix_qt_configure.patch &&
+$(package)_patch_qt_configure=sed -i.old '/CLANGVERSION/s/\\([0-9]\\)/\\([0-9]*\\)/' qtbase/configure &&
 endif
 
 # qwindowsmousehandler.cpp (Qt 5.9.6) declares tagTOUCHINPUT / TOUCHINPUT
