@@ -166,4 +166,4 @@ struct TestMemPoolEntryHelper {
 
 CBlock getBlock13b8a();
 
-#endif
+#endif // BITCOIN_TEST_TEST_GOBYTE_H
