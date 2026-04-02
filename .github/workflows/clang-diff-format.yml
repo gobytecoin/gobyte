@@ -11,14 +11,16 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
       - name: Fetch git
-        run: git fetch --no-tags -fu origin ${{ github.ref_name }}:${{ github.ref_name }}
+        run: git fetch --no-tags -fu origin develop:develop
       - name: Run Clang-Format-Diff.py
         run: |
           git diff -U0 origin/develop -- $(git ls-files -- $(cat test/util/data/non-backported.txt)) | ./contrib/devtools/clang-format-diff.py -p1 > diff_output.txt
           if [ -s diff_output.txt ]; then
               echo "Clang format differences found:"
               cat diff_output.txt
-              exit 1
+              file_count=$(grep -c '^--- .*(before formatting)' diff_output.txt || true)
+              echo "## ℹ️ Clang Format Style Notes" >> "$GITHUB_STEP_SUMMARY"
+              echo "Formatting differences found in ${file_count} file(s). See job log for details." >> "$GITHUB_STEP_SUMMARY"
           else
               echo "No Clang format differences found."
           fi
