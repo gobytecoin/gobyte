@@ -195,7 +195,7 @@ public:
             READWRITE(strVersion);
         }
         // we don't serialize pubkey ids because pubkeys should be
-        // hardcoded or be setted with cmdline or options, should
+        // hardcoded or be set with cmdline or options, should
         // not reuse pubkeys from previous gobyted run
         LOCK(cs);
         READWRITE(mapSporksByHash);
@@ -287,7 +287,7 @@ public:
      * a spork to be considered active.
      *
      * This value must be at least a majority of the total number of spork
-     * keys, and for obvious resons cannot be larger than that number.
+     * keys, and for obvious reasons cannot be larger than that number.
      */
     bool SetMinSporkKeys(int minSporkKeys);
 

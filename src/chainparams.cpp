@@ -812,7 +812,7 @@ public:
         // By default assume that the signatures in ancestors of this block are valid.
         consensus.defaultAssumeValid = uint256S("0x000000000000000000000000000000000000000000000000000000000000000");
 
-        // FIXME: For some reason DevNet doesnt work with 0.16.x pchMessage and Genesis/Merkle -- So we use TestNet data on DevNet
+        // FIXME: For some reason DevNet doesn't work with 0.16.x pchMessage and Genesis/Merkle -- So we use TestNet data on DevNet
         pchMessageStart[0] = 0xd1;
         pchMessageStart[1] = 0x2b;
         pchMessageStart[2] = 0xb3;

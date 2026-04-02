@@ -1379,7 +1379,7 @@ void InitScriptExecutionCache()
  * which are matched. This is useful for checking blocks where we will likely never need the cache
  * entry again.
  *
- * Non-static (and re-declared) in src/test/txvalidationcache_tests.cpp
+ * Non-static (and redeclared) in src/test/txvalidationcache_tests.cpp
  */
 bool CheckInputs(const CTransaction& tx, CValidationState& state, const CCoinsViewCache& inputs, bool fScriptChecks, unsigned int flags, bool cacheSigStore, bool cacheFullScriptStore, PrecomputedTransactionData& txdata, std::vector<CScriptCheck>* pvChecks)
 {
@@ -2853,7 +2853,7 @@ CBlockIndex* CChainState::FindMostWorkChain()
                     if (fFailedChain) {
                         pindexFailed->nStatus |= BLOCK_FAILED_CHILD;
                     } else if (fConflictingChain) {
-                        // We don't need data for conflciting blocks
+                        // We don't need data for conflicting blocks
                         pindexFailed->nStatus |= BLOCK_CONFLICT_CHAINLOCK;
                     } else if (fMissingData) {
                         // If we're missing data, then add back to mapBlocksUnlinked,
@@ -3360,7 +3360,7 @@ bool ResetBlockFailureFlags(CBlockIndex* pindex)
 
 CBlockIndex* CChainState::AddToBlockIndex(const CBlockHeader& block, enum BlockStatus nStatus)
 {
-    assert(!(nStatus & BLOCK_FAILED_MASK)); // no failed blocks alowed
+    assert(!(nStatus & BLOCK_FAILED_MASK)); // no failed blocks allowed
     AssertLockHeld(cs_main);
 
     // Check for duplicate
@@ -4954,7 +4954,7 @@ void CChainState::CheckBlockIndex(const Consensus::Params& consensusParams)
             assert((pindex->nStatus & BLOCK_FAILED_MASK) == 0); // The failed mask cannot be set for blocks without invalid parents.
         }
         if (pindexFirstConflicing == nullptr) {
-            // Checks for not-conflciting blocks.
+            // Checks for not-conflicting blocks.
             assert((pindex->nStatus & BLOCK_CONFLICT_CHAINLOCK) == 0); // The conflicting mask cannot be set for blocks without conflicting parents.
         }
         if (!CBlockIndexWorkComparator()(pindex, chainActive.Tip()) && pindexFirstNeverProcessed == nullptr) {

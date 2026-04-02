@@ -593,7 +593,7 @@ void PaymentServer::fetchPaymentACK(WalletModel* walletModel, const SendCoinsRec
     payment.set_merchant_data(details.merchant_data());
     payment.add_transactions(transaction.data(), transaction.size());
 
-    // Create a new refund address, or re-use:
+    // Create a new refund address, or reuse:
     CPubKey newKey;
     if (walletModel->wallet().getKeyFromPool(false /* internal */, newKey)) {
         // BIP70 requests encode the scriptPubKey directly, so we are not restricted to address
