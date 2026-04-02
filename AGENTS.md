@@ -91,10 +91,20 @@ test/functional/test_runner.py -j$(nproc)  # Parallel execution
 
 ### Linting
 ```bash
-test/lint/lint-all.sh             # Run all lint checks
-test/lint/lint-whitespace.sh     # Whitespace checks
-contrib/devtools/clang-format-diff.py   # Check formatting
-test/lint/check-rpc-mappings.py  # RPC consistency
+test/lint/all-lint.py            # Run all Python lint checks
+test/lint/lint-whitespace.py     # Check for trailing whitespace and tabs
+test/lint/lint-includes.py       # Check for duplicate includes, Boost deps, bracket syntax
+test/lint/lint-include-guards.py # Verify include guards are present
+test/lint/lint-format-strings.py # Check format string consistency
+test/lint/lint-logs.py           # Ensure logs are terminated with \n
+test/lint/lint-assertions.py     # Check for proper assertion usage in RPC
+test/lint/lint-circular-dependencies.sh  # Detect circular dependencies
+test/lint/lint-filenames.sh      # Verify filename conventions
+test/lint/lint-python.py        # Python flake8 and mypy checks
+test/lint/lint-shell.py         # Shell script linting with shellcheck
+test/lint/lint-shell-locale.py  # Verify LC_ALL=C in shell scripts
+test/lint/check-rpc-mappings.py # Validate RPC argument consistency
+contrib/devtools/clang-format-diff.py   # Check C++ formatting
 ```
 
 ## C++ Code Style
