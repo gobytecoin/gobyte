@@ -1792,7 +1792,7 @@ UniValue listtransactions(const JSONRPCRequest& request)
                                     "                                         'send' category of transactions.\n"
                                     "    \"confirmations\": n,       (numeric) The number of blockchain confirmations for the transaction. Available for 'send' and \n"
                                     "                                         'receive' category of transactions. Negative confirmations indicate the\n"
-                                    "                                         transation conflicts with the block chain\n"
+                                    "                                         transaction conflicts with the block chain\n"
                                     "    \"instantlock\" : true|false, (bool) Current transaction lock state. Available for 'send' and 'receive' category of transactions\n"
                                     "    \"instantlock_internal\" : true|false, (bool) Current internal transaction lock state. Available for 'send' and 'receive' category of transactions\n"
                                     "    \"chainlock\" : true|false, (bool) The state of the corresponding block chainlock\n"
@@ -1847,7 +1847,7 @@ UniValue listtransactions(const JSONRPCRequest& request)
                                     "                                         'send' category of transactions.\n"
                                     "    \"confirmations\": n,       (numeric) The number of blockchain confirmations for the transaction. Available for 'send' and \n"
                                     "                                         'receive' category of transactions. Negative confirmations indicate the\n"
-                                    "                                         transation conflicts with the block chain\n"
+                                    "                                         transaction conflicts with the block chain\n"
                                     "    \"instantlock\" : true|false, (bool) Current transaction lock state. Available for 'send' and 'receive' category of transactions\n"
                                     "    \"instantlock_internal\" : true|false, (bool) Current internal transaction lock state. Available for 'send' and 'receive' category of transactions\n"
                                     "    \"chainlock\" : true|false, (bool) The state of the corresponding block chainlock\n"
@@ -2468,9 +2468,9 @@ UniValue walletpassphrase(const JSONRPCRequest& request)
         fForMixingOnly = request.params[2].get_bool();
 
     if (fForMixingOnly && !pwallet->IsLocked()) {
-        // Downgrading from "fuly unlocked" mode to "mixing only" one is not supported.
+        // Downgrading from "fully unlocked" mode to "mixing only" one is not supported.
         // Updating unlock time when current unlock mode is not changed or when it is upgraded
-        // from "mixing only" to "fuly unlocked" is ok.
+        // from "mixing only" to "fully unlocked" is ok.
         throw JSONRPCError(RPC_WALLET_ALREADY_UNLOCKED, "Error: Wallet is already fully unlocked.");
     }
 

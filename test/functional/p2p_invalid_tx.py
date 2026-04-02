@@ -112,7 +112,7 @@ class InvalidTxRequestTest(BitcoinTestFramework):
     def test_orphan_tx_handling(self, base_tx, resolve_via_block):
         node = self.nodes[0]  # convenience reference to the node
 
-        # Create a root transaction that we withold until all dependend transactions
+        # Create a root transaction that we withhold until all dependent transactions
         # are sent out and in the orphan cache
         tx_withhold = CTransaction()
         tx_withhold.vin.append(CTxIn(outpoint=COutPoint(base_tx, 0)))

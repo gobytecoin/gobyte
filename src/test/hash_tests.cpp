@@ -129,7 +129,7 @@ BOOST_AUTO_TEST_CASE(siphash)
     ss << tx;
 
     // Check consistency between CSipHasher and SipHashUint256[Extra].
-    // TODO reenable when backporting Bitcoin #10321
+    // TODO re-enable when backporting Bitcoin #10321
     /*FastRandomContext ctx;
     for (int i = 0; i < 16; ++i) {
         uint64_t k1 = ctx.rand64();

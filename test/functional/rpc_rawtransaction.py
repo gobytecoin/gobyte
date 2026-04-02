@@ -314,8 +314,8 @@ class RawTransactionsTest(BitcoinTestFramework):
         # 5. valid parameters - supply txid and True for non-verbose
         assert_equal(self.nodes[0].getrawtransaction(txHash, True)["hex"], rawTxSigned['hex'])
 
-        # 6. invalid parameters - supply txid and string "Flase"
-        assert_raises_rpc_error(-1, "not a boolean", self.nodes[0].getrawtransaction, txHash, "Flase")
+        # 6. invalid parameters - supply txid and string "notboolean"
+        assert_raises_rpc_error(-1, "not a boolean", self.nodes[0].getrawtransaction, txHash, "notboolean")
 
         # 7. invalid parameters - supply txid and empty array
         assert_raises_rpc_error(-1, "not a boolean", self.nodes[0].getrawtransaction, txHash, [])

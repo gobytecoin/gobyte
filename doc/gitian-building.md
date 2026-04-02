@@ -343,7 +343,7 @@ There will be a lot of warnings printed during the build of the image. These can
 **Note**: if you get the error message *"bin/make-base-vm: mkfs.ext4: not found"* during this process you have to make the following change in file *"gitian-builder/bin/make-base-vm"* at line 117:
 ```bash
 # mkfs.ext4 -F $OUT-lxc
-/sbin/mkfs.ext4 -F $OUT-lxc # (some Gitian environents do NOT find mkfs.ext4. Some do...)
+/sbin/mkfs.ext4 -F $OUT-lxc # (some Gitian environments do NOT find mkfs.ext4. Some do...)
 ```
 
 Getting and building the inputs

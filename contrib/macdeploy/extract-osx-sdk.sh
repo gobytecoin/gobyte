@@ -13,8 +13,8 @@ SDKDIR="Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/Ma
 7z x "${INPUTFILE}" "${HFSFILENAME}"
 SDKNAME="$(basename "${SDKDIR}")"
 SDKDIRINODE=$(ifind -n "${SDKDIR}" "${HFSFILENAME}")
-fls "${HFSFILENAME}" -rpF ${SDKDIRINODE} |
- while read type inode filename; do
+fls "${HFSFILENAME}" -rpF "${SDKDIRINODE}" |
+ while read -r type inode filename; do
 	inode="${inode::-1}"
 	if [ "${filename:0:14}" = "usr/share/man/" ]; then
 		continue
@@ -23,9 +23,9 @@ fls "${HFSFILENAME}" -rpF ${SDKDIRINODE} |
 	echo "Extracting $filename ..."
 	mkdir -p "$(dirname "$filename")"
 	if [ "$type" = "l/l" ]; then
-		ln -s "$(icat "${HFSFILENAME}" $inode)" "$filename"
+		ln -s "$(icat "${HFSFILENAME}" "$inode")" "$filename"
 	else
-		icat "${HFSFILENAME}" $inode >"$filename"
+		icat "${HFSFILENAME}" "$inode" >"$filename"
 	fi
 done
 echo "Building ${SDKNAME}.tar.gz ..."

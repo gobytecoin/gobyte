@@ -787,12 +787,12 @@ UniValue protx_revoke(const JSONRPCRequest& request)
             throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, std::string("Invalid GoByte address: ") + request.params[4].get_str());
         FundSpecialTx(pwallet, tx, ptx, feeSourceDest);
     } else if (dmn->pdmnState->scriptOperatorPayout != CScript()) {
-        // Using funds from previousely specified operator payout address
+        // Using funds from previously specified operator payout address
         CTxDestination txDest;
         ExtractDestination(dmn->pdmnState->scriptOperatorPayout, txDest);
         FundSpecialTx(pwallet, tx, ptx, txDest);
     } else if (dmn->pdmnState->scriptPayout != CScript()) {
-        // Using funds from previousely specified masternode payout address
+        // Using funds from previously specified masternode payout address
         CTxDestination txDest;
         ExtractDestination(dmn->pdmnState->scriptPayout, txDest);
         FundSpecialTx(pwallet, tx, ptx, txDest);
@@ -817,11 +817,11 @@ void protx_list_help()
         "If \"height\" is not specified, it defaults to the current chain-tip.\n"
         "\nAvailable types:\n"
         "  registered   - List all ProTx which are registered at the given chain height.\n"
-        "                 This will also include ProTx which failed PoSe verfication.\n"
+        "                 This will also include ProTx which failed PoSe verification.\n"
         "  valid        - List only ProTx which are active/valid at the given chain height.\n"
 #ifdef ENABLE_WALLET
         "  wallet       - List only ProTx which are found in your wallet at the given chain height.\n"
-        "                 This will also include ProTx which failed PoSe verfication.\n"
+        "                 This will also include ProTx which failed PoSe verification.\n"
 #endif
     );
 }

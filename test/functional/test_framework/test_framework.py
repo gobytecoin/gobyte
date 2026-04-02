@@ -123,7 +123,7 @@ class BitcoinTestFramework():
         parser.add_option("--gobyted-arg", dest="gobyted_extra_args", default=[], type='string', action='append',
                           help="Pass extra args to all gobyted instances")
         parser.add_option("--timeoutscale", dest="timeout_scale", default=1, type='int' ,
-                          help="Scale the test timeouts by multiplying them with the here provided value (defaul: 1)")
+                          help="Scale the test timeouts by multiplying them with the here provided value (default: 1)")
         self.add_options(parser)
         (self.options, self.args) = parser.parse_args()
 
@@ -1058,7 +1058,7 @@ class GoByteTestFramework(BitcoinTestFramework):
         assert_equal(q, new_quorum)
         quorum_info = self.nodes[0].quorum("info", 100, new_quorum)
 
-        # Mine 8 (SIGN_HEIGHT_OFFSET) more blocks to make sure that the new quorum gets eligable for signing sessions
+        # Mine 8 (SIGN_HEIGHT_OFFSET) more blocks to make sure that the new quorum gets eligible for signing sessions
         self.nodes[0].generate(8)
 
         sync_blocks(nodes)

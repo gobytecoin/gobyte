@@ -446,7 +446,7 @@
           <string>Accept connections from outside.</string>
          </property>
          <property name="text">
-          <string>Allow incomin&amp;g connections</string>
+          <string>Allow incoming &amp;connections</string>
          </property>
         </widget>
        </item>

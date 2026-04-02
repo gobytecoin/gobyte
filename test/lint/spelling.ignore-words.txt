@@ -26,3 +26,13 @@ unser
 useable
 warmup
 wit
+xwindows
+hashIn
+viewIn
+outIn
+scriptIn
+amountIn
+indexIn
+bitIn
+nNumber
+scriptin

@@ -1749,7 +1749,7 @@ void static ProcessGetData(CNode* pfrom, const CChainParams& chainparams, CConnm
         // of transactions relevant to them, without having to download the
         // entire memory pool.
         // Also, other nodes can use these messages to automatically request a
-        // transaction from some other peer that annnounced it, and stop
+        // transaction from some other peer that announced it, and stop
         // waiting for us to respond.
         // In normal operation, we often send NOTFOUND messages for parents of
         // transactions that we relay; if a peer is missing a parent, they may
@@ -2981,7 +2981,7 @@ bool static ProcessMessage(CNode* pfrom, const std::string& strCommand, CDataStr
 
         // When we succeed in decoding a block's txids from a cmpctblock
         // message we typically jump to the BLOCKTXN handling code, with a
-        // dummy (empty) BLOCKTXN message, to re-use the logic there in
+        // dummy (empty) BLOCKTXN message, to reuse the logic there in
         // completing processing of the putative block (without cs_main).
         bool fProcessBLOCKTXN = false;
         CDataStream blockTxnMsg(SER_NETWORK, PROTOCOL_VERSION);

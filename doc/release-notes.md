@@ -125,7 +125,7 @@ performed.
 Users can now load and unload wallets dynamically via RPC and GUI console.
 It's now possible to have multiple wallets loaded at the same time, however only
 one of them is going to be active and receive updates or be used for sending
-trasactions at a specific point in time.
+transactions at a specific point in time.
 
 Also, enabling wallet encryption no longer requires a wallet restart.
 
