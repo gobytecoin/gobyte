@@ -1,11 +1,10 @@
---- Makefile
-+++ Makefile
-@@ -272,7 +272,7 @@
- 
+--- a/Makefile
++++ b/Makefile
+@@ -272,8 +272,4 @@
+
  $(LIBRARY):	$(LIBOBJS)
- ifneq (, $(findstring darwin, $(OS)))
+-ifneq (, $(findstring darwin, $(OS)))
 -	$(LIBTOOL) -static -o $@ $?
-+	$(AR) crs $@ $?
- else
+-else
  	$(AR) crs $@ $?
- endif
+-endif
