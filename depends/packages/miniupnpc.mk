@@ -3,6 +3,7 @@ $(package)_version=2.0.20180203
 $(package)_download_path=https://miniupnp.tuxfamily.org/files
 $(package)_file_name=$(package)-$($(package)_version).tar.gz
 $(package)_sha256_hash=90dda8c7563ca6cd4a83e23b3c66dbbea89603a1675bfdb852897c2c9cc220b7
+$(package)_patches=Makefile-darwin-archive-fix.patch
 
 define $(package)_set_vars
 $(package)_build_opts=CC="$($(package)_cc)"
