@@ -1,10 +1,10 @@
 package=bls-gobyte
-$(package)_version=1.0.1
+$(package)_version=1.1.0
 $(package)_download_path=https://github.com/d0wn3d/bls-signatures/archive/refs/tags
 $(package)_download_file=$($(package)_version).tar.gz
 $(package)_file_name=$(package)-$($(package)_download_file)
 $(package)_build_subdir=build
-$(package)_sha256_hash=c1e10faadc9a4b39e36ddbcf595cb29251879922890bbd141d5507daf68ee89e
+$(package)_sha256_hash=30209153a05dffff3f358b5e6ae08baad33966d5f302716518311fba80f36bb1
 $(package)_dependencies=gmp cmake
 
 $(package)_relic_version=3a23142be0a5510a3aa93cd6c76fc59d3fc732a5
