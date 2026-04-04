@@ -53,10 +53,10 @@ private:
     void WriteInstantSendLockMined(CDBBatch& batch, const uint256& hash, int nHeight);
     void RemoveInstantSendLockMined(CDBBatch& batch, const uint256& hash, int nHeight);
 
-    void Upgrade();
-
 public:
     explicit CInstantSendDb(CDBWrapper& _db);
+
+    void Upgrade();
 
     void WriteNewInstantSendLock(const uint256& hash, const CInstantSendLock& islock);
     void RemoveInstantSendLock(CDBBatch& batch, const uint256& hash, CInstantSendLockPtr islock, bool keep_cache = true);
@@ -84,6 +84,8 @@ class CInstantSendManager : public CRecoveredSigsListener
 private:
     mutable CCriticalSection cs;
     CInstantSendDb db;
+
+    std::atomic<bool> fUpgradedDB{false};
 
     std::thread workThread;
     CThreadInterrupt workInterrupt;
