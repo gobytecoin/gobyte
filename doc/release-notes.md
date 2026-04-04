@@ -1,4 +1,4 @@
-GoByte Core version 0.17.0.2
+GoByte Core version 0.17.0.3
 ==========================
 
 Release is now available from:
@@ -43,7 +43,7 @@ Downgrading to a version older than 0.14.0.3 is no longer supported due to
 changes in the "evodb" database format. If you need to use an older version,
 you must either reindex or re-sync the whole chain.
 
-### Downgrade of masternodes to < 0.17.0.2
+### Downgrade of masternodes to < 0.17.0.3
 
 Starting with the 0.16 release, masternodes verify the protocol version of other
 masternodes. This results in PoSe punishment/banning for outdated masternodes,
@@ -264,10 +264,10 @@ Miscellaneous
 -------------
 A lot of refactoring, code cleanups and other small fixes were done in this release.
 
-0.17.0.2 Change log
+0.17.0.3 Change log
 ===================
 
-See detailed [set of changes](https://github.com/gobytecoin/gobyte/compare/v0.16.2.2...v0.17.0.2).
+See detailed [set of changes](https://github.com/gobytecoin/gobyte/compare/v0.16.2.2...v0.17.0.3).
 
 Credits
 =======
