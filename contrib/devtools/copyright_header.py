@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # Copyright (c) 2016 The Bitcoin Core developers
-# Copyright (c) 2019 The GoByte Core developers
+# Copyright (c) 2019 The Dash Core developers
+# Copyright (c) 2026 The GoByte Core developers
 # Distributed under the MIT software license, see the accompanying
 # file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -108,6 +109,7 @@ EXPECTED_HOLDER_NAMES = [
     "Jan-Klaas Kollhof\n",
     "Sam Rushing\n",
     "ArtForz -- public domain half-a-node\n",
+    "The Dash Core developers\n",
     "The GoByte Core developers\n",
 ]
 
