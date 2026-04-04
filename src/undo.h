@@ -25,7 +25,8 @@ class TxInUndoSerializer
 public:
     template<typename Stream>
     void Serialize(Stream &s) const {
-        ::Serialize(s, VARINT(txout->nHeight * 2 + (txout->fCoinBase ? 1 : 0)));
+        const uint32_t nCode = txout->nHeight * 2 + (txout->fCoinBase ? 1 : 0);
+        ::Serialize(s, VARINT(nCode));
         if (txout->nHeight > 0) {
             // Required to maintain compatibility with older undo format.
             ::Serialize(s, (unsigned char)0);
