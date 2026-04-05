@@ -4,6 +4,7 @@ GoByte Core staging tree
 |CI|master|develop|
 |-|-|-|
 |GitHub|[![CI](https://github.com/gobytecoin/gobyte/actions/workflows/build.yml/badge.svg?branch=master)](https://github.com/gobytecoin/gobyte/actions/workflows/build.yml)|[![CI](https://github.com/gobytecoin/gobyte/actions/workflows/build.yml/badge.svg?branch=develop)](https://github.com/gobytecoin/gobyte/actions/workflows/build.yml)|
+|PR Reviews|-|![CodeRabbit Pull Request Reviews](https://img.shields.io/coderabbit/prs/github/gobytecoin/gobyte?utm_source=oss&utm_medium=github&utm_campaign=gobytecoin%2Fgobyte&labelColor=171717&color=FF570A&link=https%3A%2F%2Fcoderabbit.ai&label=CodeRabbit+Reviews)|
 
 https://www.gobyte.network
 
