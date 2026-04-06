@@ -46,7 +46,9 @@
 
 #include <QApplication>
 #include <QDebug>
+#include <QProcessEnvironment>
 #include <QLibraryInfo>
+#include <QtGlobal>
 #include <QLocale>
 #include <QMessageBox>
 #include <QProcess>
@@ -598,6 +600,33 @@ int main(int argc, char *argv[])
 #endif
 #ifdef Q_OS_MAC
     QApplication::setAttribute(Qt::AA_DontShowIconsInMenus);
+#endif
+
+    // Set XKB environment variables for compatibility with modern Linux/Wayland.
+    // This fixes keyboard input issues on Ubuntu 24.04 and similar systems.
+    // Only set if not already defined by the user.
+#if defined(Q_OS_LINUX)
+    QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
+
+    // 1. Fix XKB Path: Resolves "failed to add default include path auto"
+    // Standard on Ubuntu 18.04 through 26.04.
+    if (!env.contains("QT_XKB_CONFIG_ROOT")) {
+        qputenv("QT_XKB_CONFIG_ROOT", "/usr/share/X11/xkb");
+    }
+
+    // 2. Force XCB: Ensures stability for legacy Qt event loops on Wayland-default distros.
+    if (!env.contains("QT_QPA_PLATFORM")) {
+        qputenv("QT_QPA_PLATFORM", "xcb");
+    }
+
+    // 3. Targeted IBus Fix: Only disable IM_MODULE if IBus is detected active.
+    // This prevents the 'dead-input' bug on Ubuntu 24.04/GNOME 46 while
+    // preserving IME support for users on Fcitx or other frameworks.
+    if (!env.contains("QT_IM_MODULE")) {
+        if (env.contains("IBUS_DAEMON_PID") || env.contains("IBUS_ADDRESS")) {
+            qputenv("QT_IM_MODULE", "none");
+        }
+    }
 #endif
 
     BitcoinApplication app(argc, argv);

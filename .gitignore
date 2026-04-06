@@ -120,6 +120,7 @@ test/cache/*
 .project
 .autotools
 /doc/doxygen/
+test/lint/.cppcheck
 
 libgobyteconsensus.pc
 contrib/devtools/split-debug.sh
